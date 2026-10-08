@@ -17,7 +17,7 @@ function MenuController.Start()
 	local gui = UI.screenGui("MainMenu", 4)
 	-- Abajo a la izquierda: arriba a la izquierda está la ventana del chat de Roblox
 	local column = UI.make("Frame", {
-		AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 16, 1, -84), Size = UDim2.fromOffset(200, 300),
+		AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 16, 1, -84), Size = UDim2.fromOffset(200, 460),
 		BackgroundTransparency = 1,
 	}, gui)
 	UI.make("UIListLayout", {
@@ -60,8 +60,49 @@ function MenuController.Start()
 	end)
 
 	menuButton(column, 4, "Store", "Tienda", Color3.fromRGB(90, 220, 255)).Activated:Connect(StoreController.Toggle)
+	-- Ruleta Maldita (con aviso cuando tienes la tirada gratis del día)
+	local rouletteButton = menuButton(column, 5, "Chest", "Ruleta", Color3.fromRGB(255, 50, 90))
+	rouletteButton.Activated:Connect(function()
+		require(script.Parent:WaitForChild("RouletteController")).Toggle()
+	end)
+	local freeBadge = UI.label(rouletteButton, {
+		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(1, -10, 0, 4), Size = UDim2.fromOffset(58, 22),
+		BackgroundTransparency = 0, BackgroundColor3 = UI.Colors.Green, Text = "¡GRATIS!", TextSize = 11, Font = Enum.Font.GothamBlack,
+		TextXAlignment = Enum.TextXAlignment.Center, Visible = false, ZIndex = 3,
+	})
+	UI.corner(freeBadge, 11)
+	local StateController = require(script.Parent:WaitForChild("StateController"))
+	local function refreshBadge()
+		local st = StateController.Get()
+		local r = st and st.Roulette
+		local todayDay = math.floor(StateController.Now() / 86400)
+		freeBadge.Visible = st ~= nil and (not r or r.Day ~= todayDay or not r.FreeUsed)
+	end
+	StateController.Changed:Connect(refreshBadge)
+	task.spawn(function()
+		while true do
+			refreshBadge()
+			task.wait(30)
+		end
+	end)
+
+	-- Misiones diarias (con el nº de misiones para cobrar)
+	local questButton = menuButton(column, 6, "Codes", "Misiones", Color3.fromRGB(80, 230, 130))
+	local QuestController = require(script.Parent:WaitForChild("QuestController"))
+	questButton.Activated:Connect(QuestController.Toggle)
+	local questBadge = UI.label(questButton, {
+		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(1, -4, 0, 4), Size = UDim2.fromOffset(24, 24),
+		BackgroundTransparency = 0, BackgroundColor3 = UI.Colors.Red, Text = "", TextSize = 12, Font = Enum.Font.GothamBlack,
+		TextXAlignment = Enum.TextXAlignment.Center, Visible = false, ZIndex = 3,
+	})
+	UI.corner(questBadge, 12)
+	QuestController.ClaimableChanged:Connect(function(count)
+		questBadge.Visible = count > 0
+		questBadge.Text = tostring(count)
+	end)
+
 	-- El tutorial es opcional: se puede empezar (o repetir) cuando quieras desde aquí
-	menuButton(column, 5, "Story", "Tutorial", Color3.fromRGB(120, 230, 150)).Activated:Connect(function()
+	menuButton(column, 7, "Story", "Tutorial", Color3.fromRGB(120, 230, 150)).Activated:Connect(function()
 		require(script.Parent:WaitForChild("TutorialController")).Restart()
 	end)
 

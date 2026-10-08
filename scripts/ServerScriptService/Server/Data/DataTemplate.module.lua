@@ -50,7 +50,9 @@ return {
 	Login = { LastDay = 0, Streak = 0 }, -- recompensa diaria con racha
 	RedeemedCodes = {}, -- [CÓDIGO] = true
 	Tutorial = { Done = false },
-	Obby = { LastRewardDay = 0, BestTime = 0, Clears = 0 }, -- obby: premio 1 vez al día y mejor tiempo
+	Obby = { LastRewardDay = 0, BestTime = 0, Clears = 0 },
+	Roulette = { Day = 0, FreeUsed = false, Paid = 0 },
+	Quests = { Day = 0, List = {}, BonusClaimed = false }, -- misiones diarias -- Ruleta Maldita: tirada gratis diaria + tiradas de pago del día -- obby: premio 1 vez al día y mejor tiempo
 
 	PurchaseHistory = {}, -- PurchaseIds de Developer Products ya entregados (evita duplicados)
 	GemLedger = {}, -- últimas transacciones de gemas (auditoría / soporte)

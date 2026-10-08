@@ -296,6 +296,10 @@ local function runMatch(players: { Player }, mode: string)
 			end
 		end)
 		services.DataService.PushState(player)
+		services.QuestService.Add(player, "Matches", 1)
+		if won then
+			services.QuestService.Add(player, "Wins", 1)
+		end
 	end
 
 	if winner and #ranking > 1 then

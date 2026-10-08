@@ -44,6 +44,12 @@ function CombatService.OnHit(fn)
 	table.insert(hitListeners, fn)
 end
 
+-- Avisos de "empieza un movimiento" (misiones: técnicas especiales usadas)
+local moveListeners = {}
+function CombatService.OnMoveStarted(fn)
+	table.insert(moveListeners, fn)
+end
+
 -- Quién golpeó por última vez a la víctima (para dar el crédito del KO)
 function CombatService.GetLastAttacker(victim: Model, window: number): Model?
 	local entry = lastAttacker[victim]
@@ -357,6 +363,9 @@ function CombatService.PerformAttack(model: Model, kind: string, dir: string, fa
 		then Vector3.new(move.SelfVelocity.X * facing, move.SelfVelocity.Y, 0)
 		else nil
 	feedback:FireAllClients("MoveStarted", model, key, selfVelocity, facing)
+	for _, fn in moveListeners do
+		task.spawn(fn, model, key)
+	end
 	-- Los NPC no tienen cliente: el impulso propio lo aplica el servidor
 	if selfVelocity and not Players:GetPlayerFromCharacter(model) then
 		hrp.AssemblyLinearVelocity = selfVelocity

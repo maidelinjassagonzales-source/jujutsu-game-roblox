@@ -127,6 +127,8 @@ UnlockService.Handlers.BuySkin = function(player: Player, skinId: any)
 		return result(false, "Esta skin solo se consigue en el Pase de Batalla")
 	elseif skin.StoryOnly then
 		return result(false, "Esta skin se consigue completando el Modo Historia")
+	elseif skin.RouletteOnly then
+		return result(false, "Esta skin solo sale en la Ruleta Maldita")
 	end
 	local currency = if skin.PriceGems then "Gems" else "Coins"
 	local price = skin.PriceGems or skin.PriceCoins

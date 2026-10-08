@@ -188,6 +188,9 @@ function UltimateService.Activate(model: Model): boolean
 		cfg = if jackpot then cfg.Jackpot else cfg.Miss
 	end
 	local windup = UltimateConfig.WindupFor(cfg.Kind)
+	if services.QuestService then
+		services.QuestService.Add(Players:GetPlayerFromCharacter(model), "Ults", 1)
+	end
 	model:SetAttribute("Ult", 0)
 	model:SetAttribute("UltActive", true)
 	model:SetAttribute("Invulnerable", true)

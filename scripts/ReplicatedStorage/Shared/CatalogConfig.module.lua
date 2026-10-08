@@ -153,6 +153,17 @@ CatalogConfig.Skins = {
 		Colors = { Head = C(240, 200, 165), Torso = C(40, 80, 200), Arms = C(240, 200, 165), Legs = C(40, 80, 200) },
 		Aura = C(80, 200, 255),
 	},
+	-- Exclusivas de la RULETA MALDITA (solo salen ahí, muy raras)
+	CursedKing_TrueForm = {
+		Character = "CursedKing", Name = "Forma Verdadera del Rey", Premium = true, RouletteOnly = true,
+		Colors = { Head = C(200, 150, 125), Torso = C(25, 5, 8), Arms = C(200, 150, 125), Legs = C(90, 10, 15) },
+		Aura = C(255, 20, 40),
+	},
+	Sorcerer_Honored = {
+		Character = "Sorcerer", Name = "El Honrado", Premium = true, RouletteOnly = true,
+		Colors = { Head = C(245, 225, 205), Torso = C(250, 250, 255), Arms = C(250, 250, 255), Legs = C(220, 225, 240) },
+		Aura = C(140, 220, 255),
+	},
 	RubberPirate_Gear = {
 		Character = "RubberPirate", Name = "Quinta Marcha", Premium = true, PriceGems = 650,
 		Colors = { Head = C(245, 235, 230), Torso = C(240, 240, 240), Arms = C(245, 235, 230), Legs = C(220, 220, 230) },

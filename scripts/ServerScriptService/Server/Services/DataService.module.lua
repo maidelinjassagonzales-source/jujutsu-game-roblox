@@ -194,6 +194,8 @@ function DataService.BuildState(player: Player)
 		RedeemedCodes = d.RedeemedCodes,
 		Tutorial = d.Tutorial,
 		Obby = d.Obby,
+		Roulette = d.Roulette,
+		Quests = d.Quests,
 		Stats = { Wins = d.Stats.Wins, KOs = d.Stats.KOs, Matches = d.Stats.Matches, BestStreak = d.Stats.BestStreak, StoryClears = d.Stats.StoryClears },
 	}
 end

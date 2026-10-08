@@ -175,6 +175,7 @@ ObbyService.Handlers.ObbyFinish = function(player: Player)
 		text = "  (premio de hoy ya cobrado)"
 	end
 	services.DataService.PushState(player)
+	services.QuestService.Add(player, "Obby", 1)
 	local t = string.format("%d:%04.1f", elapsed // 60, elapsed % 60)
 	return { ok = true, msg = `¡Obby completada en {t}!{if isRecord then " ¡NUEVO RÉCORD!" else ""}{text}`, Time = elapsed, Record = isRecord }
 end

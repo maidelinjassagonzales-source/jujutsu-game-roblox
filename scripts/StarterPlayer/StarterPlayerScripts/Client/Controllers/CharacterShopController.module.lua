@@ -172,6 +172,11 @@ local function skinRow(parent: Instance, order: number, skinId: string, skin)
 		UI.button(row, "Pase de Batalla", UI.Colors.Disabled, props).AutoButtonColor = false
 	elseif skin.StoryOnly then
 		UI.button(row, "Modo Historia", UI.Colors.Disabled, props).AutoButtonColor = false
+	elseif skin.RouletteOnly then
+		local b = UI.button(row, "Ruleta Maldita", Color3.fromRGB(255, 50, 90), props)
+		b.Activated:Connect(function()
+			require(script.Parent:WaitForChild("RouletteController")).Open()
+		end)
 	else
 		local gems = skin.PriceGems ~= nil
 		local price = skin.PriceGems or skin.PriceCoins

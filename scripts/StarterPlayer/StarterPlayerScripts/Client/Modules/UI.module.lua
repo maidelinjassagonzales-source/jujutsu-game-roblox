@@ -33,7 +33,7 @@ UI.Icons = {
 -- Emoji -> icono (para quitar los emojis de los títulos)
 local EMOJI_ICONS = {
 	["⚔️"] = "Play", ["🥋"] = "Characters", ["🎫"] = "Pass", ["🛒"] = "Store", ["🎁"] = "Rewards", ["📖"] = "Story",
-	["💎"] = "Gems", ["🔮"] = "Coins", ["🏯"] = "Lobby", ["🗡️"] = "Duel", ["⚡"] = "Boost", ["🎟️"] = "Codes",
+	["💎"] = "Gems", ["🔮"] = "Coins", ["🏯"] = "Lobby", ["🗡️"] = "Duel", ["⚡"] = "Boost", ["🎟️"] = "Codes", ["🎰"] = "Chest", ["📜"] = "Codes",
 }
 
 function UI.icon(parent: Instance, name: string, props): ImageLabel
@@ -450,7 +450,7 @@ local modals = {}
 
 -- Kanji de marca de agua según el icono de la ventana
 local WATERMARK = {
-	Characters = "術", Pass = "札", Store = "店", Play = "戦", Rewards = "賞", Story = "語", Codes = "符", Gems = "晶",
+	Characters = "術", Pass = "札", Store = "店", Play = "戦", Rewards = "賞", Story = "語", Codes = "符", Gems = "晶", Chest = "運",
 }
 
 function UI.modal(gui: ScreenGui, title: string, size: UDim2, accent: Color3)
