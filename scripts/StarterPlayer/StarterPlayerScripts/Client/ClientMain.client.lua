@@ -34,7 +34,7 @@ local CONTROLLERS = {
 	"EffectsController", "PoseController", "LightingController",
 	"StateController", "CurrencyController", "StoreController", "CharacterShopController", "BattlePassController",
 	"StoryController", "PlayMenuController", "LobbyController",
-	"GoalController", "MatchUIController", "MenuController", "SoundController", "TitleController", "CinematicController", "RewardsController", "TutorialController", "UltimateController", "StageSelectController", "ObbyController", "RouletteController", "QuestController",
+	"GoalController", "MatchUIController", "MenuController", "SoundController", "TitleController", "CinematicController", "RewardsController", "TutorialController", "UltimateController", "StageSelectController", "ObbyController", "RouletteController", "QuestController", "EventController",
 }
 
 for _, name in CONTROLLERS do

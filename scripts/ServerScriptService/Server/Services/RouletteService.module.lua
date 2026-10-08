@@ -68,7 +68,9 @@ RouletteService.Handlers.Spin = function(player: Player, mode: any)
 			if data.Roulette.Paid >= RouletteConfig.MaxPaidPerDay then
 				return result(false, `Máximo {RouletteConfig.MaxPaidPerDay} tiradas al día. ¡Vuelve mañana!`)
 			end
-			if not services.EconomyService.SpendCurrency(player, "Coins", RouletteConfig.SpinCostCoins, "Ruleta") then
+			-- Evento "Fortuna Maldita": mitad de precio
+			local cost = if services.EventService and services.EventService.Active() == "Fortune" then RouletteConfig.SpinCostCoins // 2 else RouletteConfig.SpinCostCoins
+			if not services.EconomyService.SpendCurrency(player, "Coins", cost, "Ruleta") then
 				return result(false, "No tienes suficientes Monedas Malditas")
 			end
 			services.DataService.Update(player, function(d)

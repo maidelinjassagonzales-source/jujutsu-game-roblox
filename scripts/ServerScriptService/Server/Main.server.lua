@@ -58,6 +58,7 @@ local services = {
 	ObbyService = load("ObbyService"),
 	RouletteService = load("RouletteService"),
 	QuestService = load("QuestService"),
+	EventService = load("EventService"),
 	EconomyFeedback = remotes.EconomyFeedback,
 }
 local S = services
@@ -83,10 +84,11 @@ S.ColorSlotService.Start() -- colores alternativos si se repite personaje
 S.ObbyService.Start(services) -- obby "Ascenso Maldito"
 S.RouletteService.Start(services) -- Ruleta Maldita
 S.QuestService.Start(services) -- misiones diarias
+S.EventService.Start(services) -- eventos aleatorios
 
 -- Enrutador de peticiones: el cliente pide, el servidor valida y responde { ok, msg }
 local handlers = {}
-for _, service in { S.UnlockService, S.BattlePassService, S.MatchService, S.StoryService, S.LobbyService, S.RewardsService, S.StoreService, S.ObbyService, S.RouletteService, S.QuestService } do
+for _, service in { S.UnlockService, S.BattlePassService, S.MatchService, S.StoryService, S.LobbyService, S.RewardsService, S.StoreService, S.ObbyService, S.RouletteService, S.QuestService, S.EventService } do
 	for action, fn in service.Handlers do
 		handlers[action] = fn
 	end

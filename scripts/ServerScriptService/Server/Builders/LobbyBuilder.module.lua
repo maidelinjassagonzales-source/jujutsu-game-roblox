@@ -50,7 +50,49 @@ function LobbyBuilder.Build(): Model
 			CanCollide = collide ~= false,
 		})
 	end
-	local function sign(pos: Vector3, text: string, color: Color3, width: number?)
+	-- Cartel: texto a pincel + estructura física para que no flote "en la nada".
+	--   mode = "gate"  -> puerta de madera con dos pilares hasta el suelo, travesaño y tejadillo
+	--   mode = "plaque" (por defecto en carteles altos) -> placa lacada con marco dorado
+	--   mode = "none"  -> solo texto (carteles bajos o pegados a una fachada)
+	local function sign(pos: Vector3, text: string, color: Color3, width: number?, mode: string?)
+		local w = (width or 18) * 1.05
+		mode = mode or (if pos.Y > 8 then "plaque" else "none")
+		if mode ~= "none" then
+			-- las puertas miran al camino central (eje X); las placas, hacia la plaza
+			local look = if mode == "gate" then Vector3.new(0, pos.Y, pos.Z) - pos else Vector3.new(0, pos.Y, 30) - pos
+			local facing = if look.Magnitude > 1 then CFrame.lookAt(pos, pos + Vector3.new(look.X, 0, look.Z)) else CFrame.new(pos)
+			local h = 4.2
+			part({ Size = Vector3.new(w, h, 0.6), CFrame = facing * CFrame.new(0, 0, 0.6), Color = C(40, 18, 20), Material = M.Wood, CanCollide = false })
+			-- marco dorado
+			for _, dy in { h / 2, -h / 2 } do
+				part({ Size = Vector3.new(w + 0.6, 0.35, 0.7), CFrame = facing * CFrame.new(0, dy, 0.55), Color = C(220, 170, 60), Material = M.Metal, CanCollide = false })
+			end
+			for _, dx in { w / 2, -w / 2 } do
+				part({ Size = Vector3.new(0.35, h + 0.6, 0.7), CFrame = facing * CFrame.new(dx, 0, 0.55), Color = C(220, 170, 60), Material = M.Metal, CanCollide = false })
+			end
+			if mode == "gate" then
+				local floorY = 0
+				for _, dx in { w / 2 + 1.2, -w / 2 - 1.2 } do
+					local top = facing * CFrame.new(dx, h / 2 + 1.5, 0.6)
+					local height = top.Position.Y - floorY
+					part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(height, 1.6, 1.6),
+						CFrame = CFrame.new(top.Position.X, floorY + height / 2, top.Position.Z) * CFrame.Angles(0, 0, math.rad(90)), Color = C(150, 30, 35), Material = M.Wood })
+					part({ Size = Vector3.new(2.6, 1.2, 2.6), Position = Vector3.new(top.Position.X, 0.6, top.Position.Z), Color = C(70, 65, 70), Material = M.Slate })
+				end
+				-- travesaño y tejadillo
+				part({ Size = Vector3.new(w + 6, 1.2, 1.8), CFrame = facing * CFrame.new(0, h / 2 + 1.6, 0.6), Color = C(150, 30, 35), Material = M.Wood })
+				part({ Size = Vector3.new(w + 9, 1, 3.4), CFrame = facing * CFrame.new(0, h / 2 + 2.6, 0.6), Color = C(35, 30, 35), Material = M.Slate })
+				-- farolillos colgando de los extremos
+				for _, dx in { w / 2 - 1, -w / 2 + 1 } do
+					local l = part({ Shape = Enum.PartType.Ball, Size = Vector3.new(1.6, 2, 1.6), CFrame = facing * CFrame.new(dx, -h / 2 - 1.4, 0.6),
+						Color = C(255, 120, 80), Material = M.Neon, CanCollide = false })
+					local pl = Instance.new("PointLight")
+					pl.Color = C(255, 160, 110)
+					pl.Range = 12
+					pl.Parent = l
+				end
+			end
+		end
 		local anchor = part({ Size = Vector3.one, Position = pos, Transparency = 1, CanCollide = false, CanQuery = false, CanTouch = false })
 		local gui = Instance.new("BillboardGui")
 		gui.Name = "Sign"
@@ -196,7 +238,7 @@ function LobbyBuilder.Build(): Model
 	end
 	part({ Size = Vector3.new(20, 1.6, 3.2), Position = Vector3.new(0, 16.6, -110.5), Color = DARK_WOOD })
 	part({ Size = Vector3.new(22, 0.6, 6), Position = Vector3.new(0, 0.3, -107), Color = C(150, 145, 140), Material = M.Slate })
-	sign(Vector3.new(0, 20.5, -108), "SALA DE PERSONAJES", C(255, 170, 210), 22)
+	sign(Vector3.new(0, 20.5, -108), "SALA DE PERSONAJES", C(255, 170, 210), 22, "none") -- va pegado a la fachada
 	-- Tejadillo sobre la entrada
 	part({ Size = Vector3.new(26, 0.8, 6), CFrame = CFrame.new(0, 18.2, -106.5) * CFrame.Angles(math.rad(-12), 0, 0), Color = C(55, 58, 72), Material = M.Slate })
 	for _, x in { -11, 11 } do
@@ -408,7 +450,7 @@ function LobbyBuilder.Build(): Model
 	veil.SpreadAngle = Vector2.new(180, 180)
 	veil.Parent = storyGate
 	prompt(storyGate, "OpenStory", "Abrir", "Modo Historia")
-	sign(Vector3.new(-96, 24, -10), "MODO HISTORIA", C(210, 170, 255), 22)
+	sign(Vector3.new(-72, 23, -10), "MODO HISTORIA", C(210, 170, 255), 20, "gate")
 	for _, z in { -26, 6 } do
 		lantern(Vector3.new(-86, 1, z))
 	end
@@ -416,8 +458,10 @@ function LobbyBuilder.Build(): Model
 	-- ===== Delante a la izquierda: portal de la OBBY "Ascenso Maldito"
 	do
 		local obbyColor = C(255, 170, 60)
-		local base = CFrame.new(-112, 0, 72) * CFrame.Angles(0, math.rad(90), 0)
-		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(1, 26, 26), CFrame = CFrame.new(-106, 0.5, 72) * CFrame.Angles(0, 0, math.rad(90)), Color = C(85, 80, 90), Material = M.Slate })
+		-- (delante a la izquierda, entre el santuario y el estanque)
+		local OZ = 40
+		local base = CFrame.new(-124, 0, OZ) * CFrame.Angles(0, math.rad(90), 0)
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(1, 24, 24), CFrame = CFrame.new(-118, 0.5, OZ) * CFrame.Angles(0, 0, math.rad(90)), Color = C(85, 80, 90), Material = M.Slate })
 		local mesh = nil
 		if useMeshes then
 			mesh = Env.Place(model, "PortalStone", base, 1.05, { CanCollide = true })
@@ -428,9 +472,9 @@ function LobbyBuilder.Build(): Model
 			end
 		end
 		if not mesh then
-			torii(Vector3.new(-110, 0, 72), 12, 16, obbyColor, true)
+			torii(Vector3.new(-122, 0, OZ), 12, 16, obbyColor, true)
 		end
-		local gate = part({ Name = "ObbyGate", Size = Vector3.new(0.6, 13, 11), Position = Vector3.new(-110, 7.5, 72), Color = obbyColor, Material = M.Neon,
+		local gate = part({ Name = "ObbyGate", Size = Vector3.new(0.6, 13, 11), Position = Vector3.new(-122, 7.5, OZ), Color = obbyColor, Material = M.Neon,
 			Transparency = if mesh then 1 else 0.3, CanCollide = false })
 		local gl = Instance.new("PointLight")
 		gl.Color = obbyColor
@@ -438,16 +482,27 @@ function LobbyBuilder.Build(): Model
 		gl.Brightness = 2.5
 		gl.Parent = gate
 		prompt(gate, "Obby", "Entrar", "Obby · Ascenso Maldito")
-		sign(Vector3.new(-106, 22, 72), "OBBY · ASCENSO MALDITO", obbyColor, 20)
-		sign(Vector3.new(-104, 4, 72), "Parkour con premio diario", C(255, 255, 255), 13)
-		for _, z in { 60, 84 } do
-			lantern(Vector3.new(-100, 1, z))
+		sign(Vector3.new(-120, 21, OZ), "OBBY · ASCENSO MALDITO", obbyColor, 18)
+		sign(Vector3.new(-112, 4, OZ), "Parkour con premio diario", C(255, 255, 255), 13)
+		for _, z in { OZ - 12, OZ + 12 } do
+			lantern(Vector3.new(-110, 1, z))
 		end
 	end
 
 	-- ===== Derecha: Sala de Combate (portales + plataformas de cola)
 	part({ Size = Vector3.new(72, 1, 100), Position = Vector3.new(92, 0.5, -10), Color = C(50, 45, 60), Material = M.Slate })
-	sign(Vector3.new(92, 24, -60), "SALA DE COMBATE", C(255, 120, 120), 26)
+	-- Puerta de entrada a la Sala de Combate (antes el cartel flotaba en el aire)
+	sign(Vector3.new(62, 18, -10), "SALA DE COMBATE", C(255, 120, 120), 24, "gate")
+	-- Barandilla de madera alrededor de la sala (con hueco en la entrada)
+	for _, seg in { { 56.5, -58, 56.5, -26 }, { 56.5, 6, 56.5, 38 }, { 56.5, 38, 128, 38 }, { 56.5, -58, 128, -58 } } do
+		local a, b = Vector3.new(seg[1], 2.4, seg[2]), Vector3.new(seg[3], 2.4, seg[4])
+		local len = (b - a).Magnitude
+		part({ Size = Vector3.new(0.6, 0.5, len), CFrame = CFrame.lookAt((a + b) / 2, b), Color = C(130, 35, 40), Material = M.Wood, CanCollide = false })
+		for k = 0, math.floor(len / 6) do
+			local p = a:Lerp(b, k * 6 / len)
+			part({ Size = Vector3.new(0.7, 2.6, 0.7), Position = Vector3.new(p.X, 1.3, p.Z), Color = C(90, 25, 30), Material = M.Wood, CanCollide = false })
+		end
+	end
 	local portals = {
 		{ Mode = "FFA", Z = -40, Color = C(220, 60, 70), Title = "PARTIDA RÁPIDA" },
 		{ Mode = "Duel", Z = -10, Color = C(230, 140, 30), Title = "DUELO 1V1" },
@@ -579,9 +634,9 @@ function LobbyBuilder.Build(): Model
 			end
 		end
 	end
-	for _, pos in { Vector3.new(-128, 0, 96), Vector3.new(128, 0, 96), Vector3.new(-128, 0, -100), Vector3.new(128, 0, -100), Vector3.new(-40, 0, 80), Vector3.new(40, 0, 80), Vector3.new(-128, 0, 60), Vector3.new(128, 0, 60),
+	for _, pos in { Vector3.new(-128, 0, 96), Vector3.new(128, 0, 96), Vector3.new(-128, 0, -100), Vector3.new(128, 0, -100), Vector3.new(-40, 0, 80), Vector3.new(40, 0, 80), Vector3.new(128, 0, 60),
 		Vector3.new(-34, 0, 30), Vector3.new(34, 0, 30), Vector3.new(-34, 0, -40), Vector3.new(34, 0, -40),
-		Vector3.new(-128, 0, 20), Vector3.new(128, 0, 20), Vector3.new(-100, 0, 96), Vector3.new(100, 0, 96) } do
+		Vector3.new(128, 0, 20), Vector3.new(-100, 0, 96), Vector3.new(100, 0, 96) } do
 		tree(pos, 1.2)
 	end
 	for _, x in { -24, 24 } do
@@ -589,6 +644,57 @@ function LobbyBuilder.Build(): Model
 			lantern(Vector3.new(x, 0, z))
 		end
 	end
+	-- Bordillos de piedra a los lados del camino central
+	for _, x in { -8.4, 8.4 } do
+		part({ Size = Vector3.new(0.8, 0.5, 196), Position = Vector3.new(x, 0.25, 2), Color = C(95, 90, 88), Material = M.Slate })
+	end
+	-- Tiras de farolillos de papel (chōchin) cruzando el camino central
+	for _, z in { 66, 36, -28, -58 } do -- (sin tapar la estatua del centro)
+		for _, x in { -11, 11 } do
+			cylY(Vector3.new(x, 7, z), 14, 0.7, C(60, 40, 35), M.Wood)
+		end
+		for i = 0, 8 do
+			local k = i / 8
+			local x = -11 + 22 * k
+			local sag = math.sin(k * math.pi) * 2.2
+			local lamp = part({
+				Shape = Enum.PartType.Ball, Size = Vector3.new(1.3, 1.7, 1.3), Position = Vector3.new(x, 13 - sag, z),
+				Color = if i % 2 == 0 then C(255, 90, 70) else C(255, 235, 200), Material = M.Neon, CanCollide = false, CastShadow = false,
+			})
+			if i == 4 then
+				local pl = Instance.new("PointLight")
+				pl.Color = C(255, 170, 120)
+				pl.Range = 16
+				pl.Brightness = 1.2
+				pl.Parent = lamp
+			end
+		end
+		part({ Size = Vector3.new(22, 0.12, 0.12), Position = Vector3.new(0, 13.6, z), Color = C(30, 25, 25), CanCollide = false })
+	end
+	-- Banderas nobori con kanji a los lados del camino
+	local KANJI = { "呪", "術", "高", "専", "祓", "魂" }
+	for i, z in { 80, 50, 20, -10, -40, -70 } do
+		for _, x in { -14, 14 } do
+			cylY(Vector3.new(x, 6, z), 12, 0.4, C(40, 30, 30), M.Wood)
+			local flag = part({ Size = Vector3.new(0.1, 8, 2.6), Position = Vector3.new(x, 7.5, z + 1.4), Color = if i % 2 == 0 then C(150, 25, 35) else C(30, 30, 60), Material = M.Fabric, CanCollide = false })
+			for _, face in { Enum.NormalId.Left, Enum.NormalId.Right } do
+				local g = Instance.new("SurfaceGui")
+				g.Face = face
+				g.CanvasSize = Vector2.new(60, 180)
+				g.LightInfluence = 0.5
+				g.Parent = flag
+				local t = Instance.new("TextLabel")
+				t.Size = UDim2.fromScale(1, 1)
+				t.BackgroundTransparency = 1
+				t.Text = KANJI[i]
+				t.TextScaled = true
+				t.Font = Enum.Font.GothamBlack
+				t.TextColor3 = C(255, 225, 160)
+				t.Parent = g
+			end
+		end
+	end
+
 	for _, z in { -55, -25, 5, 35 } do -- Sala de Combate iluminada
 		lantern(Vector3.new(76, 0, z))
 		lantern(Vector3.new(130, 0, z))
