@@ -1,0 +1,20 @@
+-- GENERADO por tools/gen_audio.py: dónde está cada efecto dentro de SFX.wav (segundos).
+return {
+	HitLight = { Start = 0.0, Length = 0.18 },
+	HitHeavy = { Start = 0.33, Length = 0.45 },
+	Swing = { Start = 0.93, Length = 0.28 },
+	Dash = { Start = 1.36, Length = 0.22 },
+	KO = { Start = 1.73, Length = 1.8 },
+	Shield = { Start = 3.68, Length = 0.35 },
+	ShieldBreak = { Start = 4.18, Length = 0.9 },
+	Jump = { Start = 5.23, Length = 0.16 },
+	Grab = { Start = 5.54, Length = 0.18 },
+	Click = { Start = 5.87, Length = 0.07 },
+	Buy = { Start = 6.09, Length = 0.7 },
+	Count = { Start = 6.94, Length = 0.22 },
+	Go = { Start = 7.31, Length = 0.5 },
+	Special = { Start = 7.96, Length = 0.7 },
+	Victory = { Start = 8.8099, Length = 2.51 },
+	LevelUp = { Start = 11.4699, Length = 1.36 },
+	Domain = { Start = 12.9799, Length = 4.6 },
+}
