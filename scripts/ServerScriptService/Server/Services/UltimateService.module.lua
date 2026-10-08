@@ -55,6 +55,7 @@ local function sureHit(caster: Model, victim: Model, damage: number, kb: number,
 end
 
 -- ===== Tipos de ulti
+local runTransform -- definida más abajo (el dominio de Hakari la usa)
 local function runDomain(model: Model, cfg)
 	local enemies = enemiesOf(model)
 	if cfg.Freeze then
@@ -70,6 +71,7 @@ local function runDomain(model: Model, cfg)
 		end
 		for _, e in enemies do
 			if e.Parent and not e:GetAttribute("KOing") then
+				feedback:FireAllClients("DomainTick", model, e, cfg.Theme)
 				sureHit(model, e, cfg.TickDamage, 3, 80)
 				if cfg.Burn then
 					feedback:FireAllClients("Burn", e)
@@ -81,8 +83,24 @@ local function runDomain(model: Model, cfg)
 	if cfg.Final then
 		for _, e in enemies do
 			if e.Parent and not e:GetAttribute("KOing") then
+				feedback:FireAllClients("DomainTick", model, e, cfg.Theme, true)
 				sureHit(model, e, cfg.Final.Damage, cfg.Final.KB, 40)
 			end
+		end
+	end
+	-- Hakari: al cerrar el dominio, tirada de pachinko -> JACKPOT = transformación
+	if cfg.Jackpot and model.Parent then
+		local won = math.random() < (cfg.JackpotChance or 1 / 3)
+		feedback:FireAllClients("Jackpot", model, won)
+		if won then
+			task.wait(0.8)
+			local j = cfg.Jackpot
+			feedback:FireAllClients("Ultimate", model, {
+				Kind = j.Kind, Name = j.Name, Japanese = j.Japanese, Color = j.Color, Duration = j.Duration, Theme = j.Theme,
+				Windup = 0.6, CharacterId = model:GetAttribute("CharacterId"),
+			})
+			task.wait(0.6)
+			runTransform(model, j)
 		end
 	end
 end
@@ -109,7 +127,7 @@ local function swapHair(model: Model, on: boolean)
 	end
 end
 
-local function runTransform(model: Model, cfg)
+function runTransform(model: Model, cfg)
 	model:SetAttribute("DamageMult", cfg.Damage)
 	model:SetAttribute("SpeedMult", cfg.Speed)
 	model:SetAttribute("JumpMult", cfg.Jump)
@@ -176,7 +194,7 @@ function UltimateService.Activate(model: Model): boolean
 	services.CombatService.SetBusy(model, windup)
 	feedback:FireAllClients("Ultimate", model, {
 		Kind = cfg.Kind, Name = cfg.Name, Japanese = cfg.Japanese, Color = cfg.Color, Duration = cfg.Duration or 1.5,
-		Windup = windup, CharacterId = model:GetAttribute("CharacterId"),
+		Windup = windup, CharacterId = model:GetAttribute("CharacterId"), Theme = cfg.Theme, Canon = cfg.Canon,
 	})
 	task.spawn(function()
 		-- Durante la cinemática todos quedan congelados (el lanzador y, en los dominios, también los rivales)

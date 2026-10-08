@@ -14,6 +14,28 @@ local ArenaInfo = require(Shared:WaitForChild("ArenaInfo"))
 local UltimateConfig = require(Shared:WaitForChild("UltimateConfig"))
 local UI = require(script.Parent.Parent:WaitForChild("Modules"):WaitForChild("UI"))
 local Sfx = require(script.Parent.Parent:WaitForChild("Modules"):WaitForChild("Sfx"))
+local DomainThemes = require(script.Parent.Parent:WaitForChild("Modules"):WaitForChild("DomainThemes"))
+
+-- Color del "cielo" de cada dominio
+local DOMAIN_SKY = {
+	Void = Color3.fromRGB(4, 8, 28), Shrine = Color3.fromRGB(95, 0, 0), Shadow = Color3.fromRGB(4, 2, 10), Hands = Color3.fromRGB(40, 50, 62),
+	Volcano = Color3.fromRGB(70, 18, 0), Swords = Color3.fromRGB(36, 22, 62), Womb = Color3.fromRGB(55, 22, 20), Pachinko = Color3.fromRGB(16, 6, 28),
+	BlackFlash = Color3.fromRGB(12, 0, 0), Ratio = Color3.fromRGB(32, 26, 10), Blood = Color3.fromRGB(55, 0, 6), Clap = Color3.fromRGB(32, 10, 10),
+	Nails = Color3.fromRGB(42, 26, 14),
+}
+
+-- Altura del suelo bajo un punto (para que el escenario del dominio salga del suelo)
+local function groundBelow(position: Vector3): number
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	local ignore = { workspace:FindFirstChild("UltimateFX") }
+	for _, m in game:GetService("CollectionService"):GetTagged("Fighter") do
+		table.insert(ignore, m)
+	end
+	params.FilterDescendantsInstances = ignore
+	local hit = workspace:Raycast(position + Vector3.new(0, 2, 0), Vector3.new(0, -200, 0), params)
+	return if hit then hit.Position.Y else position.Y - 3
+end
 local CameraController = require(script.Parent:WaitForChild("CameraController"))
 
 local player = Players.LocalPlayer
@@ -324,7 +346,8 @@ local function domain(model: Model, info)
 	-- Telón del dominio: tapa el escenario de fondo con el color de la técnica (desde la cámara se ve "dentro")
 	local look = workspace.CurrentCamera.CFrame.LookVector
 	local back = if info.CamSide then Vector3.new(0, 0, -info.CamSide) else Vector3.new(0, 0, if look.Z < 0 then -1 else 1)
-	local backdrop = part({ Size = Vector3.new(700, 400, 1), CFrame = CFrame.lookAt(center + back * 70, center), Color = info.Color:Lerp(Color3.new(0, 0, 0), 0.75),
+	DomainThemes.Build(info.Theme, { Center = center, Back = back, Ground = groundBelow(hrp.Position), Color = info.Color, Duration = dur })
+	local backdrop = part({ Size = Vector3.new(700, 400, 1), CFrame = CFrame.lookAt(center + back * 70, center), Color = DOMAIN_SKY[info.Theme or ""] or info.Color:Lerp(Color3.new(0, 0, 0), 0.75),
 		Material = Enum.Material.Neon, Transparency = 1 })
 	local glow = part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.4, 4, 4), CFrame = CFrame.new(center - Vector3.new(0, 0.6, 0)) * CFrame.Angles(0, 0, math.rad(90)),
 		Color = info.Color, Material = Enum.Material.Neon, Transparency = 0.35 })
@@ -400,6 +423,7 @@ function UltimateController.Start()
 	fxFolder = Instance.new("Folder")
 	fxFolder.Name = "UltimateFX"
 	fxFolder.Parent = workspace
+	DomainThemes.Init(fxFolder)
 
 	gui = UI.screenGui("UltimateFX", 45)
 	gui.IgnoreGuiInset = true
@@ -443,7 +467,7 @@ function UltimateController.Start()
 		TextXAlignment = Enum.TextXAlignment.Center, TextColor3 = Color3.new(1, 1, 1), ZIndex = 6,
 	})
 
-	ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("CombatFeedback").OnClientEvent:Connect(function(kind, a, b, c)
+	ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("CombatFeedback").OnClientEvent:Connect(function(kind, a, b, c, d)
 		if kind == "Ultimate" and typeof(a) == "Instance" and type(b) == "table" then
 			local inMyArena = a:GetAttribute("ArenaId") == myArena()
 			if not inMyArena then
@@ -459,13 +483,20 @@ function UltimateController.Start()
 				task.delay(windup - 0.5, domain, a, b)
 			elseif b.Kind == "Transform" then
 				aura(a, b.Color, (b.Duration or 10) + windup)
+				DomainThemes.Aura(b.Theme, a, (b.Duration or 10) + windup)
 				task.delay(windup * 0.85, function()
 					screenFlash(b.Color, 0.7)
 					CameraController.Shake(1.6, 0.4)
 				end)
 			else
+				DomainThemes.Burst(b.Theme, a, windup)
 				task.delay(windup, screenFlash, b.Color, 0.4)
 			end
+		elseif kind == "DomainTick" and typeof(a) == "Instance" and a:GetAttribute("ArenaId") == myArena() then
+			DomainThemes.Tick(c, b, d)
+		elseif kind == "Jackpot" and typeof(a) == "Instance" and a:GetAttribute("ArenaId") == myArena() then
+			DomainThemes.Jackpot(a, b == true)
+			screenFlash(if b then Color3.fromRGB(255, 225, 60) else Color3.fromRGB(80, 80, 90), 0.6)
 		elseif kind == "BlackFlash" and typeof(b) == "Vector3" then
 			lightning(b, { Color3.fromRGB(10, 0, 0), Color3.fromRGB(230, 20, 40), Color3.fromRGB(20, 0, 10) }, 14, 9)
 			floating(b + Vector3.new(0, 3, 0), "黒閃 ¡DESTELLO NEGRO!", Color3.fromRGB(255, 50, 60), 34)
