@@ -50,6 +50,7 @@ return {
 	Login = { LastDay = 0, Streak = 0 }, -- recompensa diaria con racha
 	RedeemedCodes = {}, -- [CÓDIGO] = true
 	Tutorial = { Done = false },
+	Obby = { LastRewardDay = 0, BestTime = 0, Clears = 0 }, -- obby: premio 1 vez al día y mejor tiempo
 
 	PurchaseHistory = {}, -- PurchaseIds de Developer Products ya entregados (evita duplicados)
 	GemLedger = {}, -- últimas transacciones de gemas (auditoría / soporte)

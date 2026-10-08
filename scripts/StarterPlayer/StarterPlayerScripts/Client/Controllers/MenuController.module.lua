@@ -27,7 +27,7 @@ function MenuController.Start()
 	-- En móvil abajo a la izquierda va el joystick: el menú sube arriba (el chat allí está plegado)
 	if UserInputService.TouchEnabled then
 		column.AnchorPoint = Vector2.new(0, 0)
-		column.Position = UDim2.fromOffset(16, 60)
+		column.Position = UDim2.fromOffset(16, 12) -- ya va por debajo de la barra de Roblox (zona segura)
 		column:FindFirstChildOfClass("UIListLayout").VerticalAlignment = Enum.VerticalAlignment.Top
 	end
 

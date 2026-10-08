@@ -44,7 +44,7 @@ function MobileController.Start()
 		return
 	end
 
-	local gui = UI.screenGui("MobileControls", 6)
+	local gui = UI.screenGui("MobileControls", 6, true)
 
 	-- Joystick dinámico
 	local zone = UI.make("Frame", {

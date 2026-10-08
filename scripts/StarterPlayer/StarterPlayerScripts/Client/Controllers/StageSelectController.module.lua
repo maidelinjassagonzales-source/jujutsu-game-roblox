@@ -41,23 +41,49 @@ local function stageCard(parent: Instance, id: string, order: number, onPick: ()
 	UI.make("UIGradient", { Rotation = 90, Color = ColorSequence.new(info.Colors[1], info.Colors[2]) }, card)
 	local stroke = UI.stroke(card, info.Colors[1]:Lerp(Color3.new(1, 1, 1), 0.4), 2)
 	UI.bounce(card, 1.04)
+	-- Imagen del escenario: el escenario de verdad en 3D (el cielo es el degradado de la tarjeta)
+	local previews = ReplicatedStorage:FindFirstChild("StagePreviews")
+	local template = previews and previews:FindFirstChild(id)
+	if template then
+		local vp = UI.make("ViewportFrame", {
+			Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, ZIndex = 1,
+			Ambient = Color3.fromRGB(170, 160, 180), LightColor = Color3.fromRGB(255, 240, 230), LightDirection = Vector3.new(-0.4, -1, -0.6),
+		}, card)
+		UI.corner(vp, 14)
+		local copy = template:Clone()
+		copy.Parent = vp
+		local cam = Instance.new("Camera")
+		cam.FieldOfView = 40
+		cam.CFrame = CFrame.lookAt(Vector3.new(0, 30, 95), Vector3.new(0, 6, 0))
+		cam.Parent = vp
+		vp.CurrentCamera = cam
+		-- giro lento de cámara para que la tarjeta "viva"
+		task.spawn(function()
+			local t0 = os.clock()
+			while vp.Parent do
+				local a = math.sin((os.clock() - t0) * 0.4) * 0.25
+				cam.CFrame = CFrame.lookAt(Vector3.new(math.sin(a) * 95, 30, math.cos(a) * 95), Vector3.new(0, 6, 0))
+				task.wait(1 / 30)
+			end
+		end)
+	end
 	-- Oscurece la parte de abajo para que se lea el texto (va por debajo de los textos)
 	local shade = UI.make("Frame", {
 		AnchorPoint = Vector2.new(0, 1), Position = UDim2.fromScale(0, 1), Size = UDim2.new(1, 0, 0, 70), BackgroundColor3 = Color3.new(0, 0, 0),
-		BackgroundTransparency = 0.35, BorderSizePixel = 0, ZIndex = 1,
+		BackgroundTransparency = 0.35, BorderSizePixel = 0, ZIndex = 2,
 	}, card)
 	UI.make("UIGradient", { Rotation = -90, Transparency = NumberSequence.new(0, 1) }, shade)
 	UI.label(card, {
 		AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, 6, 0, -14), Size = UDim2.fromOffset(120, 120), Text = info.Kanji,
-		TextScaled = true, Font = Enum.Font.GothamBlack, TextTransparency = 0.55, TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 1,
+		TextScaled = true, Font = Enum.Font.GothamBlack, TextTransparency = if template then 0.75 else 0.55, TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 2,
 	})
 	UI.label(card, {
 		Position = UDim2.new(0, 12, 1, -56), Size = UDim2.new(1, -24, 0, 28), Text = stageName, TextSize = 21, Font = UI.TitleFont,
-		TextStrokeTransparency = 0.3, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 2,
+		TextStrokeTransparency = 0.3, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 3,
 	})
 	UI.label(card, {
 		Position = UDim2.new(0, 12, 1, -28), Size = UDim2.new(1, -24, 0, 18), Text = info.Description, TextSize = 12,
-		TextColor3 = Color3.fromRGB(230, 225, 240), TextStrokeTransparency = 0.5, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 2,
+		TextColor3 = Color3.fromRGB(230, 225, 240), TextStrokeTransparency = 0.5, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 3,
 	})
 	card.Activated:Connect(onPick)
 	return card, stroke
@@ -122,14 +148,14 @@ local function showVote(options: { string }, seconds: number)
 		local count = UI.make("TextLabel", {
 			Position = UDim2.fromOffset(10, 10), Size = UDim2.fromOffset(0, 26), AutomaticSize = Enum.AutomaticSize.X,
 			BackgroundColor3 = Color3.fromRGB(20, 18, 30), BackgroundTransparency = 0.2, Text = "0 votos", TextSize = 13,
-			Font = Enum.Font.GothamBlack, TextColor3 = Color3.new(1, 1, 1), Visible = false, ZIndex = 3,
+			Font = Enum.Font.GothamBlack, TextColor3 = Color3.new(1, 1, 1), Visible = false, ZIndex = 4,
 		}, card)
 		UI.make("UIPadding", { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8) }, count)
 		UI.corner(count, 8)
 		local check = UI.make("TextLabel", {
 			AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.4), Size = UDim2.fromOffset(150, 34),
 			BackgroundColor3 = UI.Colors.Green, Text = "TU VOTO", TextSize = 16, Font = Enum.Font.GothamBlack,
-			TextColor3 = Color3.new(1, 1, 1), Visible = false, Rotation = -6, ZIndex = 3,
+			TextColor3 = Color3.new(1, 1, 1), Visible = false, Rotation = -6, ZIndex = 4,
 		}, card)
 		UI.corner(check, 8)
 		UI.stroke(check, Color3.new(1, 1, 1), 2)
@@ -187,7 +213,7 @@ function StageSelectController.Start()
 	UI.make("UIPadding", { PaddingTop = UDim.new(0, 6), PaddingLeft = UDim.new(0, 4), PaddingRight = UDim.new(0, 4) }, dojoGrid)
 
 	-- Pantalla de votación (no se puede cerrar: dura lo que dura la cuenta atrás)
-	voteGui = UI.screenGui("StageVote", 40)
+	voteGui = UI.screenGui("StageVote", 40, true)
 	voteGui.Enabled = false
 	UI.make("Frame", { Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.new(0, 0, 0), BackgroundTransparency = 0.35, ZIndex = 1 }, voteGui)
 	voteFrame = UI.make("Frame", {

@@ -225,6 +225,9 @@ function HUDController.Start()
 	gui.Name = "SmashHUD"
 	gui.ResetOnSpawn = false
 	gui.IgnoreGuiInset = true
+	pcall(function()
+		gui.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets -- nada debajo de la barra de Roblox
+	end)
 	gui.Parent = player:WaitForChild("PlayerGui")
 
 	container = Instance.new("Frame")
@@ -243,7 +246,7 @@ function HUDController.Start()
 	-- En móvil no se muestran: ahí están el joystick y los botones táctiles.
 	local keys = Instance.new("Frame")
 	keys.Position = UDim2.fromOffset(16, 152)
-	keys.Size = UDim2.fromOffset(220, 230)
+	keys.Size = UDim2.fromOffset(220, 320)
 	keys.BackgroundTransparency = 1
 	keys.Parent = gui
 	UI.autoScale(keys)
@@ -253,7 +256,8 @@ function HUDController.Start()
 
 	local KEYBOARD_ROWS = {
 		{ { "A", "D" }, "Moverse" }, { { "ESPACIO" }, "Saltar ×2" }, { { "J" }, "Golpe" }, { { "K" }, "Fuerte" },
-		{ { "E" }, "Especial" }, { { "R" }, "Ulti" }, { { "W", "S" }, "+ ataque: variantes" }, { { "T" }, "Cambiar personaje" },
+		{ { "E" }, "Especial" }, { { "Q" }, "Escudo / esquivar" }, { { "G" }, "Agarre" }, { { "R" }, "Ulti" },
+		{ { "SHIFT" }, "Correr" }, { { "W", "S" }, "+ ataque: variantes" }, { { "T" }, "Cambiar personaje" },
 	}
 	local GAMEPAD_ROWS = {
 		{ { "A" }, "Saltar ×2" }, { { "X" }, "Golpe" }, { { "Y" }, "Fuerte" }, { { "B" }, "Especial" },

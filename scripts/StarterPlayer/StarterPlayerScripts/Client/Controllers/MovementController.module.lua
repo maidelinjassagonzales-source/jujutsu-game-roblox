@@ -105,6 +105,11 @@ function MovementController.GetCharacter()
 	return character, humanoid, hrp
 end
 
+-- Saltos en el aire usados desde que tocó el suelo (el tutorial lo usa para el doble salto)
+function MovementController.AirJumpsUsed(): number
+	return airJumpsUsed
+end
+
 function MovementController.ResetAirJumps()
 	airJumpsUsed = 0
 end

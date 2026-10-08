@@ -297,7 +297,7 @@ local function playFinish(winner: Model?)
 end
 
 function CinematicController.Start()
-	gui = UI.screenGui("Cinematic", 40)
+	gui = UI.screenGui("Cinematic", 40, true)
 	gui.IgnoreGuiInset = true
 	topBar = UI.make("Frame", { Size = UDim2.new(1, 0, 0, 0), BackgroundColor3 = Color3.new(0, 0, 0), BorderSizePixel = 0, ZIndex = 2 }, gui)
 	bottomBar = UI.make("Frame", {

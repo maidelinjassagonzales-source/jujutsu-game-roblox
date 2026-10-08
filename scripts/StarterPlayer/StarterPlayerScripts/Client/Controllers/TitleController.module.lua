@@ -62,7 +62,7 @@ end
 
 local function build()
 	local pg = player:WaitForChild("PlayerGui")
-	gui = UI.screenGui("Title", 60)
+	gui = UI.screenGui("Title", 60, true)
 
 	local fade = UI.make("Frame", {
 		Name = "Fade", Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.fromRGB(8, 4, 16), BackgroundTransparency = 0.25,

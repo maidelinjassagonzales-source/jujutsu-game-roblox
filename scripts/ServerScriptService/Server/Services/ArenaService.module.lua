@@ -184,6 +184,34 @@ function ArenaService.Start()
 
 	create("Hub", StageConfig.HubStage, Vector3.zero, "Hub")
 
+	-- Vistas previas de los escenarios (para las tarjetas de "elegir escenario"): una copia
+	-- estática de cada uno en ReplicatedStorage.StagePreviews que el cliente pinta en un ViewportFrame
+	task.spawn(function()
+		local previews = ReplicatedStorage:FindFirstChild("StagePreviews") or Instance.new("Folder")
+		previews.Name = "StagePreviews"
+		for _, stageId in StageConfig.MatchPool do
+			if not previews:FindFirstChild(stageId) then
+				local ok, model = pcall(stageModel, stageId)
+				if ok and model then
+					for _, d in model:GetDescendants() do
+						if d:IsA("LuaSourceContainer") or d:IsA("ProximityPrompt") or d:IsA("Sound") then
+							d:Destroy()
+						elseif d:IsA("BasePart") then
+							d.Anchored = true
+							d.CanCollide = false
+							d.CanQuery = false
+							d.CanTouch = false
+						end
+					end
+					model.Name = stageId
+					model:PivotTo(CFrame.new())
+					model.Parent = previews
+				end
+			end
+		end
+		previews.Parent = ReplicatedStorage
+	end)
+
 	local templates = ServerStorage:FindFirstChild("Templates")
 	local template = templates and templates:FindFirstChild("Lobby")
 	local model = if template then template:Clone() else LobbyBuilder.Build()

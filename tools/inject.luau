@@ -39,6 +39,13 @@ for _, svcName in fs.readDir(dir) do
 		visit(dir .. "/" .. svcName, svc)
 	end
 end
+-- El Lobby se construye en vivo con LobbyBuilder (la copia precocinada impedía ver los cambios del código)
+local templates = game:GetService("ServerStorage"):FindFirstChild("Templates")
+local oldLobby = templates and templates:FindFirstChild("Lobby")
+if oldLobby then
+	oldLobby:Destroy()
+	print("Quitada la plantilla precocinada del Lobby")
+end
 -- Carpeta donde se meten los personajes de la Toolbox (ver FighterService)
 local storage = game:GetService("ServerStorage")
 if not storage:FindFirstChild("CharacterModels") then

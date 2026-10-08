@@ -587,11 +587,19 @@ function UI.autoScale(obj: GuiObject, designHeight: number?)
 	return scale
 end
 
-function UI.screenGui(name: string, displayOrder: number?)
-	return UI.make("ScreenGui", {
+-- fullscreen = true -> ocupa toda la pantalla (cinemáticas, controles táctiles, efectos).
+-- Si no, se queda en la zona segura: NUNCA debajo de la barra de Roblox (menú, chat) ni de la muesca del móvil.
+function UI.screenGui(name: string, displayOrder: number?, fullscreen: boolean?)
+	local gui = UI.make("ScreenGui", {
 		Name = name, ResetOnSpawn = false, IgnoreGuiInset = true, DisplayOrder = displayOrder or 0,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling, -- los hijos siempre se dibujan encima de su padre
 	}, Players.LocalPlayer:WaitForChild("PlayerGui"))
+	if not fullscreen then
+		pcall(function()
+			gui.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets
+		end)
+	end
+	return gui
 end
 
 return UI

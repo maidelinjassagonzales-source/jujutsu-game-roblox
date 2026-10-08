@@ -193,6 +193,7 @@ function DataService.BuildState(player: Player)
 		Login = d.Login,
 		RedeemedCodes = d.RedeemedCodes,
 		Tutorial = d.Tutorial,
+		Obby = d.Obby,
 		Stats = { Wins = d.Stats.Wins, KOs = d.Stats.KOs, Matches = d.Stats.Matches, BestStreak = d.Stats.BestStreak, StoryClears = d.Stats.StoryClears },
 	}
 end

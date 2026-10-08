@@ -100,7 +100,7 @@ function GoalController.Start()
 		local activity = player:GetAttribute("Activity")
 		local inHub = activity == "Hub" or activity == "Queue" or activity == nil
 		goalId = findGoal()
-		panel.Visible = goalId ~= nil and inHub
+		panel.Visible = goalId ~= nil and inHub and not player:GetAttribute("InObby") -- en la obby va su marcador
 		if goalId then
 			local priceCoins, priceGems, level = CatalogConfig.GetPrices(goalId)
 			local coins = player:GetAttribute("Coins") or 0
@@ -131,6 +131,7 @@ function GoalController.Start()
 	StateController.Changed:Connect(refresh)
 	player:GetAttributeChangedSignal("Coins"):Connect(refresh)
 	player:GetAttributeChangedSignal("Activity"):Connect(refresh)
+	player:GetAttributeChangedSignal("InObby"):Connect(refresh)
 	task.spawn(function()
 		while true do
 			task.wait(1) -- la cuenta atrás del Acceso Anticipado

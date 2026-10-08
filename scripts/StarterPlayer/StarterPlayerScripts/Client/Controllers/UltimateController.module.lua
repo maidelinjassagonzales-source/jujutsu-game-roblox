@@ -425,7 +425,7 @@ function UltimateController.Start()
 	fxFolder.Parent = workspace
 	DomainThemes.Init(fxFolder)
 
-	gui = UI.screenGui("UltimateFX", 45)
+	gui = UI.screenGui("UltimateFX", 45, true)
 	gui.IgnoreGuiInset = true
 	flash = UI.make("Frame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, ZIndex = 1 }, gui)
 	barTop = UI.make("Frame", { Size = UDim2.fromScale(1, 0), BackgroundColor3 = Color3.new(0, 0, 0), BorderSizePixel = 0, ZIndex = 8 }, gui)

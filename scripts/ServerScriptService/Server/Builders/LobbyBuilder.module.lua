@@ -169,10 +169,17 @@ function LobbyBuilder.Build(): Model
 		Env.Roof(model, CFrame.new(0, 50, SCHOOL_Z), 216, 48, 20, C(55, 58, 72))
 		Env.Roof(model, CFrame.new(0, 21.5, SCHOOL_Z + 18), 208, 10, 3.5, C(55, 58, 72))
 		for x = -97.75, 97.75, 11.5 do
-			part({ Size = Vector3.new(1.2, 48, 1.2), Position = Vector3.new(x, 24, -109.4), Color = DARK_WOOD, Material = M.Wood, CanCollide = false })
+			-- las vigas no pueden caer delante de la puerta (antes tapaban la entrada)
+			if math.abs(x) > 10 then
+				part({ Size = Vector3.new(1.2, 48, 1.2), Position = Vector3.new(x, 24, -109.4), Color = DARK_WOOD, Material = M.Wood, CanCollide = false })
+			end
 		end
-		for _, y in { 0.6, 23, 49.4 } do
+		for _, y in { 23, 49.4 } do
 			part({ Size = Vector3.new(202, 1.2, 1.4), Position = Vector3.new(0, y, -109.4), Color = DARK_WOOD, Material = M.Wood, CanCollide = false })
+		end
+		-- zócalo de madera a ras de suelo, partido en dos para dejar libre la puerta
+		for _, x in { -54.5, 54.5 } do
+			part({ Size = Vector3.new(91, 1.2, 1.4), Position = Vector3.new(x, 0.6, -109.4), Color = DARK_WOOD, Material = M.Wood, CanCollide = false })
 		end
 	end
 	-- Planta baja: muros con la puerta en el centro
@@ -190,6 +197,11 @@ function LobbyBuilder.Build(): Model
 	part({ Size = Vector3.new(20, 1.6, 3.2), Position = Vector3.new(0, 16.6, -110.5), Color = DARK_WOOD })
 	part({ Size = Vector3.new(22, 0.6, 6), Position = Vector3.new(0, 0.3, -107), Color = C(150, 145, 140), Material = M.Slate })
 	sign(Vector3.new(0, 20.5, -108), "SALA DE PERSONAJES", C(255, 170, 210), 22)
+	-- Tejadillo sobre la entrada
+	part({ Size = Vector3.new(26, 0.8, 6), CFrame = CFrame.new(0, 18.2, -106.5) * CFrame.Angles(math.rad(-12), 0, 0), Color = C(55, 58, 72), Material = M.Slate })
+	for _, x in { -11, 11 } do
+		part({ Size = Vector3.new(0.8, 18, 0.8), Position = Vector3.new(x, 9, -104.2), Color = DARK_WOOD, Material = M.Wood })
+	end
 	-- Ventanas de la fachada (las de la puerta no)
 	for row = 0, 2 do
 		for col = -8, 8 do
@@ -209,6 +221,63 @@ function LobbyBuilder.Build(): Model
 	part({ Size = Vector3.new(190, 0.12, 0.5), Position = Vector3.new(0, 0.46, SCHOOL_Z - 3.7), Color = C(220, 180, 70), Material = M.Metal })
 	part({ Size = Vector3.new(190, 0.12, 0.5), Position = Vector3.new(0, 0.46, SCHOOL_Z + 3.7), Color = C(220, 180, 70), Material = M.Metal })
 	part({ Size = Vector3.new(7, 0.1, 18), Position = Vector3.new(0, 0.45, -116), Color = C(150, 25, 35), Material = M.Fabric })
+	-- Techo de madera (antes se veía el bloque de la planta alta) y decoración de las paredes
+	part({ Size = Vector3.new(196, 0.4, 32), Position = Vector3.new(0, 21.9, SCHOOL_Z), Color = C(120, 85, 60), Material = M.WoodPlanks, CanCollide = false })
+	local WAINSCOT = C(70, 45, 35)
+	local PAPER = C(250, 238, 215)
+	-- zócalo de madera + moldura dorada en la pared del fondo y en la de la entrada (dejando libre la puerta)
+	part({ Size = Vector3.new(196, 4, 0.4), Position = Vector3.new(0, 2, -143.8), Color = WAINSCOT, Material = M.Wood })
+	part({ Size = Vector3.new(196, 0.4, 0.5), Position = Vector3.new(0, 4.2, -143.7), Color = C(220, 180, 70), Material = M.Metal })
+	for _, x in { -53.5, 53.5 } do
+		part({ Size = Vector3.new(91, 4, 0.4), Position = Vector3.new(x, 2, -112.2), Color = WAINSCOT, Material = M.Wood })
+		part({ Size = Vector3.new(91, 0.4, 0.5), Position = Vector3.new(x, 4.2, -112.3), Color = C(220, 180, 70), Material = M.Metal })
+	end
+	for _, x in { -98.8, 98.8 } do
+		part({ Size = Vector3.new(0.4, 4, 32), Position = Vector3.new(x, 2, SCHOOL_Z), Color = WAINSCOT, Material = M.Wood })
+	end
+	-- Paneles shoji (papel con celosía de madera) en la pared de la entrada, por dentro
+	local function shoji(center: Vector3, width: number, height: number, z: number)
+		part({ Size = Vector3.new(width, height, 0.2), Position = Vector3.new(center.X, center.Y, z), Color = PAPER, Material = M.SmoothPlastic, CanCollide = false })
+		local function bar(size: Vector3, pos: Vector3)
+			part({ Size = size, Position = pos, Color = DARK_WOOD, Material = M.Wood, CanCollide = false })
+		end
+		local zb = z + (if z < SCHOOL_Z then 0.15 else -0.15)
+		bar(Vector3.new(width + 0.6, 0.5, 0.3), Vector3.new(center.X, center.Y + height / 2, zb))
+		bar(Vector3.new(width + 0.6, 0.5, 0.3), Vector3.new(center.X, center.Y - height / 2, zb))
+		bar(Vector3.new(0.5, height, 0.3), Vector3.new(center.X - width / 2, center.Y, zb))
+		bar(Vector3.new(0.5, height, 0.3), Vector3.new(center.X + width / 2, center.Y, zb))
+		for i = 1, 2 do
+			bar(Vector3.new(0.18, height, 0.25), Vector3.new(center.X - width / 2 + width * i / 3, center.Y, zb))
+			bar(Vector3.new(width, 0.18, 0.25), Vector3.new(center.X, center.Y - height / 2 + height * i / 3, zb))
+		end
+	end
+	for _, x in { -82.5, -67.5, -52.5, -37.5, -22.5, 22.5, 37.5, 52.5, 67.5, 82.5 } do
+		shoji(Vector3.new(x, 11, 0), 9, 9, -112.3)
+	end
+	-- Por dentro de la puerta: marco de madera y noren (cortina partida con el kanji 術)
+	for _, x in { -8.6, 8.6 } do
+		part({ Size = Vector3.new(1.4, 16, 1.2), Position = Vector3.new(x, 8, -112.6), Color = DARK_WOOD, Material = M.Wood })
+	end
+	part({ Size = Vector3.new(20, 1.6, 1.2), Position = Vector3.new(0, 16.6, -112.6), Color = DARK_WOOD, Material = M.Wood })
+	for i, x in { -5.2, 0, 5.2 } do
+		local strip = part({ Size = Vector3.new(4.9, 4.5, 0.1), Position = Vector3.new(x, 13.4, -112.8), Color = C(150, 25, 35), Material = M.Fabric, CanCollide = false })
+		if i == 2 then
+			local g = Instance.new("SurfaceGui")
+			g.Face = Enum.NormalId.Back
+			g.LightInfluence = 0.5
+			g.CanvasSize = Vector2.new(100, 90)
+			g.Parent = strip
+			local t = Instance.new("TextLabel")
+			t.Size = UDim2.fromScale(1, 1)
+			t.BackgroundTransparency = 1
+			t.Text = "術"
+			t.Font = Enum.Font.GothamBlack
+			t.TextScaled = true
+			t.TextColor3 = C(250, 238, 215)
+			t.Parent = g
+		end
+	end
+
 	-- Vigas del techo y farolillos de papel sobre el pasillo
 	for x = -90, 90, 15 do
 		part({ Size = Vector3.new(1.6, 1.6, 34), Position = Vector3.new(x, 21, SCHOOL_Z), Color = DARK_WOOD, Material = M.Wood })
@@ -294,7 +363,41 @@ function LobbyBuilder.Build(): Model
 	part({ Size = Vector3.new(60, 1, 60), Position = Vector3.new(-96, 0.5, -10), Color = C(85, 80, 90), Material = M.Slate })
 	cylY(Vector3.new(-104, 1.2, -10), 1.4, 30, C(60, 45, 80), M.Marble)
 	torii(Vector3.new(-80, 0, -10), 16, 18, C(120, 40, 160), true)
-	local storyGate = part({ Name = "StoryGate", Size = Vector3.new(0.6, 15, 14), Position = Vector3.new(-104, 9, -10), Color = C(110, 40, 180), Material = M.Neon, Transparency = 0.35, CanCollide = false })
+	-- Portal del Modo Historia: el mismo arco de piedra con remolino que los de combate (antes era un bloque morado)
+	local storyColor = C(150, 60, 230)
+	local storyMesh = nil
+	if useMeshes then
+		local base = CFrame.new(-106, 0, -10) * CFrame.Angles(0, math.rad(90), 0)
+		storyMesh = Env.Place(model, "PortalStone", base, 1.15, { CanCollide = true })
+		Env.Place(model, "PortalCharms", base, 1.15)
+		local vortex = Env.Place(model, "PortalSwirl", base, 1.15, { Color = storyColor, CanQuery = false })
+		if vortex then
+			CollectionService:AddTag(vortex, "PortalSwirl")
+		end
+	end
+	if not storyMesh then
+		-- Sin las mallas: anillo de piedra con talismanes y un disco de energía
+		local center = Vector3.new(-104, 9, -10)
+		for i = 0, 19 do
+			local a = i / 20 * math.pi * 2
+			part({
+				Size = Vector3.new(2.4, 2.6, 2.6), CFrame = CFrame.new(center + Vector3.new(0, math.sin(a) * 8, math.cos(a) * 8)) * CFrame.Angles(-a, 0, 0),
+				Color = C(70, 65, 75), Material = M.Slate,
+			})
+			if i % 4 == 0 then
+				part({ Size = Vector3.new(0.2, 2.4, 1.2), CFrame = CFrame.new(center + Vector3.new(1.4, math.sin(a) * 8 - 1.6, math.cos(a) * 8)),
+					Color = C(250, 238, 215), CanCollide = false })
+			end
+		end
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.4, 14.5, 14.5), Position = center, Color = storyColor, Material = M.ForceField, CanCollide = false })
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.2, 13, 13), Position = center + Vector3.new(0.3, 0, 0), Color = C(40, 10, 70), Material = M.Neon, Transparency = 0.25, CanCollide = false })
+	end
+	local storyLight = Instance.new("PointLight")
+	storyLight.Color = storyColor
+	storyLight.Range = 28
+	storyLight.Brightness = 2.5
+	local storyGate = part({ Name = "StoryGate", Size = Vector3.new(0.6, 15, 14), Position = Vector3.new(-104, 9, -10), Color = storyColor, Material = M.Neon, Transparency = 1, CanCollide = false })
+	storyLight.Parent = storyGate
 	local veil = Instance.new("ParticleEmitter")
 	veil.Color = ColorSequence.new(C(170, 80, 255), C(40, 0, 80))
 	veil.LightEmission = 0.8
@@ -308,6 +411,38 @@ function LobbyBuilder.Build(): Model
 	sign(Vector3.new(-96, 24, -10), "MODO HISTORIA", C(210, 170, 255), 22)
 	for _, z in { -26, 6 } do
 		lantern(Vector3.new(-86, 1, z))
+	end
+
+	-- ===== Delante a la izquierda: portal de la OBBY "Ascenso Maldito"
+	do
+		local obbyColor = C(255, 170, 60)
+		local base = CFrame.new(-112, 0, 72) * CFrame.Angles(0, math.rad(90), 0)
+		part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(1, 26, 26), CFrame = CFrame.new(-106, 0.5, 72) * CFrame.Angles(0, 0, math.rad(90)), Color = C(85, 80, 90), Material = M.Slate })
+		local mesh = nil
+		if useMeshes then
+			mesh = Env.Place(model, "PortalStone", base, 1.05, { CanCollide = true })
+			Env.Place(model, "PortalCharms", base, 1.05)
+			local vortex = Env.Place(model, "PortalSwirl", base, 1.05, { Color = obbyColor, CanQuery = false })
+			if vortex then
+				CollectionService:AddTag(vortex, "PortalSwirl")
+			end
+		end
+		if not mesh then
+			torii(Vector3.new(-110, 0, 72), 12, 16, obbyColor, true)
+		end
+		local gate = part({ Name = "ObbyGate", Size = Vector3.new(0.6, 13, 11), Position = Vector3.new(-110, 7.5, 72), Color = obbyColor, Material = M.Neon,
+			Transparency = if mesh then 1 else 0.3, CanCollide = false })
+		local gl = Instance.new("PointLight")
+		gl.Color = obbyColor
+		gl.Range = 26
+		gl.Brightness = 2.5
+		gl.Parent = gate
+		prompt(gate, "Obby", "Entrar", "Obby · Ascenso Maldito")
+		sign(Vector3.new(-106, 22, 72), "OBBY · ASCENSO MALDITO", obbyColor, 20)
+		sign(Vector3.new(-104, 4, 72), "Parkour con premio diario", C(255, 255, 255), 13)
+		for _, z in { 60, 84 } do
+			lantern(Vector3.new(-100, 1, z))
+		end
 	end
 
 	-- ===== Derecha: Sala de Combate (portales + plataformas de cola)

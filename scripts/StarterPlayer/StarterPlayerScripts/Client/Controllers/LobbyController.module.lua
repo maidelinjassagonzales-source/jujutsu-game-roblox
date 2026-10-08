@@ -44,6 +44,12 @@ local ACTIONS = {
 	Practice = function()
 		request("GoPractice")
 	end,
+	Obby = function()
+		request("EnterObby")
+	end,
+	LeaveObby = function()
+		request("LeaveObby")
+	end,
 }
 
 -- ===== Pétalos de cerezo
