@@ -181,18 +181,25 @@ function LobbyController.Start()
 
 	-- Barra del Dojo
 	local dojoBar = UI.make("Frame", {
-		AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 58), Size = UDim2.fromOffset(360, 40),
+		AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 58), Size = UDim2.fromOffset(450, 40),
 		BackgroundColor3 = UI.Colors.Panel, BackgroundTransparency = 0.1, Visible = false,
 	}, gui)
 	UI.corner(dojoBar, 10)
 	UI.stroke(dojoBar, Color3.fromRGB(60, 160, 220), 2)
 	UI.autoScale(dojoBar)
-	UI.label(dojoBar, { Position = UDim2.fromOffset(12, 0), Size = UDim2.new(1, -150, 1, 0), Text = "Dojo de práctica", TextSize = 15 })
+	UI.label(dojoBar, { Position = UDim2.fromOffset(12, 0), Size = UDim2.new(1, -270, 1, 0), Text = "Dojo de práctica", TextSize = 15 })
 	local back = UI.button(dojoBar, "Volver al Lobby", Color3.fromRGB(60, 160, 220), {
 		AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.fromOffset(136, 28), TextSize = 13,
 	})
 	back.Activated:Connect(function()
 		request("ReturnToLobby")
+	end)
+	-- Elegir el escenario del Dojo
+	local stageBtn = UI.button(dojoBar, "Escenario", Color3.fromRGB(150, 70, 220), {
+		AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -152, 0.5, 0), Size = UDim2.fromOffset(110, 28), TextSize = 13,
+	})
+	stageBtn.Activated:Connect(function()
+		require(script.Parent:WaitForChild("StageSelectController")).OpenDojo()
 	end)
 
 	-- Guía de bienvenida

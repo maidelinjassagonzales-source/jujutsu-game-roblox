@@ -142,6 +142,10 @@ function CurrencyController.Start()
 			if a.XP and a.XP > 0 then
 				CurrencyController.Toast(`+{a.XP} XP`, UI.Colors.Gold)
 			end
+			-- Aviso sin recompensa (p. ej. "X ha cambiado el Dojo", "Servidor lleno")
+			if not ((a.Coins or 0) > 0 or (a.Gems or 0) > 0 or (a.XP or 0) > 0) and a.Reason then
+				CurrencyController.Toast(a.Reason, UI.Colors.Muted)
+			end
 		elseif kind == "LevelUp" then
 			-- a = nivel, b = monedas, c = gemas
 			CurrencyController.Toast(`¡NIVEL {a}! +{b} {coinInfo.Icon}` .. (if c > 0 then ` +{c} {gemInfo.Icon}` else ""), UI.Colors.Gold)

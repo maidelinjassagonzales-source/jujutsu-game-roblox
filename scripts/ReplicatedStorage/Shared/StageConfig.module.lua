@@ -79,4 +79,13 @@ StageConfig.LobbyLighting = {
 StageConfig.HubStage = "Academy"
 StageConfig.MatchPool = { "Shibuya", "Infinity", "Temple", "Academy" }
 
+-- Para las ventanas de elegir escenario (Dojo y votación antes de cada partida)
+StageConfig.Cards = {
+	Academy = { Kanji = "校", Description = "El patio de la Escuela al atardecer", Colors = { C(255, 150, 130), C(70, 40, 80) } },
+	Shibuya = { Kanji = "渋", Description = "Calles de neón bajo el Velo", Colors = { C(130, 90, 230), C(20, 15, 50) } },
+	Infinity = { Kanji = "無", Description = "Un vacío lleno de estrellas", Colors = { C(90, 140, 255), C(8, 10, 35) } },
+	Temple = { Kanji = "寺", Description = "El santuario del Rey Maldito", Colors = { C(230, 90, 60), C(60, 12, 10) } },
+}
+StageConfig.VoteTime = 8 -- segundos para votar el escenario antes de un duelo / partida
+
 return StageConfig

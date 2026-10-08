@@ -6,6 +6,7 @@
 --   * Dojo de práctica / vuelta al Lobby
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StageConfig = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("StageConfig"))
 local CollectionService = game:GetService("CollectionService")
 local DataStoreService = game:GetService("DataStoreService")
 local RunService = game:GetService("RunService")
@@ -352,6 +353,48 @@ LobbyService.Handlers.GoPractice = function(player: Player)
 	end
 	services.FighterService.SendToDojo(player)
 	return result(true, "Dojo de práctica · pulsa ‘Lobby’ para volver")
+end
+
+-- Elegir el escenario del Dojo (o uno al azar). El Dojo es compartido: cambia para todos los que están dentro.
+local lastDojoStageChange = 0
+LobbyService.Handlers.SetDojoStage = function(player: Player, stageId: any)
+	if player:GetAttribute("ArenaId") ~= "Hub" then
+		return result(false, "Solo dentro del Dojo")
+	end
+	if os.clock() - lastDojoStageChange < 4 then
+		return result(false, "Espera un momento antes de cambiar otra vez")
+	end
+	local current = services.ArenaService.Hub().StageId
+	if stageId == "Random" then
+		local options = {}
+		for _, id in StageConfig.MatchPool do
+			if id ~= current then
+				table.insert(options, id)
+			end
+		end
+		stageId = options[math.random(1, #options)]
+	end
+	if type(stageId) ~= "string" or not StageConfig.Stages[stageId] then
+		return result(false, "Escenario desconocido")
+	end
+	if stageId == current then
+		return result(false, "Ya estás en ese escenario")
+	end
+	lastDojoStageChange = os.clock()
+	services.ArenaService.SetHubStage(stageId)
+	-- Todos los del Dojo vuelven a su punto de salida en el escenario nuevo
+	local name = StageConfig.Stages[stageId].Name
+	for _, other in Players:GetPlayers() do
+		if other:GetAttribute("ArenaId") == "Hub" and other.Character then
+			other.Character:SetAttribute("Percent", 0)
+			services.FighterService.TeleportToSpawn(other.Character)
+			if other ~= player then
+				services.EconomyFeedback:FireClient(other, "Reward", { Reason = `{player.DisplayName} ha cambiado el Dojo a {name}` })
+			end
+		end
+	end
+	services.FighterService.SetDummyEnabled(true)
+	return result(true, `Escenario: {name}`)
 end
 
 LobbyService.Handlers.ReturnToLobby = function(player: Player)

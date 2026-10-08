@@ -100,6 +100,30 @@ function ArenaService.Release(arena)
 	arena.Info:Destroy()
 end
 
+-- Cambia el escenario del Dojo de práctica (lo reconstruye en el mismo sitio)
+function ArenaService.SetHubStage(stageId: string): boolean
+	local hub = arenas.Hub
+	local stage = StageConfig.Stages[stageId]
+	if not hub or not stage or hub.StageId == stageId then
+		return false
+	end
+	local model = stageModel(stageId)
+	model.Name = "Hub"
+	model:PivotTo(CFrame.new(hub.Center))
+	hub.Model:Destroy()
+	model.Parent = worldFolder
+	hub.Model = model
+	hub.StageId = stageId
+	hub.Stage = stage
+	local info = hub.Info
+	info:SetAttribute("StageId", stageId)
+	info:SetAttribute("Left", hub.Center.X + stage.Bounds.Left)
+	info:SetAttribute("Right", hub.Center.X + stage.Bounds.Right)
+	info:SetAttribute("Top", hub.Center.Y + stage.Bounds.Top)
+	info:SetAttribute("Bottom", hub.Center.Y + stage.Bounds.Bottom)
+	return true
+end
+
 function ArenaService.Get(id: string?)
 	return if id then arenas[id] else nil
 end

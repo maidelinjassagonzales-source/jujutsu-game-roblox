@@ -78,9 +78,85 @@ local function getHRP(model: Model?): BasePart?
 	return model and model:FindFirstChild("HumanoidRootPart") :: BasePart?
 end
 
+-- ===== Votación de escenario antes de cada partida
+-- Cada jugador vota un escenario o "Random". Gana el más votado; si nadie vota o hay empate, al azar.
+local stageVotes = {} -- [Player] = { Group = {Player}, Votes = {[Player] = stageId | "Random"} }
+
+local function broadcastVotes(session)
+	local counts = {}
+	for _, choice in session.Votes do
+		counts[choice] = (counts[choice] or 0) + 1
+	end
+	for _, p in session.Group do
+		if p.Parent then
+			matchFeedback:FireClient(p, "StageVotes", counts)
+		end
+	end
+end
+
+MatchService.Handlers.VoteStage = function(player: Player, choice: any)
+	local session = stageVotes[player]
+	if not session then
+		return result(false, "Ahora no se está votando")
+	end
+	if choice ~= "Random" and not (type(choice) == "string" and table.find(StageConfig.MatchPool, choice)) then
+		return result(false, "Escenario desconocido")
+	end
+	session.Votes[player] = choice
+	broadcastVotes(session)
+	return result(true, "")
+end
+
+local function chooseStage(players: { Player }): string
+	local session = { Group = players, Votes = {} }
+	for _, p in players do
+		stageVotes[p] = session
+		matchFeedback:FireClient(p, "StageVote", StageConfig.MatchPool, StageConfig.VoteTime)
+	end
+	local deadline = os.clock() + StageConfig.VoteTime
+	while os.clock() < deadline do
+		local voted = 0
+		for _, p in players do
+			if session.Votes[p] or not p.Parent then
+				voted += 1
+			end
+		end
+		if voted >= #players then
+			task.wait(0.8) -- que se vea el último voto
+			break
+		end
+		task.wait(0.2)
+	end
+	for _, p in players do
+		stageVotes[p] = nil
+	end
+	-- Recuento
+	local counts, best = {}, 0
+	for _, choice in session.Votes do
+		if choice ~= "Random" then
+			counts[choice] = (counts[choice] or 0) + 1
+			best = math.max(best, counts[choice])
+		end
+	end
+	local winners = {}
+	for id, n in counts do
+		if n == best then
+			table.insert(winners, id)
+		end
+	end
+	local stageId = if #winners > 0 then winners[math.random(1, #winners)] else StageConfig.MatchPool[math.random(1, #StageConfig.MatchPool)]
+	for _, p in players do
+		if p.Parent then
+			matchFeedback:FireClient(p, "StageChosen", stageId, #winners ~= 1)
+		end
+	end
+	task.wait(1.6) -- revelación del escenario
+	return stageId
+end
+
 local function runMatch(players: { Player }, mode: string)
 	local rules = QUEUES[mode]
-	local stageId = StageConfig.MatchPool[math.random(1, #StageConfig.MatchPool)]
+	local stageId = chooseStage(players)
 	local arena = services.ArenaService.Allocate(stageId, "Match")
 	if not arena then
 		for _, p in players do
@@ -257,6 +333,7 @@ function MatchService.Start(remotes: Folder, s)
 
 	Players.PlayerRemoving:Connect(function(player)
 		removeFromQueues(player)
+		stageVotes[player] = nil
 		winStreaks[player] = nil
 	end)
 
