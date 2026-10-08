@@ -14,6 +14,7 @@ local CatalogConfig = require(Shared:WaitForChild("CatalogConfig"))
 local ArenaInfo = require(Shared:WaitForChild("ArenaInfo"))
 local CharacterRegistry = require(Shared:WaitForChild("CharacterRegistry"))
 local CameraController = require(script.Parent:WaitForChild("CameraController"))
+local SpecialFX = require(script.Parent.Parent:WaitForChild("Modules"):WaitForChild("SpecialFX"))
 
 local EffectsController = {}
 
@@ -356,6 +357,7 @@ function EffectsController.Start()
 	fxFolder = Instance.new("Folder")
 	fxFolder.Name = "ClientFX"
 	fxFolder.Parent = workspace
+	SpecialFX.Start(fxFolder)
 
 	RunService.RenderStepped:Connect(function()
 		updateRunFx()
@@ -373,7 +375,7 @@ function EffectsController.Start()
 		end
 	end)
 
-	ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("CombatFeedback").OnClientEvent:Connect(function(kind, a, b, c, d)
+	ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("CombatFeedback").OnClientEvent:Connect(function(kind, a, b, c, d, e, f, g, h, i)
 		if kind == "Hit" then
 			-- a = víctima, b = daño, c = knockback, d = posición
 			flash(a)
@@ -404,7 +406,21 @@ function EffectsController.Start()
 			koEffect(pos, c)
 			CameraController.Shake(2, 0.4)
 		elseif kind == "MoveStarted" and typeof(a) == "Instance" and typeof(b) == "string" and b:find("Special") then
-			cursedAura(a)
+			-- Efecto propio de cada técnica (SpecialFX); si no se encuentra, el aura genérica
+			local data = CharacterRegistry.Get(a:GetAttribute("CharacterId"))
+			local move = data and data.Moves and data.Moves[b]
+			if move then
+				SpecialFX.Move(a, move, data.Color or Color3.fromRGB(150, 70, 220), if typeof(d) == "number" then d else 1)
+			else
+				cursedAura(a)
+			end
+		elseif kind == "ProjectileSpawn" then
+			-- a = id, b = atacante, c = nombre, d = color, ... (tamaño, inicio, dirección, velocidad, vida)
+			SpecialFX.ProjectileSpawn(a, b, c, d, e, f, g, h, i)
+		elseif kind == "ProjectileHit" then
+			SpecialFX.ProjectileHit(a, b)
+		elseif kind == "ProjectileEnd" then
+			SpecialFX.ProjectileEnd(a, b, c)
 		elseif kind == "ShieldHit" then
 			burst(b, Color3.fromRGB(150, 220, 255), 3, 8, 0.15, 0.4)
 		elseif kind == "ShieldBreak" then

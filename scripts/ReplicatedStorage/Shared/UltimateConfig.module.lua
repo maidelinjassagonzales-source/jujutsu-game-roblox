@@ -1,5 +1,5 @@
 -- UltimateConfig: la ULTI de cada luchador y sus habilidades pasivas de firma.
--- La barra de ulti (0-100) se carga pegando (x1.6 del % que haces) y recibiendo (x0.8 del % que recibes).
+-- La barra de ulti (0-100) se carga pegando (x0.7 del % que haces) y recibiendo (x0.35 del % que recibes).
 -- Tipos:
 --   Domain    = Expansión de Dominio: ataques que SIEMPRE aciertan a todos los rivales de la arena
 --               Ticks golpes de TickDamage% cada TickEvery s; Final = golpe final; Freeze = paraliza (Gojo)
@@ -10,8 +10,9 @@ local C = Color3.fromRGB
 
 local UltimateConfig = {}
 
-UltimateConfig.ChargeDealt = 1.6
-UltimateConfig.ChargeTaken = 0.8
+-- Más difícil de cargar (antes 1.6 / 0.8): hace falta ~140% de daño hecho (o mucho recibido) para llenarla
+UltimateConfig.ChargeDealt = 0.7
+UltimateConfig.ChargeTaken = 0.35
 UltimateConfig.Windup = 1.3 -- cinemática (el lanzador es invulnerable mientras)
 -- Las Expansiones de Dominio tienen cinemática larga: el tiempo se para para TODOS los de la arena
 UltimateConfig.DomainWindup = 3.2

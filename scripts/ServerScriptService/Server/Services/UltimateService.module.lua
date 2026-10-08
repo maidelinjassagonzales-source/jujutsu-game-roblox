@@ -165,7 +165,7 @@ local function runBurst(model: Model, cfg)
 	local facing = if hrp.CFrame.LookVector.X >= 0 then 1 else -1
 	services.CombatService.ExecuteMove(model, {
 		Damage = cfg.Damage, BaseKnockback = cfg.KB, KnockbackGrowth = 95, Angle = 38, Startup = 0, Active = 0, Endlag = 0,
-		NoUltCharge = true,
+		NoUltCharge = true, Name = cfg.Name, -- el nombre elige el efecto visual en el cliente
 		Projectile = { Speed = cfg.Speed, Lifetime = 2.2, Size = Vector3.one * cfg.Size, Color = cfg.Color, Pierce = true },
 	}, facing)
 end

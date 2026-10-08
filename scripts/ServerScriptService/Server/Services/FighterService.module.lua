@@ -367,15 +367,19 @@ local function applyCosmetics(player: Player, model: Model)
 	end
 end
 
+-- Personaje con el que juega AHORA: el elegido, o el que está probando en el Dojo
+function FighterService.CurrentCharacter(player: Player): string
+	local trial = player:GetAttribute("TrialCharacter")
+	if trial and player:GetAttribute("ArenaId") == "Hub" and CharacterRegistry.Get(trial) then
+		return trial
+	end
+	return player:GetAttribute("SelectedCharacter") or Config.DefaultCharacter
+end
+
 -- (Re)crea el personaje del jugador. Con preserve=true mantiene posición, %, stocks y estado.
 function FighterService.SpawnCharacter(player: Player, preserve: boolean?)
 	local data = DataService.Get(player)
-	local characterId = player:GetAttribute("SelectedCharacter") or Config.DefaultCharacter
-	-- Prueba en el Dojo: cualquier personaje, aunque no lo tengas (solo mientras estés en el Dojo)
-	local trial = player:GetAttribute("TrialCharacter")
-	if trial and player:GetAttribute("ArenaId") == "Hub" and CharacterRegistry.Get(trial) then
-		characterId = trial
-	end
+	local characterId = FighterService.CurrentCharacter(player)
 	local skinId = data and data.EquippedSkins[characterId]
 
 	local old = player.Character
@@ -540,7 +544,7 @@ local function onCharacterAdded(player: Player, model: Model)
 
 	model:WaitForChild("Humanoid")
 	model:WaitForChild("HumanoidRootPart")
-	FighterService.SetupFighter(model, player:GetAttribute("SelectedCharacter"), player.DisplayName)
+	FighterService.SetupFighter(model, FighterService.CurrentCharacter(player), player.DisplayName)
 	if model:GetAttribute("LobbyAvatar") then
 		model:SetAttribute("DisplayName", player.DisplayName) -- en el Lobby eres tú, no tu luchador
 	end
