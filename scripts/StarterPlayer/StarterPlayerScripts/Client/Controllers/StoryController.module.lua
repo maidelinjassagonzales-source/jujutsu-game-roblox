@@ -13,6 +13,7 @@ local StageConfig = require(Shared:WaitForChild("StageConfig"))
 local EconomyConfig = require(Shared:WaitForChild("EconomyConfig"))
 local CatalogConfig = require(Shared:WaitForChild("CatalogConfig"))
 local UI = require(script.Parent.Parent:WaitForChild("Modules"):WaitForChild("UI"))
+local Portrait = require(script.Parent.Parent:WaitForChild("Modules"):WaitForChild("Portrait"))
 local StateController = require(script.Parent:WaitForChild("StateController"))
 local CurrencyController = require(script.Parent:WaitForChild("CurrencyController"))
 
@@ -136,6 +137,17 @@ local function playDialogue(lines)
 		speakerLabel.TextColor3 = speaker.Color
 		portrait.BackgroundColor3 = speaker.Color
 		portraitIcon.Text = speaker.Icon
+		-- Retrato 3D del personaje que habla (busto)
+		local old = portrait:FindFirstChild("Bust")
+		if old and old:GetAttribute("Character") ~= speaker.Character then
+			old:Destroy()
+			old = nil
+		end
+		if speaker.Character and not old then
+			local vp = Portrait.Create(portrait, speaker.Character, "Bust", { Name = "Bust", Size = UDim2.fromScale(1, 1) })
+			vp:SetAttribute("Character", speaker.Character)
+			UI.corner(vp, 42)
+		end
 		textLabel.Text = line.Text
 		textLabel.MaxVisibleGraphemes = 0
 		-- Máquina de escribir (un toque la completa; otro toque avanza)
@@ -223,7 +235,9 @@ function StoryController.Start()
 	UI.autoScale(dialogue)
 	portrait = UI.make("Frame", { Position = UDim2.fromOffset(16, 16), Size = UDim2.fromOffset(84, 84), BackgroundColor3 = Color3.new(1, 1, 1) }, dialogue)
 	UI.corner(portrait, 42)
-	portraitIcon = UI.label(portrait, { Size = UDim2.fromScale(1, 1), TextSize = 44, TextXAlignment = Enum.TextXAlignment.Center })
+	UI.gradient(portrait, Color3.new(1, 1, 1), Color3.fromRGB(70, 70, 80))
+	UI.stroke(portrait, Color3.new(1, 1, 1), 2.5).Transparency = 0.3
+	portraitIcon = UI.label(portrait, { Size = UDim2.fromScale(1, 1), TextSize = 44, Font = Enum.Font.GothamBlack, TextXAlignment = Enum.TextXAlignment.Center, TextStrokeTransparency = 0.5 })
 	speakerLabel = UI.label(dialogue, { Position = UDim2.fromOffset(116, 14), Size = UDim2.new(1, -240, 0, 26), TextSize = 20, Font = Enum.Font.GothamBlack })
 	textLabel = UI.label(dialogue, {
 		Position = UDim2.fromOffset(116, 44), Size = UDim2.new(1, -132, 1, -60), TextSize = 18, Font = Enum.Font.Gotham,

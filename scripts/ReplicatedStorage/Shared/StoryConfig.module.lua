@@ -9,21 +9,22 @@ StoryConfig.PlayerStocks = 3
 StoryConfig.ReplayRewardMultiplier = 0.25 -- repetir un capítulo ya superado da el 25%
 StoryConfig.ReviveGems = 25 -- revivir tras perder (continuar con 3 stocks)
 
+-- Character = luchador cuyo retrato 3D se ve en el cuadro de diálogo
 StoryConfig.Speakers = {
-	Narrador = { Name = "Narrador", Color = C(200, 200, 210), Icon = "" },
-	Kaito = { Name = "Kaito Hayami", Color = C(255, 110, 140), Icon = "" },
-	Shiro = { Name = "Shiro Tenma", Color = C(110, 170, 255), Icon = "" },
-	Ryo = { Name = "Ryo Kurogane", Color = C(90, 90, 170), Icon = "" },
-	Mika = { Name = "Mika Zenra", Color = C(90, 200, 120), Icon = "" },
-	Yuto = { Name = "Yuto Arashi", Color = C(230, 230, 240), Icon = "" },
-	Tsugi = { Name = "Tsugi, el Alma Cosida", Color = C(140, 170, 200), Icon = "" },
-	Kessen = { Name = "Kessen", Color = C(170, 60, 90), Icon = "" },
-	Gen = { Name = "Gen, el Cazador", Color = C(80, 80, 80), Icon = "" },
-	Ozen = { Name = "Ozen, el Rey Maldito", Color = C(220, 40, 60), Icon = "" },
-	Voz = { Name = "???", Color = C(220, 40, 60), Icon = "" },
-	Raiko = { Name = "Raiko", Color = C(255, 160, 40), Icon = "" },
-	Kubo = { Name = "Kubo", Color = C(230, 50, 50), Icon = "" },
-	Eirik = { Name = "Eirik", Color = C(200, 170, 90), Icon = "" },
+	Narrador = { Name = "Narrador", Color = C(200, 200, 210), Icon = "語" },
+	Kaito = { Name = "Kaito Hayami", Color = C(255, 110, 140), Icon = "", Character = "Brawler" },
+	Shiro = { Name = "Shiro Tenma", Color = C(110, 170, 255), Icon = "", Character = "Sorcerer" },
+	Ryo = { Name = "Ryo Kurogane", Color = C(90, 90, 170), Icon = "", Character = "ShadowSummoner" },
+	Mika = { Name = "Mika Zenra", Color = C(90, 200, 120), Icon = "", Character = "WeaponMaster" },
+	Yuto = { Name = "Yuto Arashi", Color = C(230, 230, 240), Icon = "", Character = "Swordsman" },
+	Tsugi = { Name = "Tsugi, el Alma Cosida", Color = C(140, 170, 200), Icon = "", Character = "Stitched" },
+	Kessen = { Name = "Kessen", Color = C(170, 60, 90), Icon = "", Character = "BloodBrother" },
+	Gen = { Name = "Gen, el Cazador", Color = C(80, 80, 80), Icon = "", Character = "Hunter" },
+	Ozen = { Name = "Ozen, el Rey Maldito", Color = C(220, 40, 60), Icon = "", Character = "CursedKing" },
+	Voz = { Name = "???", Color = C(220, 40, 60), Icon = "", Character = "CursedKing" },
+	Raiko = { Name = "Raiko", Color = C(255, 160, 40), Icon = "", Character = "GoldenWarrior" },
+	Kubo = { Name = "Kubo", Color = C(230, 50, 50), Icon = "", Character = "RubberPirate" },
+	Eirik = { Name = "Eirik", Color = C(200, 170, 90), Icon = "", Character = "Viking" },
 }
 
 local function L(speaker: string, text: string)

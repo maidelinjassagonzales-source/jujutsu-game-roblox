@@ -169,21 +169,41 @@ function UltimateService.Activate(model: Model): boolean
 		local jackpot = math.random() < 1 / 3
 		cfg = if jackpot then cfg.Jackpot else cfg.Miss
 	end
+	local windup = UltimateConfig.WindupFor(cfg.Kind)
 	model:SetAttribute("Ult", 0)
 	model:SetAttribute("UltActive", true)
 	model:SetAttribute("Invulnerable", true)
-	services.CombatService.SetBusy(model, UltimateConfig.Windup)
+	services.CombatService.SetBusy(model, windup)
 	feedback:FireAllClients("Ultimate", model, {
 		Kind = cfg.Kind, Name = cfg.Name, Japanese = cfg.Japanese, Color = cfg.Color, Duration = cfg.Duration or 1.5,
+		Windup = windup, CharacterId = model:GetAttribute("CharacterId"),
 	})
 	task.spawn(function()
-		local hrp = root(model)
-		if hrp and Players:GetPlayerFromCharacter(model) == nil then
-			hrp.Anchored = true -- los NPC se quedan quietos durante la cinemática
+		-- Durante la cinemática todos quedan congelados (el lanzador y, en los dominios, también los rivales)
+		local frozen = {}
+		local arena = model:GetAttribute("ArenaId")
+		for _, other in CollectionService:GetTagged("Fighter") do
+			local isCaster = other == model
+			local otherRoot = root(other)
+			if otherRoot and not otherRoot.Anchored and (isCaster or (cfg.Kind == "Domain" and other:GetAttribute("ArenaId") == arena)) then
+				otherRoot.AssemblyLinearVelocity = Vector3.zero
+				otherRoot.Anchored = true
+				table.insert(frozen, otherRoot)
+				if not isCaster then
+					services.CombatService.SetBusy(other, windup)
+					other:SetAttribute("Invulnerable", true) -- nadie puede pegar ni ser pegado durante la cinemática
+				end
+			end
 		end
-		task.wait(UltimateConfig.Windup)
-		if hrp and Players:GetPlayerFromCharacter(model) == nil then
-			hrp.Anchored = false
+		task.wait(windup)
+		for _, r in frozen do
+			if r.Parent then
+				r.Anchored = false
+				local m = r.Parent
+				if m ~= model and m:IsA("Model") then
+					m:SetAttribute("Invulnerable", false)
+				end
+			end
 		end
 		if not model.Parent then
 			return

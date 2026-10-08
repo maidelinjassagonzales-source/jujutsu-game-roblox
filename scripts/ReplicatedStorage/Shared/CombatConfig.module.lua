@@ -11,7 +11,7 @@ local CombatConfig = {
 	PlaneZ = 0, -- el combate ocurre en el plano X/Y
 
 	-- Knockback estilo Smash
-	LaunchSpeedMultiplier = 0.75, -- unidades de KB -> studs/s
+	LaunchSpeedMultiplier = 0.62, -- unidades de KB -> studs/s (antes 0.75: a 60% ya se salía del mapa; ahora un golpe fuerte desde el borde mata sobre 130-150%)
 	KnockbackDecay = 45, -- studs/s que pierde la velocidad horizontal por segundo
 	HitstunFactor = 0.4 / 60, -- segundos de hitstun por unidad de KB (fórmula de Smash: KB * 0.4 frames)
 	MinHitstun = 0.15,

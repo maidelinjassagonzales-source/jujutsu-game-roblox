@@ -99,6 +99,18 @@ UnlockService.Handlers.SelectCharacter = function(player: Player, id: any)
 	return result(true, `Has elegido a {CharacterRegistry.Get(id).DisplayName}`)
 end
 
+-- Modo prueba: juega con cualquier personaje en el Dojo para probarlo antes de comprarlo
+UnlockService.Handlers.TryCharacter = function(player: Player, id: any)
+	if type(id) ~= "string" or not CharacterRegistry.Get(id) or not CatalogConfig.Characters[id] then
+		return result(false, "Personaje desconocido")
+	end
+	if not MatchService.CanChangeLoadout(player) then
+		return result(false, "Termina la partida antes de probar personajes")
+	end
+	FighterService.TryCharacter(player, id)
+	return result(true, `Probando a {CharacterRegistry.Get(id).DisplayName} en el Dojo`)
+end
+
 UnlockService.Handlers.BuySkin = function(player: Player, skinId: any)
 	local skin = type(skinId) == "string" and CatalogConfig.Skins[skinId]
 	if not skin then

@@ -1,4 +1,5 @@
--- TutorialController: tutorial guiado la primera vez que entras (o desde Ajustes > "Repetir tutorial").
+-- TutorialController: tutorial guiado OPCIONAL. La primera vez te pregunta si quieres hacerlo
+-- (se puede saltar en cualquier momento y empezar o repetir con el botón "Tutorial" del menú).
 --   * Cartel de misión arriba en el centro (estilo Jujutsu Zero) con el paso actual y la distancia
 --   * Flecha 3D botando sobre el destino + rastro brillante en el suelo desde tu personaje
 --   * Flecha en pantalla señalando el botón cuando el paso es de interfaz
@@ -105,6 +106,8 @@ local beam: Beam
 local att0: Attachment
 local att1: Attachment
 local active = false
+local cancelled = false
+local skipButton: TextButton
 
 -- "[texto]" se pinta en dorado (RichText)
 local function rich(text: string): string
@@ -155,6 +158,12 @@ local function build()
 		Position = UDim2.fromOffset(0, 42), Size = UDim2.new(1, 0, 0, 14), TextSize = 11, TextColor3 = Color3.fromRGB(255, 210, 90),
 		TextXAlignment = Enum.TextXAlignment.Center, Text = "",
 	})
+	skipButton = UI.button(banner, "Saltar", Color3.fromRGB(70, 60, 95), {
+		AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.fromOffset(70, 26), TextSize = 12,
+	})
+	skipButton.Activated:Connect(function()
+		cancelled = true
+	end)
 	uiArrow = UI.label(gui, {
 		AnchorPoint = Vector2.new(0, 0.5), Size = UDim2.fromOffset(44, 44), Text = "◀", TextSize = 40, Font = Enum.Font.GothamBlack,
 		TextColor3 = Color3.fromRGB(255, 210, 90), TextStrokeTransparency = 0, Visible = false, ZIndex = 50,
@@ -235,7 +244,7 @@ local function run(fromStep: number)
 		local scale = banner:FindFirstChildOfClass("UIScale")
 		banner.Position = UDim2.new(0.5, 0, 0, 124)
 		TweenService:Create(banner, TweenInfo.new(0.35, Enum.EasingStyle.Back), { Position = UDim2.new(0.5, 0, 0, 150) }):Play()
-		while not step.Done() do
+		while not step.Done() and not cancelled do
 			local root = myRoot()
 			local target = step.Target and step.Target()
 			if target and root then
@@ -264,16 +273,68 @@ local function run(fromStep: number)
 			task.wait()
 		end
 		hideGuides()
+		if cancelled then
+			break
+		end
 		Sfx.Play("LevelUp", nil, 0.7)
 		bannerText.Text = rich("¡Completado!  [" .. step.Text:gsub("[%[%]]", "") .. "]")
 		task.wait(1.1)
 	end
 	banner.Visible = false
 	active = false
+	if cancelled then
+		cancelled = false
+		CurrencyController.Toast("Tutorial saltado · puedes repetirlo con el botón Tutorial", UI.Colors.Muted)
+		return
+	end
 	local response = StateController.Request("CompleteTutorial")
 	if response.msg and response.msg ~= "" then
 		CurrencyController.Toast(response.msg, if response.ok then UI.Colors.Gold else UI.Colors.Muted)
 	end
+end
+
+-- Ventana que pregunta si quieres hacer el tutorial (no es obligatorio)
+local function offer(onAccept: () -> ())
+	local gui = UI.screenGui("TutorialOffer", 40)
+	local card = UI.make("Frame", {
+		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromOffset(440, 220),
+		BackgroundColor3 = Color3.new(1, 1, 1),
+	}, gui)
+	UI.autoScale(card)
+	UI.corner(card, 18)
+	UI.gradient(card, Color3.fromRGB(44, 32, 68), Color3.fromRGB(14, 12, 22))
+	UI.animatedStroke(card, UI.Colors.Gold, 2.5)
+	UI.glow(card, UI.Colors.Gold, 18)
+	UI.icon(card, "Story", { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, -34), Size = UDim2.fromOffset(72, 72) })
+	local title = UI.label(card, {
+		Position = UDim2.fromOffset(0, 40), Size = UDim2.new(1, 0, 0, 34), Text = "¿Quieres hacer el tutorial?", TextSize = 26,
+		Font = UI.TitleFont, TextXAlignment = Enum.TextXAlignment.Center, TextStrokeTransparency = 0.5,
+	})
+	UI.gradient(title, Color3.new(1, 1, 1), UI.Colors.Gold)
+	UI.label(card, {
+		Position = UDim2.fromOffset(24, 78), Size = UDim2.new(1, -48, 0, 50), TextWrapped = true, TextSize = 14,
+		TextColor3 = UI.Colors.Muted, TextXAlignment = Enum.TextXAlignment.Center,
+		Text = "Unas flechas te guiarán por la Escuela, el Dojo y tu primera partida. Al terminarlo te llevas una recompensa.",
+	})
+	local yes = UI.button(card, "¡VAMOS!", UI.Colors.Green, {
+		AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(0.5, -8, 1, -20), Size = UDim2.fromOffset(170, 44), TextSize = 17,
+	})
+	UI.shine(yes, 1.5)
+	local no = UI.button(card, "Ahora no", Color3.fromRGB(70, 60, 95), {
+		AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0.5, 8, 1, -20), Size = UDim2.fromOffset(170, 44), TextSize = 15,
+	})
+	local scale = card:FindFirstChildOfClass("UIScale")
+	local target = scale.Scale
+	scale.Scale = target * 0.8
+	TweenService:Create(scale, TweenInfo.new(0.3, Enum.EasingStyle.Back), { Scale = target }):Play()
+	yes.Activated:Connect(function()
+		gui:Destroy()
+		onAccept()
+	end)
+	no.Activated:Connect(function()
+		gui:Destroy()
+		CurrencyController.Toast("Puedes empezar el tutorial cuando quieras con el botón Tutorial", UI.Colors.Muted)
+	end)
 end
 
 function TutorialController.Start()
@@ -295,7 +356,9 @@ function TutorialController.Start()
 				task.wait(0.3)
 			end
 			task.wait(if player:GetAttribute("TitleStart") then 12 else 3)
-			run(1)
+			offer(function()
+				run(1)
+			end)
 		end
 	end)
 end

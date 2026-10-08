@@ -13,6 +13,18 @@ local UltimateConfig = {}
 UltimateConfig.ChargeDealt = 1.6
 UltimateConfig.ChargeTaken = 0.8
 UltimateConfig.Windup = 1.3 -- cinemática (el lanzador es invulnerable mientras)
+-- Las Expansiones de Dominio tienen cinemática larga: el tiempo se para para TODOS los de la arena
+UltimateConfig.DomainWindup = 3.2
+UltimateConfig.TransformWindup = 1.8
+
+function UltimateConfig.WindupFor(kind: string): number
+	if kind == "Domain" then
+		return UltimateConfig.DomainWindup
+	elseif kind == "Transform" then
+		return UltimateConfig.TransformWindup
+	end
+	return UltimateConfig.Windup
+end
 
 local function domain(name, jp, color, o)
 	o = o or {}

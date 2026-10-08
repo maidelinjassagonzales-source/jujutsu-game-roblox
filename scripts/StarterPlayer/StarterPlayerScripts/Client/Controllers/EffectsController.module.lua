@@ -12,6 +12,7 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Config = require(Shared:WaitForChild("CombatConfig"))
 local CatalogConfig = require(Shared:WaitForChild("CatalogConfig"))
 local ArenaInfo = require(Shared:WaitForChild("ArenaInfo"))
+local CharacterRegistry = require(Shared:WaitForChild("CharacterRegistry"))
 local CameraController = require(script.Parent:WaitForChild("CameraController"))
 
 local EffectsController = {}
@@ -81,6 +82,106 @@ local function scatter(position: Vector3, color: Color3, count: number, spread: 
 		}):Play()
 		Debris:AddItem(p, 0.7)
 	end
+end
+
+local TEX_SPARK = "rbxasset://textures/particles/sparkles_main.dds"
+local TEX_FIRE = "rbxasset://textures/particles/fire_main.dds"
+local TEX_SMOKE = "rbxasset://textures/particles/smoke_main.dds"
+
+-- Anillo de impacto mirando a la cámara
+local function impactRing(position: Vector3, color: Color3, size: number, duration: number)
+	local look = workspace.CurrentCamera.CFrame.LookVector
+	local ring = fxPart({
+		Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.15, size * 0.3, size * 0.3), Color = color, Transparency = 0.05,
+		CFrame = CFrame.lookAt(position, position + look) * CFrame.Angles(0, math.rad(90), 0),
+	})
+	TweenService:Create(ring, TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		Size = Vector3.new(0.05, size, size), Transparency = 1,
+	}):Play()
+	Debris:AddItem(ring, duration)
+end
+
+-- Ráfaga de partículas puntual (chispas, llamas, humo)
+local function emitAt(position: Vector3, count: number, props)
+	local holder = fxPart({ Size = Vector3.one * 0.2, Position = position, Transparency = 1 })
+	local e = Instance.new("ParticleEmitter")
+	e.Rate = 0
+	e.LightEmission = 1
+	e.LightInfluence = 0
+	for k, v in props do
+		(e :: any)[k] = v
+	end
+	e.Parent = holder
+	e:Emit(count)
+	Debris:AddItem(holder, 1.5)
+end
+
+-- "Impact frame" de anime: un instante en blanco y negro con mucho contraste
+local impactCC: ColorCorrectionEffect? = nil
+local function impactFrame(duration: number)
+	if impactCC then
+		return
+	end
+	local cc = Instance.new("ColorCorrectionEffect")
+	cc.Saturation = -1
+	cc.Contrast = 0.9
+	cc.Brightness = 0.12
+	cc.Parent = game:GetService("Lighting")
+	impactCC = cc
+	task.delay(duration, function()
+		cc:Destroy()
+		impactCC = nil
+	end)
+end
+
+-- Aura maldita al lanzar una técnica: llamas del color del personaje + humo negro + anillo en el suelo
+local function cursedAura(model: Model)
+	local torso = model:FindFirstChild("Torso") :: BasePart?
+	local hrp = model:FindFirstChild("HumanoidRootPart") :: BasePart?
+	if not torso or not hrp then
+		return
+	end
+	local data = CharacterRegistry.Get(model:GetAttribute("CharacterId"))
+	local color = if data and data.Color then data.Color else Color3.fromRGB(150, 70, 220)
+	local flames = Instance.new("ParticleEmitter")
+	flames.Texture = TEX_FIRE
+	flames.Color = ColorSequence.new(color:Lerp(Color3.new(1, 1, 1), 0.25), color:Lerp(Color3.new(0, 0, 0), 0.5))
+	flames.LightEmission = 1
+	flames.LightInfluence = 0
+	flames.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1.8), NumberSequenceKeypoint.new(1, 0.2) })
+	flames.Transparency = NumberSequence.new(0.15, 1)
+	flames.Lifetime = NumberRange.new(0.35, 0.6)
+	flames.Rate = 90
+	flames.Speed = NumberRange.new(2, 5)
+	flames.Acceleration = Vector3.new(0, 14, 0)
+	flames.SpreadAngle = Vector2.new(30, 30)
+	flames.EmissionDirection = Enum.NormalId.Top
+	flames.RotSpeed = NumberRange.new(-150, 150)
+	flames.Rotation = NumberRange.new(0, 360)
+	flames.Parent = torso
+	local smoke = Instance.new("ParticleEmitter")
+	smoke.Texture = TEX_SMOKE
+	smoke.Color = ColorSequence.new(Color3.fromRGB(12, 6, 18))
+	smoke.LightInfluence = 0
+	smoke.Size = NumberSequence.new(1.5, 3.5)
+	smoke.Transparency = NumberSequence.new(0.5, 1)
+	smoke.Lifetime = NumberRange.new(0.4, 0.7)
+	smoke.Rate = 30
+	smoke.Speed = NumberRange.new(1, 3)
+	smoke.Acceleration = Vector3.new(0, 6, 0)
+	smoke.Parent = torso
+	task.delay(0.55, function()
+		flames.Enabled = false
+		smoke.Enabled = false
+		Debris:AddItem(flames, 1)
+		Debris:AddItem(smoke, 1)
+	end)
+	local ring = fxPart({
+		Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.2, 2, 2), Color = color, Transparency = 0.2,
+		CFrame = CFrame.new(hrp.Position - Vector3.new(0, 2.9, 0)) * CFrame.Angles(0, 0, math.rad(90)),
+	})
+	TweenService:Create(ring, TweenInfo.new(0.4, Enum.EasingStyle.Quad), { Size = Vector3.new(0.05, 14, 14), Transparency = 1 }):Play()
+	Debris:AddItem(ring, 0.45)
 end
 
 -- KO con el efecto equipado por quien lo consigue
@@ -156,12 +257,108 @@ local function watchFighter(model: Model)
 	end)
 end
 
+-- ===== Efecto de correr: polvareda en los pies + estela de velocidad + "fantasmas" a tope de velocidad
+-- Se calcula por la velocidad real, así se ve en TODOS los luchadores sin replicar nada.
+local runFx = {} -- [Model] = { Dust, Trail, LastGhost }
+local RUN_THRESHOLD = 27
+
+local function ensureRunFx(model: Model)
+	local fx = runFx[model]
+	if fx then
+		return fx
+	end
+	local torso = model:FindFirstChild("Torso") :: BasePart?
+	local hrp = model:FindFirstChild("HumanoidRootPart") :: BasePart?
+	if not torso or not hrp then
+		return nil
+	end
+	local feet = Instance.new("Attachment")
+	feet.Name = "RunFeet"
+	feet.Position = Vector3.new(0, -2.9, 0)
+	feet.Parent = hrp
+	local dust = Instance.new("ParticleEmitter")
+	dust.Texture = "rbxasset://textures/particles/smoke_main.dds"
+	dust.Color = ColorSequence.new(Color3.fromRGB(235, 225, 210))
+	dust.LightInfluence = 0.6
+	dust.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.8), NumberSequenceKeypoint.new(1, 2.6) })
+	dust.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.45), NumberSequenceKeypoint.new(1, 1) })
+	dust.Lifetime = NumberRange.new(0.35, 0.6)
+	dust.Speed = NumberRange.new(2, 5)
+	dust.SpreadAngle = Vector2.new(35, 35)
+	dust.Acceleration = Vector3.new(0, 3, 0)
+	dust.RotSpeed = NumberRange.new(-90, 90)
+	dust.Rotation = NumberRange.new(0, 360)
+	dust.Rate = 0
+	dust.Parent = feet
+	local a0 = Instance.new("Attachment")
+	a0.Position = Vector3.new(0, 0.9, 0)
+	a0.Parent = torso
+	local a1 = Instance.new("Attachment")
+	a1.Position = Vector3.new(0, -0.9, 0)
+	a1.Parent = torso
+	local trail = Instance.new("Trail")
+	trail.Attachment0 = a0
+	trail.Attachment1 = a1
+	trail.Color = ColorSequence.new(Color3.new(1, 1, 1))
+	trail.LightEmission = 0.6
+	trail.Transparency = NumberSequence.new(0.55, 1)
+	trail.Lifetime = 0.18
+	trail.MinLength = 0.2
+	trail.Enabled = false
+	trail.Parent = torso
+	fx = { Dust = dust, Trail = trail, LastGhost = 0 }
+	runFx[model] = fx
+	return fx
+end
+
+-- Silueta translúcida que se queda atrás (afterimage)
+local function ghost(model: Model, color: Color3)
+	for _, name in { "Head", "Torso", "Left Arm", "Right Arm", "Left Leg", "Right Leg" } do
+		local p = model:FindFirstChild(name) :: BasePart?
+		if p then
+			local g = fxPart({ Size = p.Size, CFrame = p.CFrame, Color = color, Transparency = 0.55 })
+			g.Material = Enum.Material.ForceField
+			TweenService:Create(g, TweenInfo.new(0.3), { Transparency = 1 }):Play()
+			Debris:AddItem(g, 0.32)
+		end
+	end
+end
+
+local function updateRunFx()
+	local now = os.clock()
+	for _, model in CollectionService:GetTagged("Fighter") do
+		local hrp = model:FindFirstChild("HumanoidRootPart") :: BasePart?
+		local humanoid = model:FindFirstChildOfClass("Humanoid")
+		if hrp and humanoid and model:GetAttribute("MoveMode") ~= "Free" then
+			local fx = ensureRunFx(model)
+			if fx then
+				local speed = math.abs(hrp.AssemblyLinearVelocity.X)
+				local grounded = humanoid.FloorMaterial ~= Enum.Material.Air
+				local fast = speed > RUN_THRESHOLD
+				fx.Dust.Rate = if fast and grounded then 40 else 0
+				fx.Trail.Enabled = fast
+				if fast and grounded and now - fx.LastGhost > 0.09 then
+					fx.LastGhost = now
+					local data = CharacterRegistry.Get(model:GetAttribute("CharacterId"))
+					ghost(model, if data and data.Color then data.Color else Color3.new(1, 1, 1))
+				end
+			end
+		end
+	end
+	for model in runFx do
+		if not model.Parent then
+			runFx[model] = nil
+		end
+	end
+end
+
 function EffectsController.Start()
 	fxFolder = Instance.new("Folder")
 	fxFolder.Name = "ClientFX"
 	fxFolder.Parent = workspace
 
 	RunService.RenderStepped:Connect(function()
+		updateRunFx()
 		for model, bubble in bubbles do
 			local hrp = model:FindFirstChild("HumanoidRootPart") :: BasePart?
 			if not model.Parent or not hrp then
@@ -180,10 +377,22 @@ function EffectsController.Start()
 		if kind == "Hit" then
 			-- a = víctima, b = daño, c = knockback, d = posición
 			flash(a)
-			floatingText(d, `{b}%`, Color3.fromRGB(255, 230, 90))
+			floatingText(d, `{b}%`, Color3.fromRGB(255, 230, 90), if c > 80 then 34 else 26)
 			burst(d, Color3.fromRGB(255, 240, 200), 1, 3 + c / 25, 0.15)
+			-- Anillo + chispas: más grandes cuanto más fuerte es el golpe
+			local strength = math.clamp(c / 100, 0.3, 2)
+			impactRing(d, Color3.new(1, 1, 1), 6 + strength * 10, 0.2 + strength * 0.08)
+			emitAt(d, math.floor(8 + strength * 14), {
+				Texture = TEX_SPARK, Color = ColorSequence.new(Color3.new(1, 1, 1), Color3.fromRGB(255, 200, 90)),
+				Size = NumberSequence.new(0.9, 0), Lifetime = NumberRange.new(0.15, 0.35), Speed = NumberRange.new(20, 45),
+				SpreadAngle = Vector2.new(180, 180), Drag = 5,
+			})
 			if c > 60 then
 				CameraController.Shake(math.clamp(c / 120, 0.3, 1.5), 0.15)
+			end
+			if c > 95 then
+				impactFrame(0.06) -- golpes que mandan a volar: fotograma de impacto
+				impactRing(d, Color3.fromRGB(255, 90, 60), 30, 0.35)
 			end
 		elseif kind == "KO" then
 			-- a = modelo, b = posición donde cruzó la blast zone, c = quien lo consiguió
@@ -194,6 +403,8 @@ function EffectsController.Start()
 			end
 			koEffect(pos, c)
 			CameraController.Shake(2, 0.4)
+		elseif kind == "MoveStarted" and typeof(a) == "Instance" and typeof(b) == "string" and b:find("Special") then
+			cursedAura(a)
 		elseif kind == "ShieldHit" then
 			burst(b, Color3.fromRGB(150, 220, 255), 3, 8, 0.15, 0.4)
 		elseif kind == "ShieldBreak" then

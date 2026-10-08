@@ -5,6 +5,8 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
+local TweenService = game:GetService("TweenService")
+local Debris = game:GetService("Debris")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Config = require(Shared:WaitForChild("CombatConfig"))
@@ -241,58 +243,153 @@ local function runMelee(attacker: Model, move, facing: number)
 	until os.clock() >= deadline
 end
 
+-- Texturas de partículas que vienen con Roblox (no hace falta subir nada)
+local TEX_FIRE = "rbxasset://textures/particles/fire_main.dds"
+local TEX_SMOKE = "rbxasset://textures/particles/smoke_main.dds"
+local TEX_SPARK = "rbxasset://textures/particles/sparkles_main.dds"
+
+local function fxPart(name: string, shape: Enum.PartType, size: Vector3, color: Color3, material: Enum.Material, transparency: number?): Part
+	local p = Instance.new("Part")
+	p.Name = name
+	p.Shape = shape
+	p.Size = size
+	p.Color = color
+	p.Material = material
+	p.Transparency = transparency or 0
+	p.Anchored = true
+	p.CanCollide = false
+	p.CanQuery = false
+	p.CanTouch = false
+	p.CastShadow = false
+	p:SetAttribute("FX", true)
+	return p
+end
+
+local function emitter(parent: Instance, props)
+	local e = Instance.new("ParticleEmitter")
+	e.LightEmission = 1
+	e.LightInfluence = 0
+	for k, v in props do
+		(e :: any)[k] = v
+	end
+	e.Parent = parent
+	return e
+end
+
+-- Estallido al chocar / desaparecer: onda expansiva + chispas + humo maldito
+local function projectileBurst(position: Vector3, color: Color3, size: number)
+	local ring = fxPart("Shockwave", Enum.PartType.Cylinder, Vector3.new(0.3, size, size), color, Enum.Material.Neon, 0.1)
+	ring.CFrame = CFrame.new(position) * CFrame.Angles(0, math.rad(90), 0)
+	ring.Parent = projectileFolder
+	TweenService:Create(ring, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		Size = Vector3.new(0.1, size * 4, size * 4), Transparency = 1,
+	}):Play()
+	local flash = fxPart("Flash", Enum.PartType.Ball, Vector3.one * size * 1.2, Color3.new(1, 1, 1), Enum.Material.Neon, 0)
+	flash.Position = position
+	flash.Parent = projectileFolder
+	TweenService:Create(flash, TweenInfo.new(0.25), { Size = Vector3.one * size * 2.6, Transparency = 1, Color = color }):Play()
+	local holder = fxPart("BurstFX", Enum.PartType.Ball, Vector3.one, color, Enum.Material.SmoothPlastic, 1)
+	holder.Position = position
+	holder.Parent = projectileFolder
+	local sparks = emitter(holder, {
+		Texture = TEX_SPARK, Color = ColorSequence.new(Color3.new(1, 1, 1), color), Size = NumberSequence.new(size * 0.5, 0),
+		Lifetime = NumberRange.new(0.3, 0.6), Speed = NumberRange.new(30, 60), SpreadAngle = Vector2.new(180, 180),
+		Drag = 6, Rate = 0,
+	})
+	local smoke = emitter(holder, {
+		Texture = TEX_SMOKE, LightEmission = 0, Color = ColorSequence.new(color:Lerp(Color3.new(0, 0, 0), 0.7)),
+		Size = NumberSequence.new(size * 0.8, size * 2), Transparency = NumberSequence.new(0.3, 1),
+		Lifetime = NumberRange.new(0.5, 0.9), Speed = NumberRange.new(6, 14), SpreadAngle = Vector2.new(180, 180), Rate = 0,
+		RotSpeed = NumberRange.new(-90, 90), Rotation = NumberRange.new(0, 360),
+	})
+	sparks:Emit(28)
+	smoke:Emit(10)
+	Debris:AddItem(ring, 0.4)
+	Debris:AddItem(flash, 0.3)
+	Debris:AddItem(holder, 1)
+end
+
 local function runProjectile(attacker: Model, move, facing: number)
 	local hrp = attacker:FindFirstChild("HumanoidRootPart") :: BasePart?
 	if not hrp then
 		return
 	end
 	local spec = move.Projectile
+	local color: Color3 = spec.Color
+	local d = math.max(spec.Size.X, spec.Size.Y)
 
-	local part = Instance.new("Part")
-	part.Name = `{attacker.Name}_Projectile`
-	part.Shape = Enum.PartType.Ball
-	part.Size = spec.Size
-	part.Color = spec.Color
-	part.Material = Enum.Material.Neon
-	part.Anchored = true
-	part.CanCollide = false
-	part.CanQuery = false
-	part.CanTouch = false
-	part.CastShadow = false
+	-- Núcleo blanco ardiente + capa de energía del color de la técnica + anillos girando
+	local part = fxPart(`{attacker.Name}_Projectile`, Enum.PartType.Ball, Vector3.one * d * 0.55, color:Lerp(Color3.new(1, 1, 1), 0.65), Enum.Material.Neon)
+	local shell = fxPart("Shell", Enum.PartType.Ball, Vector3.one * d * 1.05, color, Enum.Material.ForceField)
+	local glow = fxPart("Glow", Enum.PartType.Ball, Vector3.one * d * 0.95, color, Enum.Material.Neon, 0.55)
+	local ringA = fxPart("RingA", Enum.PartType.Cylinder, Vector3.new(0.15, d * 1.5, d * 1.5), color:Lerp(Color3.new(1, 1, 1), 0.3), Enum.Material.Neon, 0.35)
+	local ringB = fxPart("RingB", Enum.PartType.Cylinder, Vector3.new(0.12, d * 1.25, d * 1.25), color, Enum.Material.Neon, 0.45)
 
 	local pos = hrp.Position + Vector3.new(facing * 3, 0.5, 0)
-	part.Position = pos
-	-- Estela + luz + chispas: el proyectil se ve "de anime"
+	-- Estela doble (núcleo claro + borde del color) + luz + llamas malditas + humo negro
 	local a0 = Instance.new("Attachment")
-	a0.Position = Vector3.new(0, spec.Size.Y * 0.3, 0)
+	a0.Position = Vector3.new(0, d * 0.45, 0)
 	a0.Parent = part
 	local a1 = Instance.new("Attachment")
-	a1.Position = Vector3.new(0, -spec.Size.Y * 0.3, 0)
+	a1.Position = Vector3.new(0, -d * 0.45, 0)
 	a1.Parent = part
 	local trail = Instance.new("Trail")
 	trail.Attachment0 = a0
 	trail.Attachment1 = a1
-	trail.Color = ColorSequence.new(spec.Color)
+	trail.Color = ColorSequence.new(color:Lerp(Color3.new(1, 1, 1), 0.5), color)
 	trail.LightEmission = 1
-	trail.Lifetime = 0.25
-	trail.Transparency = NumberSequence.new(0.2, 1)
+	trail.Lifetime = 0.35
+	trail.WidthScale = NumberSequence.new(1, 0.2)
+	trail.Transparency = NumberSequence.new(0.1, 1)
+	trail.FaceCamera = true
 	trail.Parent = part
 	local light = Instance.new("PointLight")
-	light.Color = spec.Color
-	light.Range = spec.Size.X * 2.5
-	light.Brightness = 3
+	light.Color = color
+	light.Range = d * 3.5
+	light.Brightness = 4
 	light.Parent = part
-	local sparks = Instance.new("ParticleEmitter")
-	sparks.Color = ColorSequence.new(spec.Color)
-	sparks.LightEmission = 1
-	sparks.Size = NumberSequence.new(spec.Size.X * 0.25, 0)
-	sparks.Lifetime = NumberRange.new(0.2, 0.4)
-	sparks.Rate = 40
-	sparks.Speed = NumberRange.new(2, 6)
-	sparks.SpreadAngle = Vector2.new(180, 180)
-	sparks.Parent = part
+	emitter(part, {
+		Texture = TEX_FIRE, Color = ColorSequence.new(color:Lerp(Color3.new(1, 1, 1), 0.4), color),
+		Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, d * 0.7), NumberSequenceKeypoint.new(1, 0) }),
+		Transparency = NumberSequence.new(0.2, 1), Lifetime = NumberRange.new(0.25, 0.45), Rate = 70,
+		Speed = NumberRange.new(1, 4), SpreadAngle = Vector2.new(180, 180), RotSpeed = NumberRange.new(-200, 200),
+		Rotation = NumberRange.new(0, 360), EmissionDirection = Enum.NormalId.Back,
+	})
+	emitter(part, {
+		Texture = TEX_SMOKE, LightEmission = 0, Color = ColorSequence.new(color:Lerp(Color3.new(0, 0, 0), 0.75)),
+		Size = NumberSequence.new(d * 0.5, d * 1.3), Transparency = NumberSequence.new(0.4, 1),
+		Lifetime = NumberRange.new(0.4, 0.7), Rate = 30, Speed = NumberRange.new(0.5, 2), SpreadAngle = Vector2.new(180, 180),
+		RotSpeed = NumberRange.new(-60, 60), Rotation = NumberRange.new(0, 360),
+	})
+	emitter(part, {
+		Texture = TEX_SPARK, Color = ColorSequence.new(Color3.new(1, 1, 1), color), Size = NumberSequence.new(d * 0.25, 0),
+		Lifetime = NumberRange.new(0.2, 0.4), Rate = 45, Speed = NumberRange.new(4, 10), SpreadAngle = Vector2.new(180, 180),
+	})
 
-	part.Parent = projectileFolder
+	local pieces = { part, shell, glow, ringA, ringB }
+	local function place(t: number)
+		local base = CFrame.new(pos)
+		part.CFrame = base
+		shell.CFrame = base * CFrame.Angles(t * 3, t * 2, 0)
+		glow.CFrame = base
+		ringA.CFrame = base * CFrame.Angles(t * 9, t * 4, 0)
+		ringB.CFrame = base * CFrame.Angles(0, t * 7, t * 10)
+		-- la capa de energía "late"
+		local pulse = 1 + math.sin(t * 25) * 0.08
+		glow.Size = Vector3.one * d * 0.95 * pulse
+	end
+	place(0)
+	for _, p in pieces do
+		p.Parent = projectileFolder
+	end
+	local function finish(burst: boolean)
+		if burst then
+			projectileBurst(pos, color, d)
+		end
+		for _, p in pieces do
+			p:Destroy()
+		end
+	end
 
 	local alreadyHit = {}
 	local born = os.clock()
@@ -300,11 +397,11 @@ local function runProjectile(attacker: Model, move, facing: number)
 	conn = RunService.Heartbeat:Connect(function(dt)
 		if os.clock() - born > spec.Lifetime or not part.Parent then
 			conn:Disconnect()
-			part:Destroy()
+			finish(part.Parent ~= nil)
 			return
 		end
 		pos += Vector3.new(facing * spec.Speed * dt, 0, 0)
-		part.Position = pos
+		place(os.clock() - born)
 
 		for victim in queryHitbox(attacker, pos, spec.Size) do
 			if not alreadyHit[victim] then
@@ -312,9 +409,10 @@ local function runProjectile(attacker: Model, move, facing: number)
 				CombatService.ApplyHit(attacker, victim, move, facing)
 				if not spec.Pierce then
 					conn:Disconnect()
-					part:Destroy()
+					finish(true)
 					return
 				end
+				projectileBurst(pos, color, d * 0.6)
 			end
 		end
 	end)

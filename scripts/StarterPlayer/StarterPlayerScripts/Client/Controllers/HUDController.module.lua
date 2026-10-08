@@ -371,7 +371,9 @@ function HUDController.Start()
 
 	local function refreshHelp()
 		local gamepad = UserInputService:GetLastInputType().Name:find("Gamepad") ~= nil
-		local touchOnly = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not gamepad
+		-- Tablets con teclado también tienen TouchEnabled: manda lo último que se usó
+		local lastTouch = UserInputService:GetLastInputType() == Enum.UserInputType.Touch
+		local touchOnly = UserInputService.TouchEnabled and (lastTouch or not UserInputService.KeyboardEnabled) and not gamepad
 		buildKeys(if gamepad then GAMEPAD_ROWS else KEYBOARD_ROWS)
 		local labels = if gamepad then { Golpe = "X", Fuerte = "Y", Especial = "B", Ulti = "↑" } else { Golpe = "J", Fuerte = "K", Especial = "E", Ulti = "R" }
 		for name, t in tiles do

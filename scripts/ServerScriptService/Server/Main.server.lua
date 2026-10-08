@@ -54,6 +54,7 @@ local services = {
 	LobbyService = load("LobbyService"),
 	RewardsService = load("RewardsService"),
 	UltimateService = load("UltimateService"),
+	ColorSlotService = load("ColorSlotService"),
 	EconomyFeedback = remotes.EconomyFeedback,
 }
 local S = services
@@ -75,6 +76,7 @@ S.StoryService.Start(remotes, services)
 S.FighterService.Start()
 S.LobbyService.Start(services)
 S.RewardsService.Start(services)
+S.ColorSlotService.Start() -- colores alternativos si se repite personaje
 
 -- Enrutador de peticiones: el cliente pide, el servidor valida y responde { ok, msg }
 local handlers = {}

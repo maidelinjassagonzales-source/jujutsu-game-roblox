@@ -15,13 +15,24 @@ local JOYSTICK_RADIUS = 60
 local function actionButton(parent: Instance, text: string, color: Color3, size: number, position: UDim2, onPress: () -> ())
 	local b = UI.make("TextButton", {
 		AnchorPoint = Vector2.new(0.5, 0.5), Position = position, Size = UDim2.fromOffset(size, size),
-		BackgroundColor3 = color, BackgroundTransparency = 0.25, Text = text, TextSize = 15,
-		Font = Enum.Font.GothamBlack, TextColor3 = Color3.new(1, 1, 1), AutoButtonColor = true,
+		BackgroundColor3 = color, BackgroundTransparency = 0.15, Text = string.upper(text), TextSize = if size >= 70 then 16 else 12,
+		Font = Enum.Font.GothamBlack, TextColor3 = Color3.new(1, 1, 1), AutoButtonColor = false,
+		TextStrokeTransparency = 0.3, TextStrokeColor3 = UI.darker(color, 0.7),
 	}, parent)
 	UI.corner(b, size // 2)
-	UI.stroke(b, Color3.new(1, 1, 1), 2).Transparency = 0.5
+	UI.gradient(b, Color3.new(1, 1, 1), Color3.fromRGB(120, 120, 130))
+	UI.stroke(b, color:Lerp(Color3.new(1, 1, 1), 0.55), 2.5).Transparency = 0.15
+	-- Anillo exterior suave
+	local ring = UI.make("Frame", {
+		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.new(1, 10, 1, 10), BackgroundTransparency = 1,
+	}, b)
+	UI.corner(ring, size)
+	UI.make("UIStroke", { Color = color, Thickness = 3, Transparency = 0.7 }, ring)
+	local scale = UI.make("UIScale", {}, b)
 	b.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+			scale.Scale = 0.88
+			game:GetService("TweenService"):Create(scale, TweenInfo.new(0.18, Enum.EasingStyle.Back), { Scale = 1 }):Play()
 			onPress()
 		end
 	end)

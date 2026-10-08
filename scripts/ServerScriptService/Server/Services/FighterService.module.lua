@@ -83,6 +83,134 @@ local function createRig(description: HumanoidDescription): Model
 	return (Players :: any).CreateHumanoidModelFromDescription(Players, description, Enum.HumanoidRigType.R6)
 end
 
+-- ===== Modelos de la Toolbox (Creator Store) =====
+-- Mete un personaje de la tienda de assets en ServerStorage > CharacterModels y ponle de nombre el Id
+-- del luchador (Brawler, Sorcerer, CursedKing... o su nombre visible). El juego copia su "look" (ropa,
+-- cara, colores, pelo y accesorios) sobre nuestro rig R6, así las animaciones y el combate siguen igual.
+-- Sirven modelos R6 y R15. Los scripts que traiga el modelo se BORRAN (los modelos gratis a veces traen virus).
+local R15_TO_R6 = {
+	Head = "Head", UpperTorso = "Torso", LowerTorso = "Torso", Torso = "Torso",
+	LeftUpperArm = "Left Arm", LeftLowerArm = "Left Arm", LeftHand = "Left Arm", ["Left Arm"] = "Left Arm",
+	RightUpperArm = "Right Arm", RightLowerArm = "Right Arm", RightHand = "Right Arm", ["Right Arm"] = "Right Arm",
+	LeftUpperLeg = "Left Leg", LeftLowerLeg = "Left Leg", LeftFoot = "Left Leg", ["Left Leg"] = "Left Leg",
+	RightUpperLeg = "Right Leg", RightLowerLeg = "Right Leg", RightFoot = "Right Leg", ["Right Leg"] = "Right Leg",
+	HumanoidRootPart = "HumanoidRootPart",
+}
+
+local function findImported(data): Model?
+	local folder = ServerStorage:FindFirstChild("CharacterModels")
+	if not folder then
+		return nil
+	end
+	local found = folder:FindFirstChild(data.Id) or folder:FindFirstChild(data.DisplayName)
+	return if found and found:IsA("Model") then found else nil
+end
+
+local function stripScripts(root: Instance)
+	for _, d in root:GetDescendants() do
+		if d:IsA("LuaSourceContainer") then
+			d:Destroy()
+		end
+	end
+end
+
+-- Parte del cuerpo del modelo importado a la que va pegada una pieza suelta (pelo de partes, armas...)
+local function attachedBodyPart(part: BasePart): string?
+	for _, j in part:GetJoints() do
+		local other = if j.Part0 == part then j.Part1 else j.Part0
+		if other and R15_TO_R6[other.Name] then
+			return R15_TO_R6[other.Name]
+		end
+	end
+	return nil
+end
+
+local function applyImportedLook(model: Model, template: Model)
+	local source = template:Clone()
+	stripScripts(source)
+	local humanoid = model:FindFirstChildOfClass("Humanoid")
+
+	-- Ropa clásica, colores del cuerpo y cara
+	for _, className in { "Shirt", "Pants", "ShirtGraphic", "BodyColors" } do
+		local item = source:FindFirstChildOfClass(className)
+		if item then
+			local old = model:FindFirstChildOfClass(className)
+			if old then
+				old:Destroy()
+			end
+			item.Parent = model
+		end
+	end
+	local srcHead = source:FindFirstChild("Head")
+	local head = model:FindFirstChild("Head")
+	if srcHead and head then
+		local face = srcHead:FindFirstChildWhichIsA("Decal")
+		if face then
+			local old = head:FindFirstChild("face")
+			if old then
+				old:Destroy()
+			end
+			face.Name = "face"
+			face.Parent = head
+		end
+		local headMesh = srcHead:FindFirstChildWhichIsA("SpecialMesh")
+		if headMesh then
+			local old = head:FindFirstChildWhichIsA("SpecialMesh")
+			if old then
+				old:Destroy()
+			end
+			headMesh.Parent = head
+		end
+	end
+	-- Mallas de cuerpo R6 (CharacterMesh)
+	for _, d in source:GetChildren() do
+		if d:IsA("CharacterMesh") then
+			d.Parent = model
+		end
+	end
+	-- Accesorios (pelo, sombreros, armas a la espalda...): Roblox los coloca por sus attachments
+	for _, d in source:GetDescendants() do
+		if d:IsA("Accessory") and humanoid then
+			local handle = d:FindFirstChild("Handle")
+			if handle and handle:IsA("BasePart") then
+				for _, w in handle:GetChildren() do
+					if w:IsA("JointInstance") or w:IsA("WeldConstraint") then
+						w:Destroy()
+					end
+				end
+				handle.Anchored = false
+				handle.CanCollide = false
+				handle.Massless = true
+			end
+			pcall(humanoid.AddAccessory, humanoid, d)
+		end
+	end
+	-- Piezas sueltas pegadas al cuerpo (pelo hecho con partes, armaduras...): se sueldan a la misma parte
+	for _, part in source:GetDescendants() do
+		if part:IsA("BasePart") and not R15_TO_R6[part.Name] and not part:FindFirstAncestorOfClass("Accessory") then
+			local bodyName = attachedBodyPart(part)
+			local srcBody = bodyName and source:FindFirstChild(bodyName, true)
+			local body = bodyName and model:FindFirstChild(bodyName)
+			if body and srcBody and srcBody:IsA("BasePart") then
+				local offset = srcBody.CFrame:ToObjectSpace(part.CFrame)
+				for _, j in part:GetJoints() do
+					j:Destroy()
+				end
+				part.Anchored = false
+				part.CanCollide = false
+				part.Massless = true
+				part.CFrame = body.CFrame * offset
+				part.Parent = model
+				local weld = Instance.new("WeldConstraint")
+				weld.Part0 = body
+				weld.Part1 = part
+				weld.Parent = part
+			end
+		end
+	end
+	source:Destroy()
+end
+
 local function buildModel(characterId: string, skinId: string?, plain: boolean?): Model
 	local data = CharacterRegistry.Get(characterId) or CharacterRegistry.Get(Config.DefaultCharacter)
 	local skin = skinId and CatalogConfig.Skins[skinId]
@@ -91,8 +219,9 @@ local function buildModel(characterId: string, skinId: string?, plain: boolean?)
 	end
 	local colors = if skin then skin.Colors else data.Appearance
 
+	local imported = if not plain then findImported(data) else nil
 	-- Ropa propia del personaje (sin skin): el cuerpo debajo es piel (manos, brazos y piernas al aire)
-	local outfit = if not skin and not plain then ClothingConfig.Characters[data.Id] else nil
+	local outfit = if not skin and not plain and not imported then ClothingConfig.Characters[data.Id] else nil
 	local dressed = outfit ~= nil and (outfit.Shirt ~= 0 or outfit.Pants ~= 0)
 	local description = Instance.new("HumanoidDescription")
 	if colors then
@@ -139,7 +268,9 @@ local function buildModel(characterId: string, skinId: string?, plain: boolean?)
 	end
 	-- Pelo, armas, sombreros, cuerpos de maldición: modelos de Blender (si están importados);
 	-- si no, las piezas simples de antes
-	if not plain then
+	if imported then
+		applyImportedLook(model, imported)
+	elseif not plain then
 		local library = game:GetService("ServerStorage"):FindFirstChild("MeshLibrary")
 		local meshes = ModelConfig.Characters[data.Id]
 		if not (meshes and Accessories.BuildMeshes(model, meshes.Base, library)) then
@@ -240,6 +371,11 @@ end
 function FighterService.SpawnCharacter(player: Player, preserve: boolean?)
 	local data = DataService.Get(player)
 	local characterId = player:GetAttribute("SelectedCharacter") or Config.DefaultCharacter
+	-- Prueba en el Dojo: cualquier personaje, aunque no lo tengas (solo mientras estés en el Dojo)
+	local trial = player:GetAttribute("TrialCharacter")
+	if trial and player:GetAttribute("ArenaId") == "Hub" and CharacterRegistry.Get(trial) then
+		characterId = trial
+	end
 	local skinId = data and data.EquippedSkins[characterId]
 
 	local old = player.Character
@@ -302,6 +438,15 @@ function FighterService.CycleCharacter(player: Player)
 	FighterService.SelectCharacter(player, owned[index % #owned + 1])
 end
 
+-- Probar un personaje que no tienes contra el muñeco del Dojo
+function FighterService.TryCharacter(player: Player, characterId: string)
+	if player:GetAttribute("ArenaId") ~= "Hub" then
+		FighterService.SendToDojo(player)
+	end
+	player:SetAttribute("TrialCharacter", characterId)
+	FighterService.SpawnCharacter(player, true)
+end
+
 -- Coloca a un luchador en un punto de salida de SU arena
 function FighterService.TeleportToSpawn(model: Model, index: number?)
 	if model:GetAttribute("ArenaId") == "Lobby" then
@@ -322,12 +467,17 @@ end
 
 -- Cambia la zona del jugador: arena 2D ("Hub" = Dojo, "Arena3"...) o el Lobby 3D ("Lobby", modo "Free")
 function FighterService.SetZone(player: Player, arenaId: string, moveMode: string?, activity: string?)
+	-- Al salir del Dojo se acaba la prueba de personaje
+	local endTrial = arenaId ~= "Hub" and player:GetAttribute("TrialCharacter") ~= nil
+	if endTrial then
+		player:SetAttribute("TrialCharacter", nil)
+	end
 	player:SetAttribute("ArenaId", arenaId)
 	player:SetAttribute("MoveMode", moveMode or "Arena")
 	player:SetAttribute("Activity", activity or (if arenaId == "Hub" then "Hub" else player:GetAttribute("Activity")))
 	-- Lobby = tu avatar de Roblox · arenas = tu luchador. Si no toca el que llevas, se cambia.
 	local current = player.Character
-	if current and (current:GetAttribute("LobbyAvatar") == true) ~= wantsAvatar(player) then
+	if current and (endTrial or (current:GetAttribute("LobbyAvatar") == true) ~= wantsAvatar(player)) then
 		local pivot = current:GetPivot()
 		FighterService.SpawnCharacter(player, false)
 		if player.Character and player.Character ~= current then

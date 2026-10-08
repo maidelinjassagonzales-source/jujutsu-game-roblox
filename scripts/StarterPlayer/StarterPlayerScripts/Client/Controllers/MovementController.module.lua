@@ -30,6 +30,19 @@ local externalMove = Vector3.zero
 local dropUntil = 0
 
 local FREE_WALK_SPEED, FREE_RUN_SPEED = 14, 26 -- Lobby: caminar / correr
+local CharacterRegistry = require(Shared:WaitForChild("CharacterRegistry"))
+
+-- Carrera en combate (estilo dash de Smash): Shift, doble toque de dirección, L3 o joystick táctil a tope
+local RUN_MULT = 1.5
+local DOUBLE_TAP = 0.28
+local running = false
+local lastDirTap = { [-1] = 0, [1] = 0 }
+local lastDirSign = 0
+local dashHeld = false
+
+function MovementController.IsRunning(): boolean
+	return running
+end
 
 local function isFreeMode(): boolean
 	return character ~= nil and character:GetAttribute("MoveMode") == "Free"
@@ -195,6 +208,27 @@ function MovementController.Start()
 			return
 		end
 		humanoid:Move(Vector3.new(mv.X, 0, 0), false)
+
+		-- Correr: velocidad base del luchador (x transformación) x RUN_MULT
+		local sign = if mv.X > 0.5 then 1 elseif mv.X < -0.5 then -1 else 0
+		if sign ~= 0 and sign ~= lastDirSign then
+			local now = os.clock()
+			dashHeld = now - lastDirTap[sign] < DOUBLE_TAP
+			lastDirTap[sign] = now
+		elseif sign == 0 then
+			dashHeld = false
+		end
+		lastDirSign = sign
+		local wantsRun = sign ~= 0 and (dashHeld
+			or UserInputService:IsKeyDown(Enum.KeyCode.LeftShift)
+			or UserInputService:IsGamepadButtonDown(Enum.UserInputType.Gamepad1, Enum.KeyCode.ButtonL3)
+			or (externalMove.Magnitude > 0.92))
+		running = wantsRun
+		local data = CharacterRegistry.Get(character:GetAttribute("CharacterId"))
+		if data and not character:GetAttribute("IsDummy") then
+			local base = (data.WalkSpeed or Config.WalkSpeed) * (character:GetAttribute("SpeedMult") or 1)
+			humanoid.WalkSpeed = if running then base * RUN_MULT else base
+		end
 
 		-- Caída rápida
 		local v = hrp.AssemblyLinearVelocity

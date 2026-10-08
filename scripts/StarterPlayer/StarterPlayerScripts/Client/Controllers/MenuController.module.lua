@@ -17,7 +17,7 @@ function MenuController.Start()
 	local gui = UI.screenGui("MainMenu", 4)
 	-- Abajo a la izquierda: arriba a la izquierda está la ventana del chat de Roblox
 	local column = UI.make("Frame", {
-		AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 16, 1, -84), Size = UDim2.fromOffset(200, 290),
+		AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 16, 1, -84), Size = UDim2.fromOffset(200, 300),
 		BackgroundTransparency = 1,
 	}, gui)
 	UI.make("UIListLayout", {
@@ -60,6 +60,10 @@ function MenuController.Start()
 	end)
 
 	menuButton(column, 4, "Store", "Tienda", Color3.fromRGB(90, 220, 255)).Activated:Connect(StoreController.Toggle)
+	-- El tutorial es opcional: se puede empezar (o repetir) cuando quieras desde aquí
+	menuButton(column, 5, "Story", "Tutorial", Color3.fromRGB(120, 230, 150)).Activated:Connect(function()
+		require(script.Parent:WaitForChild("TutorialController")).Restart()
+	end)
 
 	-- Mando: la cruceta abre los menús (arriba Jugar · izquierda Personajes · derecha Tienda · abajo Pase)
 	local DPAD = {

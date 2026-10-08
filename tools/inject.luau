@@ -39,6 +39,11 @@ for _, svcName in fs.readDir(dir) do
 		visit(dir .. "/" .. svcName, svc)
 	end
 end
+-- Carpeta donde se meten los personajes de la Toolbox (ver FighterService)
+local storage = game:GetService("ServerStorage")
+if not storage:FindFirstChild("CharacterModels") then
+	local f = Instance.new("Folder"); f.Name = "CharacterModels"; f.Parent = storage; created += 1
+end
 -- Las carpetas creadas como contenedor de scripts que también son scripts: se manejan aparte
 fs.writeFile(out, roblox.serializePlace(game))
 print("cambiados:", changed, "creados:", created)

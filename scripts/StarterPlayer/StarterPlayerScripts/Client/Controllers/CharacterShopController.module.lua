@@ -292,6 +292,13 @@ function refreshDetail()
 				request("BuyCharacter", id, "Gems")
 			end)
 		end
+		-- Probarlo gratis contra el muñeco del Dojo antes de comprarlo
+		local tryBtn = UI.button(actions, "PROBAR", Color3.fromRGB(60, 160, 220), { Size = UDim2.fromOffset(110, 42), TextSize = 15 })
+		tryBtn.Activated:Connect(function()
+			if request("TryCharacter", id) then
+				frame.Visible = false
+			end
+		end)
 		if status == "EarlyAccess" then
 			info.Text = `Acceso Anticipado: gratis con {COIN} en {UI.formatDuration(endsAt - now)}`
 			info.TextColor3 = Color3.fromRGB(255, 150, 80)
