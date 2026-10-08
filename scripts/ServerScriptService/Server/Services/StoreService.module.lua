@@ -16,19 +16,19 @@ StoreService.Handlers.BuyItem = function(player: Player, itemId: any)
 	local item = type(itemId) == "string" and CatalogConfig.StoreItems[itemId]
 	local data = services.DataService.Get(player)
 	if not item or not data then
-		return result(false, "Objeto desconocido")
+		return result(false, "Unknown item")
 	end
 	if item.StoryOnly or not item.Gems then
-		return result(false, "Este objeto no se vende")
+		return result(false, "This item isn't for sale")
 	end
 	if item.Kind == "Effect" and data.OwnedEffects[itemId] then
-		return result(false, "Ya lo tienes")
+		return result(false, "You already own it")
 	end
 	if item.Kind == "Title" and data.OwnedTitles[itemId] then
-		return result(false, "Ya lo tienes")
+		return result(false, "You already own it")
 	end
 	if not services.EconomyService.SpendCurrency(player, "Gems", item.Gems, `Tienda:{itemId}`) then
-		return result(false, "No tienes suficientes Gemas")
+		return result(false, "You don't have enough Gems")
 	end
 
 	services.DataService.Update(player, function(d)
@@ -48,18 +48,18 @@ StoreService.Handlers.BuyItem = function(player: Player, itemId: any)
 	services.BoosterService.Refresh(player)
 	services.FighterService.RefreshCosmetics(player)
 	services.DataService.PushState(player)
-	return result(true, `¡{item.Name}!`)
+	return result(true, `{item.Name}!`)
 end
 
 -- Equipar / quitar (itemId = false para quitar)
 StoreService.Handlers.EquipCosmetic = function(player: Player, kind: any, itemId: any)
 	local data = services.DataService.Get(player)
 	if not data or (kind ~= "Effect" and kind ~= "Title") then
-		return result(false, "Petición inválida")
+		return result(false, "Invalid request")
 	end
 	local owns = if kind == "Effect" then data.OwnedEffects else data.OwnedTitles
 	if itemId and (type(itemId) ~= "string" or not owns[itemId]) then
-		return result(false, "No lo tienes")
+		return result(false, "You don't own it")
 	end
 	services.DataService.Update(player, function(d)
 		if kind == "Effect" then
@@ -70,7 +70,7 @@ StoreService.Handlers.EquipCosmetic = function(player: Player, kind: any, itemId
 	end)
 	services.FighterService.RefreshCosmetics(player)
 	services.DataService.PushState(player)
-	return result(true, if itemId then "Equipado" else "Quitado")
+	return result(true, if itemId then "Equipped" else "Removed")
 end
 
 function StoreService.Start(s)

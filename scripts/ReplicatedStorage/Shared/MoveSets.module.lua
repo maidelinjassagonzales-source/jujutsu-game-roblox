@@ -82,7 +82,7 @@ end
 function MoveSets.Recovery(o)
 	o = o or {}
 	return {
-		Name = o.Name or "Recuperación", Pose = o.Pose or "Rise",
+		Name = o.Name or "Recovery", Pose = o.Pose or "Rise",
 		Damage = o.Damage or 7, BaseKnockback = o.KB or 19, KnockbackGrowth = o.Growth or 60, Angle = o.Angle or 80,
 		Startup = 0.05, Active = o.Active or 0.28, Endlag = 0.3, Cooldown = 0.5,
 		Hitbox = if o.NoHitbox then nil else { Size = Vector3.new(6, 6, 6), Offset = Vector3.new(0, 2, 0) },

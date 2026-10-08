@@ -5,6 +5,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
+local PhysicsService = game:GetService("PhysicsService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Config = require(Shared:WaitForChild("CombatConfig"))
@@ -38,6 +39,9 @@ local shielding = setmetatable({}, { __mode = "k" }) -- [model] = true
 local shieldHP = setmetatable({}, { __mode = "k" }) -- [model] = number
 local intangibleUntil = setmetatable({}, { __mode = "k" })
 local airDodgeUsed = setmetatable({}, { __mode = "k" })
+local chargeStart = setmetatable({}, { __mode = "k" }) -- [model] = os.clock() al empezar a cargar un smash
+local throwDir = setmetatable({}, { __mode = "k" }) -- [model] = dirección elegida para el lanzamiento
+local VALID_THROWS = { Side = true, Up = true, Down = true, Back = true }
 
 -- Otros servicios (economía, misiones...) se suscriben a los golpes: fn(attacker, victim, damage)
 function CombatService.OnHit(fn)
@@ -65,6 +69,29 @@ end
 
 local function isGrounded(humanoid: Humanoid): boolean
 	return humanoid.FloorMaterial ~= Enum.Material.Air
+end
+
+-- Brillo mientras se carga un smash (lo ven todos los jugadores)
+local function setChargeVisual(model: Model, on: boolean)
+	local glow = model:FindFirstChild("SmashCharge")
+	if on and not glow then
+		glow = Instance.new("Highlight")
+		glow.Name = "SmashCharge"
+		glow.FillColor = Color3.fromRGB(255, 220, 90)
+		glow.OutlineColor = Color3.fromRGB(255, 255, 255)
+		glow.FillTransparency = 0.55
+		glow.DepthMode = Enum.HighlightDepthMode.Occluded
+		glow.Parent = model
+	elseif not on and glow then
+		glow:Destroy()
+	end
+end
+
+local function stopCharging(model: Model)
+	if chargeStart[model] then
+		chargeStart[model] = nil
+		setChargeVisual(model, false)
+	end
 end
 
 local function getFighterFromPart(part: BasePart): Model?
@@ -111,6 +138,18 @@ local function resolveMove(data, kind: string, dir: string, airborne: boolean)
 	return nil, nil
 end
 
+-- ¿Puede `attacker` hacer daño a `victim`?
+--   * Partidas: cada luchador lleva el atributo Team. Mismo equipo = no hay fuego amigo
+--     (en "todos contra todos" cada uno tiene su propio equipo).
+--   * Fuera de partidas (historia): los enemigos no se pegan entre ellos.
+function CombatService.CanHurt(attacker: Model, victim: Model): boolean
+	local teamA, teamV = attacker:GetAttribute("Team"), victim:GetAttribute("Team")
+	if teamA ~= nil or teamV ~= nil then
+		return teamA ~= teamV
+	end
+	return not (victim:GetAttribute("IsNPC") and attacker:GetAttribute("IsNPC"))
+end
+
 function CombatService.ApplyHit(attacker: Model, victim: Model, move, facing: number): boolean
 	if victim == attacker or not victim.Parent then
 		return false
@@ -118,8 +157,8 @@ function CombatService.ApplyHit(attacker: Model, victim: Model, move, facing: nu
 	if victim:GetAttribute("Invulnerable") or victim:GetAttribute("KOing") or victim:GetAttribute("Eliminated") then
 		return false
 	end
-	if victim:GetAttribute("IsNPC") and attacker:GetAttribute("IsNPC") then
-		return false -- los enemigos de la historia no se pegan entre ellos
+	if not CombatService.CanHurt(attacker, victim) then
+		return false -- compañero de equipo, o enemigos de la historia entre ellos
 	end
 	if victim:GetAttribute("ArenaId") ~= attacker:GetAttribute("ArenaId") then
 		return false
@@ -189,9 +228,10 @@ function CombatService.ApplyHit(attacker: Model, victim: Model, move, facing: nu
 	local velocity = KnockbackMath.LaunchVelocity(kb, angle, facing)
 	local hitstun = KnockbackMath.Hitstun(kb)
 
-	-- 3) Hitstun: interrumpe lo que estuviera haciendo la víctima
+	-- 3) Hitstun: interrumpe lo que estuviera haciendo la víctima (también la carga de un smash)
 	stunUntil[victim] = os.clock() + hitstun
 	busyUntil[victim] = nil
+	stopCharging(victim)
 
 	-- 4) Aplicar el lanzamiento donde viva su física
 	local player = Players:GetPlayerFromCharacter(victim)
@@ -229,13 +269,16 @@ local function runMelee(attacker: Model, move, facing: number)
 	local hitbox = move.Hitbox
 	local alreadyHit = {}
 	local deadline = os.clock() + (move.Active or 0)
+	-- La hitbox baja 1.5 studs más: alcanza a rivales tumbados/aturdidos a ras de suelo
+	local EXTRA_DOWN = 1.5
+	local size = hitbox.Size + Vector3.new(0, EXTRA_DOWN, 0)
 
 	repeat
 		if not hrp.Parent or isStunned(attacker) then
 			return
 		end
-		local center = hrp.Position + Vector3.new(hitbox.Offset.X * facing, hitbox.Offset.Y, 0)
-		for victim in queryHitbox(attacker, center, hitbox.Size) do
+		local center = hrp.Position + Vector3.new(hitbox.Offset.X * facing, hitbox.Offset.Y - EXTRA_DOWN / 2, 0)
+		for victim in queryHitbox(attacker, center, size) do
 			if not alreadyHit[victim] then
 				alreadyHit[victim] = true
 				if CombatService.ApplyHit(attacker, victim, move, facing) and move.FollowUp then
@@ -299,6 +342,12 @@ function CombatService.PerformAttack(model: Model, kind: string, dir: string, fa
 	if not VALID_KINDS[kind] or not VALID_DIRS[dir] then
 		return false
 	end
+	-- Carga del smash: la mide el servidor (desde el aviso "Charge") para que no se pueda falsear
+	local chargeAmount = 0
+	if kind == "Heavy" and chargeStart[model] then
+		chargeAmount = math.clamp((os.clock() - chargeStart[model]) / Config.SmashChargeTime, 0, 1)
+	end
+	stopCharging(model)
 	if not CollectionService:HasTag(model, "Fighter") or model:GetAttribute("KOing") or model:GetAttribute("Eliminated") then
 		return false
 	end
@@ -335,6 +384,10 @@ function CombatService.PerformAttack(model: Model, kind: string, dir: string, fa
 	if not move then
 		return false
 	end
+	if chargeAmount > 0.05 and not airborne then
+		move = table.clone(move)
+		move.Damage *= 1 + Config.SmashChargeBonus * chargeAmount
+	end
 
 	local cds = cooldowns[model] or {}
 	cooldowns[model] = cds
@@ -359,8 +412,13 @@ function CombatService.PerformAttack(model: Model, kind: string, dir: string, fa
 		then facingHint
 		else (if hrp.CFrame.LookVector.X >= 0 then 1 else -1)
 
+	-- Impulsos hacia arriba (recuperaciones) compensados por la gravedad baja: misma altura que antes
 	local selfVelocity = if move.SelfVelocity
-		then Vector3.new(move.SelfVelocity.X * facing, move.SelfVelocity.Y, 0)
+		then Vector3.new(
+			move.SelfVelocity.X * facing,
+			if move.SelfVelocity.Y > 0 then move.SelfVelocity.Y * (Config.VerticalScale or 1) else move.SelfVelocity.Y,
+			0
+		)
 		else nil
 	feedback:FireAllClients("MoveStarted", model, key, selfVelocity, facing)
 	for _, fn in moveListeners do
@@ -407,6 +465,10 @@ function CombatService.SetBusy(model: Model, duration: number)
 	busyUntil[model] = math.max(busyUntil[model] or 0, os.clock() + duration)
 end
 
+function CombatService.ClearBusy(model: Model)
+	busyUntil[model] = nil
+end
+
 function CombatService.IsStunned(model: Model): boolean
 	return isStunned(model)
 end
@@ -425,6 +487,20 @@ local function canAct(model: Model): (Humanoid?, BasePart?)
 		return nil, nil
 	end
 	return humanoid, hrp
+end
+
+-- Empezar/cancelar la carga de un smash (solo en el suelo y sin estar ocupado)
+function CombatService.SetCharging(model: Model, on: boolean)
+	if not on then
+		stopCharging(model)
+		return
+	end
+	local humanoid = canAct(model)
+	if not humanoid or (busyUntil[model] or 0) > os.clock() or shielding[model] or not isGrounded(humanoid) then
+		return
+	end
+	chargeStart[model] = os.clock()
+	setChargeVisual(model, true)
 end
 
 function CombatService.SetShield(model: Model, on: boolean)
@@ -455,7 +531,7 @@ function CombatService.BreakShield(model: Model)
 	-- ¡Escudo roto! Sale disparado hacia arriba y queda aturdido
 	stunUntil[model] = os.clock() + Defense.ShieldBreakStun
 	busyUntil[model] = nil
-	local launch = Vector3.new(0, 55, 0)
+	local launch = Vector3.new(0, 55 * (Config.VerticalScale or 1), 0)
 	local player = Players:GetPlayerFromCharacter(model)
 	if player then
 		feedback:FireClient(player, "Knockback", launch, Defense.ShieldBreakStun)
@@ -537,6 +613,8 @@ function CombatService.Grab(model: Model, dir: string, facingHint: number?)
 		return false -- en Smash no se agarra en el aire
 	end
 	CombatService.SetShield(model, false)
+	stopCharging(model)
+	throwDir[model] = if VALID_THROWS[dir] then dir else "Side" -- el cliente puede cambiarla mientras agarra ("ThrowDir")
 	local facing = if facingHint == 1 or facingHint == -1 then facingHint else (if hrp.CFrame.LookVector.X >= 0 then 1 else -1)
 	local now = os.clock()
 	busyUntil[model] = now + Defense.GrabStartup + Defense.GrabActive + Defense.GrabWhiffLag
@@ -555,7 +633,7 @@ function CombatService.Grab(model: Model, dir: string, facingHint: number?)
 				if candidate:GetAttribute("ArenaId") == model:GetAttribute("ArenaId")
 					and not candidate:GetAttribute("Invulnerable") and not candidate:GetAttribute("KOing")
 					and (intangibleUntil[candidate] or 0) <= os.clock()
-					and not (candidate:GetAttribute("IsNPC") and model:GetAttribute("IsNPC")) then
+					and CombatService.CanHurt(model, candidate) then
 					victim = candidate
 					break
 				end
@@ -598,7 +676,9 @@ function CombatService.Grab(model: Model, dir: string, facingHint: number?)
 			return
 		end
 
-		-- Lanzamiento
+		-- Lanzamiento (la dirección que se mantenga al final del agarre)
+		dir = throwDir[model] or dir
+		throwDir[model] = nil
 		local throwName, throwFacing = "Forward", facing
 		if dir == "Up" then
 			throwName = "Up"
@@ -648,9 +728,70 @@ function CombatService.ClearState(model: Model)
 	shielding[model] = nil
 	intangibleUntil[model] = nil
 	airDodgeUsed[model] = nil
+	throwDir[model] = nil
+	stopCharging(model)
 	model:SetAttribute("Shielding", false)
 	model:SetAttribute("Intangible", false)
 	KnockbackSimulator.Cancel(model)
+end
+
+-- Plataformas atravesables para los luchadores que simula el SERVIDOR (muñeco de práctica, NPCs).
+-- Los jugadores ya lo hacen en su cliente (MovementController). Sin esto, un muñeco lanzado hacia
+-- arriba desde debajo de una plataforma chocaba con ella y rebotaba hacia abajo.
+local SOFT_GROUP, PASS_GROUP = "SoftPlatform", "PassThroughFighter"
+
+local function setupSoftPlatforms()
+	pcall(PhysicsService.RegisterCollisionGroup, PhysicsService, SOFT_GROUP)
+	pcall(PhysicsService.RegisterCollisionGroup, PhysicsService, PASS_GROUP)
+	PhysicsService:CollisionGroupSetCollidable(SOFT_GROUP, PASS_GROUP, false)
+
+	local function tagPlatform(part: Instance)
+		if part:IsA("BasePart") then
+			part.CollisionGroup = SOFT_GROUP
+		end
+	end
+	for _, part in CollectionService:GetTagged("SoftPlatform") do
+		tagPlatform(part)
+	end
+	CollectionService:GetInstanceAddedSignal("SoftPlatform"):Connect(tagPlatform)
+
+	local passing = setmetatable({}, { __mode = "k" }) -- [model] = atraviesa ahora mismo
+	RunService.Stepped:Connect(function()
+		local platforms = CollectionService:GetTagged("SoftPlatform")
+		for _, model in CollectionService:GetTagged("Fighter") do
+			if Players:GetPlayerFromCharacter(model) then
+				continue
+			end
+			local hrp = model:FindFirstChild("HumanoidRootPart") :: BasePart?
+			if not hrp or not hrp:IsDescendantOf(workspace) then
+				continue
+			end
+			local pos = hrp.Position
+			local feet = pos.Y - 3
+			-- Subiendo: atraviesa. Bajando: solo choca si los pies están por encima de la plataforma.
+			local pass = hrp.AssemblyLinearVelocity.Y > 1
+			if not pass then
+				for _, p in platforms do
+					if p:IsA("BasePart") then
+						local top = p.Position.Y + p.Size.Y / 2
+						local bottom = p.Position.Y - p.Size.Y / 2
+						if math.abs(pos.X - p.Position.X) < p.Size.X / 2 + 2 and feet < top - 0.7 and pos.Y + 2 > bottom - 0.5 then
+							pass = true
+							break
+						end
+					end
+				end
+			end
+			if passing[model] ~= pass then
+				passing[model] = pass
+				for _, d in model:GetDescendants() do
+					if d:IsA("BasePart") then
+						d.CollisionGroup = if pass then PASS_GROUP else "Default"
+					end
+				end
+			end
+		end
+	end)
 end
 
 function CombatService.Start(remotes: Folder)
@@ -676,8 +817,18 @@ function CombatService.Start(remotes: Folder)
 			CombatService.UltimateHandler(model)
 		elseif model and action == "Grab" and type(a) == "string" then
 			CombatService.Grab(model, a, if b == 1 or b == -1 then b else nil)
+		elseif model and action == "ThrowDir" and VALID_THROWS[a] and throwDir[model] then
+			throwDir[model] = a
+		elseif model and action == "Charge" then
+			CombatService.SetCharging(model, a == true)
+		elseif model and action == "ClashKey" and CombatService.ClashKeyHandler then
+			CombatService.ClashKeyHandler(model, a) -- choque de dominios (UltimateService)
+		elseif model and action == "UseItem" and CombatService.ItemHandler then
+			CombatService.ItemHandler(model, a, b) -- objetos de partida (ItemService)
 		end
 	end)
+
+	setupSoftPlatforms()
 
 	-- El escudo se gasta mientras se mantiene y se recarga solo cuando no
 	local syncTimer = 0
@@ -688,6 +839,11 @@ function CombatService.Start(remotes: Folder)
 			syncTimer = 0
 		end
 		for _, model in CollectionService:GetTagged("Fighter") do
+			-- Carga de smash abandonada (el cliente nunca soltó): se cancela sola
+			local cs = chargeStart[model]
+			if cs and os.clock() - cs > Config.SmashChargeTime + 1.5 then
+				stopCharging(model)
+			end
 			local hp = shieldHP[model] or Defense.ShieldMax
 			if shielding[model] then
 				hp -= Defense.ShieldDrain * dt

@@ -8,7 +8,7 @@ end
 
 return {
 	Id = "CursedKing",
-	DisplayName = "Rey Maldito",
+	DisplayName = "Cursed King",
 	Color = Color3.fromRGB(220, 40, 60),
 	Weight = 100,
 	WalkSpeed = 24,
@@ -42,21 +42,21 @@ return {
 		Heavy_Up = { Damage = 14, BaseKnockback = 31, KnockbackGrowth = 95, Angle = 86, Startup = 0.3, Active = 0.12, Endlag = 0.4, Cooldown = 0.6, Hitbox = hb(7, 7, 1, 4) },
 		Heavy_Down = { Damage = 13, BaseKnockback = 27, KnockbackGrowth = 92, Angle = 25, Startup = 0.3, Active = 0.1, Endlag = 0.4, Cooldown = 0.6, Hitbox = hb(14, 3, 0, -2) },
 
-		Special_Neutral = { Name = "Desmantelar", Pose = "Slash", -- "Desmantelar": corte a distancia rápido y débil
+		Special_Neutral = { Name = "Dismantle", Pose = "Slash", -- "Desmantelar": corte a distancia rápido y débil
 			Damage = 6, BaseKnockback = 10, KnockbackGrowth = 35, Angle = 30,
 			Startup = 0.15, Active = 0, Endlag = 0.25, Cooldown = 1,
 			Projectile = { Speed = 130, Lifetime = 0.6, Size = Vector3.new(3, 3, 3), Color = Color3.fromRGB(255, 230, 230), Pierce = true },
 		},
-		Special_Side = { Name = "Partir", Pose = "SlashHeavy", -- "Partir": corte pesado a corta distancia
+		Special_Side = { Name = "Cleave", Pose = "SlashHeavy", -- "Partir": corte pesado a corta distancia
 			Damage = 14, BaseKnockback = 32, KnockbackGrowth = 90, Angle = 38,
 			Startup = 0.28, Active = 0.1, Endlag = 0.4, Cooldown = 3, Hitbox = hb(7, 5, 3.5, 0),
 		},
-		Special_Up = { Name = "Ascenso del Rey", Pose = "Rise", -- Recuperación
+		Special_Up = { Name = "King's Ascent", Pose = "Rise", -- Recuperación
 			Damage = 7, BaseKnockback = 19, KnockbackGrowth = 60, Angle = 80,
 			Startup = 0.05, Active = 0.3, Endlag = 0.3, Cooldown = 0.5, Hitbox = hb(6, 6, 0, 2),
 			SelfVelocity = Vector3.new(10, 98, 0), OncePerAir = true,
 		},
-		Special_Down = { Name = "Flecha de Fuego", Pose = "Beam", -- "Flecha de Fuego": lenta, enorme castigo
+		Special_Down = { Name = "Fire Arrow", Pose = "Beam", -- "Flecha de Fuego": lenta, enorme castigo
 			Damage = 20, BaseKnockback = 42, KnockbackGrowth = 94, Angle = 40,
 			Startup = 1, Active = 0, Endlag = 0.6, Cooldown = 18,
 			Projectile = { Speed = 80, Lifetime = 1.6, Size = Vector3.new(6, 6, 6), Color = Color3.fromRGB(255, 120, 30), Pierce = true },

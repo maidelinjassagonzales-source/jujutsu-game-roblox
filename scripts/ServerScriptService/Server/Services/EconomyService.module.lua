@@ -201,7 +201,7 @@ local function onHit(attacker: Model, victim: Model, damage: number)
 	local rewards = EconomyConfig.Rewards
 	local xp = damage * rewards.XPPerDamage
 	if chunks > 0 then
-		EconomyService.GrantCombatReward(player, chunks * rewards.CoinsPer10Damage, xp, "Daño")
+		EconomyService.GrantCombatReward(player, chunks * rewards.CoinsPer10Damage, xp, "Damage")
 	else
 		EconomyService.AddXP(player, applyMultiplier(player, "XP", xp))
 	end
@@ -304,7 +304,7 @@ local function processReceipt(receipt)
 		return Enum.ProductPurchaseDecision.NotProcessedYet
 	end
 
-	notify(player, { Gems = gems, Reason = "Compra" })
+	notify(player, { Gems = gems, Reason = "Purchase" })
 	return Enum.ProductPurchaseDecision.PurchaseGranted
 end
 
@@ -327,7 +327,7 @@ function EconomyService.Start(remotes: Folder, combatService, koService)
 					end)
 					local last = lastCombatAt[player]
 					if last and os.clock() - last <= playtime.Interval then
-						EconomyService.GrantCombatReward(player, playtime.Coins, playtime.XP, "Tiempo de juego")
+						EconomyService.GrantCombatReward(player, playtime.Coins, playtime.XP, "Playtime")
 					end
 				end
 			end

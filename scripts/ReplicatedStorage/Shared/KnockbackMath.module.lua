@@ -20,7 +20,7 @@ end
 function KnockbackMath.LaunchVelocity(kb: number, angleDeg: number, facing: number): Vector3
 	local speed = kb * Config.LaunchSpeedMultiplier
 	local a = math.rad(angleDeg)
-	return Vector3.new(math.cos(a) * facing * speed, math.sin(a) * speed, 0)
+	return Vector3.new(math.cos(a) * facing * speed, math.sin(a) * speed * (Config.VerticalScale or 1), 0)
 end
 
 function KnockbackMath.Hitstun(kb: number): number

@@ -29,6 +29,12 @@ UI.Icons = {
 	-- Arte de la interfaz (tools/gen_ui.py)
 	Logo = 108235176735726, MetalButton = 127273806000361, CoinPile = 91638132091436, GemBig = 96762974045852,
 	Chest = 74789042502370,
+	-- Segunda tanda (tools/gen_ui2.py): piezas 9-slice para teñir + iconos cartoon
+	Panel = 97604856229295, Ribbon = 137839799702952, Glossy = 140526732497287, Card = 108242889971167,
+	Corner = 114488982693276, DiamondBack = 104754858924108, DiamondFill = 117880785752004, DiamondRing = 82532512531696,
+	Lock = 76625601767310, Check = 119843750033451, Star = 130023898272492, Crown = 121351891262153, X2 = 115689614042772,
+	Clock = 121979246064434, Skin = 116097598724590, Title = 116910914701946, KO = 85530704947126, Swords = 117182317496374,
+	PlayArrow = 70660727636840, Close = 138112506964523, Rays = 112044518614084, PortalSwirl = 124014435863502,
 }
 -- Emoji -> icono (para quitar los emojis de los títulos)
 local EMOJI_ICONS = {
@@ -59,7 +65,8 @@ function UI.splitEmoji(text: string): (string, string?)
 end
 
 -- Tipografía de pincel (estilo del logo de Jujutsu) para títulos y textos grandes
-UI.TitleFont = Enum.Font.PermanentMarker
+UI.TitleFont = Enum.Font.FredokaOne
+UI.DisplayFont = Enum.Font.LuckiestGuy
 
 function UI.make(className: string, props, parent: Instance?)
 	local inst = Instance.new(className)
@@ -198,28 +205,128 @@ function UI.button(parent: Instance, text: string, color: Color3, props)
 	local defaults = {
 		BackgroundColor3 = color,
 		Text = text,
-		Font = Enum.Font.GothamBlack,
+		Font = Enum.Font.FredokaOne,
 		TextSize = 15,
 		TextColor3 = UI.Colors.Text,
 		AutoButtonColor = false,
-		TextStrokeTransparency = 0.65,
-		TextStrokeColor3 = darker(color, 0.7),
 	}
 	for k, v in props or {} do
 		defaults[k] = v
 	end
 	local b = UI.make("TextButton", defaults, parent)
-	UI.corner(b, 9)
-	-- Volumen: arriba más claro, abajo más oscuro + borde oscuro
-	UI.gradient(b, Color3.new(1, 1, 1), Color3.fromRGB(165, 165, 175))
-	UI.make("UIStroke", {
-		Color = darker(color, 0.45), Thickness = 1.5, ApplyStrokeMode = Enum.ApplyStrokeMode.Border, Transparency = 0.2,
+	-- El fondo lo pinta una imagen con brillo; el texto va en una etiqueta hija (si no, la imagen lo taparía)
+	local skin = UI.make("ImageLabel", {
+		Name = "Skin", BackgroundTransparency = 1, Image = `rbxassetid://{UI.Icons.Glossy}`, ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(18, 18, 110, 44), SliceScale = 0.6, Size = UDim2.fromScale(1, 1), ZIndex = 0,
+		ImageColor3 = b.BackgroundColor3, ImageTransparency = b.BackgroundTransparency,
 	}, b)
-	UI.bounce(b)
+	local label = UI.make("TextLabel", {
+		Name = "Label", BackgroundTransparency = 1, Size = UDim2.new(1, -8, 1, -4), Position = UDim2.fromOffset(4, 0),
+		Text = b.Text, Font = b.Font, TextSize = b.TextSize, TextColor3 = b.TextColor3, TextScaled = b.TextScaled,
+		TextWrapped = true, RichText = b.RichText, ZIndex = 1,
+	}, b)
+	local outline = UI.make("UIStroke", { Thickness = 1.6, Transparency = 0.15 }, label)
+	b.TextTransparency = 1
+	b.BackgroundTransparency = 1
+	local function syncColor()
+		local c = b.BackgroundColor3
+		skin.ImageColor3 = c
+		outline.Color = c:Lerp(Color3.new(0, 0, 0), 0.65)
+	end
+	syncColor()
+	b:GetPropertyChangedSignal("BackgroundColor3"):Connect(syncColor)
+	b:GetPropertyChangedSignal("BackgroundTransparency"):Connect(function()
+		if b.BackgroundTransparency < 1 then
+			skin.ImageTransparency = b.BackgroundTransparency
+			b.BackgroundTransparency = 1
+		end
+	end)
+	for _, prop in { "Text", "TextColor3", "TextSize", "Font", "TextScaled" } do
+		b:GetPropertyChangedSignal(prop):Connect(function()
+			(label :: any)[prop] = (b :: any)[prop]
+		end)
+	end
+	b:GetPropertyChangedSignal("TextTransparency"):Connect(function()
+		if b.TextTransparency < 1 then
+			label.TextTransparency = b.TextTransparency
+			b.TextTransparency = 1
+		end
+	end)
+	local scale = UI.make("UIScale", {}, b)
+	b.MouseEnter:Connect(function()
+		skin.ImageColor3 = b.BackgroundColor3:Lerp(Color3.new(1, 1, 1), 0.18)
+		TweenService:Create(scale, TweenInfo.new(0.1), { Scale = 1.04 }):Play()
+	end)
+	b.MouseLeave:Connect(function()
+		syncColor()
+		TweenService:Create(scale, TweenInfo.new(0.1), { Scale = 1 }):Play()
+	end)
+	b.MouseButton1Down:Connect(function()
+		scale.Scale = 0.94
+	end)
+	b.MouseButton1Up:Connect(function()
+		TweenService:Create(scale, TweenInfo.new(0.15, Enum.EasingStyle.Back), { Scale = 1 }):Play()
+	end)
 	b.Activated:Connect(function()
 		Sfx.Play("Click")
 	end)
 	return b
+end
+
+-- Tarjeta con degradado y brillo, teñida del color que se pase (rareza, sección...)
+function UI.card(parent: Instance, color: Color3, props)
+	local c = UI.make("ImageLabel", {
+		BackgroundTransparency = 1, Image = `rbxassetid://{UI.Icons.Card}`, ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(20, 20, 108, 108), SliceScale = 0.6, ImageColor3 = color,
+	}, parent)
+	for k, v in props or {} do
+		(c :: any)[k] = v
+	end
+	return c
+end
+
+-- Rayos de luz que giran detrás de un premio
+function UI.rays(parent: Instance, color: Color3, props)
+	local r = UI.make("ImageLabel", {
+		BackgroundTransparency = 1, Image = `rbxassetid://{UI.Icons.Rays}`, ImageColor3 = color, ImageTransparency = 0.2,
+		AnchorPoint = Vector2.new(0.5, 0.5), ZIndex = 0,
+	}, parent)
+	for k, v in props or {} do
+		(r :: any)[k] = v
+	end
+	task.spawn(function()
+		while r.Parent do
+			r.Rotation = (r.Rotation + 0.4) % 360
+			task.wait(1 / 30)
+		end
+	end)
+	return r
+end
+
+-- Etiqueta inclinada tipo "¡OFERTA!"
+function UI.badge(parent: Instance, text: string, color: Color3, props)
+	local b = UI.label(parent, {
+		Text = text, TextSize = 12, Font = Enum.Font.FredokaOne, BackgroundTransparency = 0, BackgroundColor3 = color,
+		TextXAlignment = Enum.TextXAlignment.Center, Rotation = -8, ZIndex = 6, AutomaticSize = Enum.AutomaticSize.X,
+		Size = UDim2.fromOffset(0, 20),
+	})
+	for k, v in props or {} do
+		(b :: any)[k] = v
+	end
+	UI.corner(b, 6)
+	UI.make("UIPadding", { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8) }, b)
+	UI.make("UIStroke", { Color = Color3.new(1, 1, 1), Thickness = 1.5, ApplyStrokeMode = Enum.ApplyStrokeMode.Border }, b)
+	return b
+end
+
+-- Texto grande de dibujos (con contorno grueso)
+function UI.display(parent: Instance, props)
+	local l = UI.label(parent, { Font = Enum.Font.LuckiestGuy, TextSize = 24 })
+	for k, v in props or {} do
+		(l :: any)[k] = v
+	end
+	UI.make("UIStroke", { Thickness = 2.5, Color = Color3.fromRGB(14, 8, 22) }, l)
+	return l
 end
 
 -- Iconos de moneda reales (imagen) en lugar del kanji de texto
@@ -405,8 +512,8 @@ end
 
 function UI.formatNumber(n: number): string
 	local s = tostring(math.floor(n))
-	local formatted = s:reverse():gsub("(%d%d%d)", "%1."):reverse()
-	return (formatted:gsub("^%.", ""))
+	local formatted = s:reverse():gsub("(%d%d%d)", "%1,"):reverse()
+	return (formatted:gsub("^,", ""))
 end
 
 function UI.formatDuration(seconds: number): string
@@ -429,7 +536,7 @@ function UI.confirmButton(button: TextButton, onConfirm: () -> ())
 	button.Activated:Connect(function()
 		if not armed then
 			armed = true
-			button.Text = "¿Confirmar?"
+			button.Text = "Confirm?"
 			task.delay(3, function()
 				if armed then
 					armed = false
@@ -454,105 +561,97 @@ local WATERMARK = {
 }
 
 function UI.modal(gui: ScreenGui, title: string, size: UDim2, accent: Color3)
-	-- Fondo oscurecido detrás de la ventana (clic fuera = cerrar)
-	local dim = UI.make("TextButton", {
-		Name = "Dim", Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.new(0, 0, 0), BackgroundTransparency = 0.45,
-		Text = "", AutoButtonColor = false, Visible = false, ZIndex = 9,
-	}, gui)
-
+	-- Fondo oscurecido (clic fuera = cerrar)
+	local dim = gui:FindFirstChild("Dim") :: TextButton
+	if not dim then
+		dim = UI.make("TextButton", {
+			Name = "Dim", Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.fromRGB(6, 4, 12), BackgroundTransparency = 0.45,
+			Text = "", AutoButtonColor = false, Visible = false, ZIndex = 9,
+		}, gui)
+	end
 	local frame = UI.make("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = size,
-		BackgroundColor3 = Color3.fromRGB(255, 255, 255), Visible = false, ZIndex = 10,
+		BackgroundTransparency = 1, Visible = false, ZIndex = 10,
 	}, gui)
-	UI.corner(frame, 18)
-	-- Panel: violeta muy oscuro arriba -> casi negro abajo
-	UI.make("UIGradient", {
-		Rotation = 90,
-		Color = ColorSequence.new({
-			ColorSequenceKeypoint.new(0, Color3.fromRGB(38, 28, 58)),
-			ColorSequenceKeypoint.new(0.35, Color3.fromRGB(22, 18, 34)),
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(12, 10, 20)),
-		}),
+	UI.make("ImageLabel", {
+		Name = "Bg", BackgroundTransparency = 1, Image = `rbxassetid://{UI.Icons.Panel}`, ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(30, 30, 226, 226), Size = UDim2.fromScale(1, 1), ZIndex = 0,
 	}, frame)
-	UI.animatedStroke(frame, accent, 2.5)
-	UI.glow(frame, accent, 18)
+	-- Borde del color de la ventana con un degradado brillante
+	local edge = UI.make("Frame", { Name = "Edge", BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), ZIndex = 0 }, frame)
+	UI.corner(edge, 14)
+	local stroke = UI.make("UIStroke", { Color = Color3.new(1, 1, 1), Thickness = 3, ApplyStrokeMode = Enum.ApplyStrokeMode.Border }, edge)
+	UI.make("UIGradient", { Rotation = 90, Color = ColorSequence.new(accent:Lerp(Color3.new(1, 1, 1), 0.45), accent:Lerp(Color3.new(0, 0, 0), 0.25)) }, stroke)
+	-- Resplandor de color arriba
+	UI.make("Frame", {
+		Name = "Glow", Size = UDim2.new(1, 0, 0, 90), BackgroundColor3 = accent, BackgroundTransparency = 0.6, ZIndex = 0, BorderSizePixel = 0,
+	}, frame)
+	UI.make("UIGradient", { Rotation = 90, Transparency = NumberSequence.new(0.2, 1) }, frame:FindFirstChild("Glow"))
+	UI.corner(frame:FindFirstChild("Glow"), 14)
+	for i, rot in { 0, 90, 270, 180 } do
+		local x = if i == 2 or i == 4 then 1 else 0
+		local y = if i == 3 or i == 4 then 1 else 0
+		UI.make("ImageLabel", {
+			Name = "Corner", BackgroundTransparency = 1, Image = `rbxassetid://{UI.Icons.Corner}`, ImageColor3 = accent:Lerp(Color3.new(1, 1, 1), 0.35),
+			AnchorPoint = Vector2.new(x, y), Position = UDim2.new(x, if x == 0 then -4 else 4, y, if y == 0 then -4 else 4),
+			Size = UDim2.fromOffset(34, 34), Rotation = rot, ZIndex = 3,
+		}, frame)
+	end
 
 	-- En pantallas pequeñas (móvil) la ventana se encoge para caber entera
 	local scale = UI.make("UIScale", {}, frame)
-	local fitScale = 1
 	local function fit()
 		local viewport = workspace.CurrentCamera.ViewportSize
-		fitScale = math.min(1, (viewport.X - 24) / size.X.Offset, (viewport.Y - 24) / size.Y.Offset)
-		scale.Scale = fitScale
+		scale.Scale = math.min(1, (viewport.X - 24) / size.X.Offset, (viewport.Y - 24) / size.Y.Offset)
 	end
 	workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(fit)
 	fit()
 
-	-- Cabecera: franja del color de la ventana que se desvanece hacia la derecha
-	local band = UI.make("Frame", {
-		Size = UDim2.new(1, 0, 0, 60), BackgroundColor3 = accent, BackgroundTransparency = 0.55, BorderSizePixel = 0, ZIndex = 10,
-	}, frame)
-	UI.corner(band, 18)
-	UI.make("UIGradient", { Transparency = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 0.1), NumberSequenceKeypoint.new(0.6, 0.85), NumberSequenceKeypoint.new(1, 1),
-	}) }, band)
-	local line = UI.make("Frame", {
-		Position = UDim2.fromOffset(16, 60), Size = UDim2.new(1, -32, 0, 2), BackgroundColor3 = accent, BorderSizePixel = 0, ZIndex = 11,
-	}, frame)
-	UI.make("UIGradient", { Transparency = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(0.7, 0.6), NumberSequenceKeypoint.new(1, 1),
-	}) }, line)
-
+	-- Cinta con el título
 	local cleanTitle, iconName = UI.splitEmoji(title)
-	-- Marca de agua (kanji gigante y casi transparente)
-	UI.label(frame, {
-		AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -54, 0, -14), Size = UDim2.fromOffset(110, 110),
-		Text = WATERMARK[iconName or ""] or "呪", TextScaled = true, Font = Enum.Font.GothamBlack, TextColor3 = accent,
-		TextTransparency = 0.88, TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 10,
-	})
+	local ribbonW = math.min(size.X.Offset * 0.62, 420)
+	local ribbon = UI.make("ImageLabel", {
+		Name = "Ribbon", BackgroundTransparency = 1, Image = `rbxassetid://{UI.Icons.Ribbon}`, ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(30, 10, 470, 54), SliceScale = 0.7, ImageColor3 = accent, Position = UDim2.fromOffset(-12, 6),
+		Size = UDim2.fromOffset(ribbonW, 42), ZIndex = 2,
+	}, frame)
+	UI.make("UIGradient", { Rotation = 0, Color = ColorSequence.new(Color3.new(1, 1, 1), Color3.fromRGB(200, 200, 200)) }, ribbon)
 	if iconName then
-		local icon = UI.icon(frame, iconName, { Position = UDim2.fromOffset(10, 4), Size = UDim2.fromOffset(52, 52), ZIndex = 12 })
-		-- respiración suave del icono
-		task.spawn(function()
-			local s = UI.make("UIScale", {}, icon)
-			while icon.Parent do
-				TweenService:Create(s, TweenInfo.new(1.4, Enum.EasingStyle.Sine), { Scale = 1.08 }):Play()
-				task.wait(1.4)
-				TweenService:Create(s, TweenInfo.new(1.4, Enum.EasingStyle.Sine), { Scale = 1 }):Play()
-				task.wait(1.4)
-			end
-		end)
+		UI.icon(frame, iconName, { Position = UDim2.fromOffset(-20, -8), Size = UDim2.fromOffset(62, 62), ZIndex = 4 })
 	end
-	local titleLabel = UI.label(frame, {
-		Position = UDim2.fromOffset(if iconName then 68 else 20, 8), Size = UDim2.new(1, -140, 0, 44),
-		Text = cleanTitle, TextSize = 30, Font = UI.TitleFont, ZIndex = 12, TextStrokeTransparency = 0.4,
-		TextStrokeColor3 = darker(accent, 0.7),
-	})
-	UI.gradient(titleLabel, Color3.new(1, 1, 1), accent:Lerp(Color3.new(1, 1, 1), 0.45))
-
-	local close = UI.button(frame, "X", Color3.fromRGB(200, 45, 60), {
-		AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -12, 0, 12), Size = UDim2.fromOffset(36, 36), TextSize = 18,
-		ZIndex = 12,
-	})
-	local function hide()
+	UI.display(frame, {
+		Position = UDim2.fromOffset(if iconName then 48 else 14, 8), Size = UDim2.fromOffset(ribbonW - 70, 36),
+		Text = string.upper(cleanTitle), TextSize = 26, ZIndex = 3, TextScaled = true,
+	}):FindFirstChildOfClass("UIStroke").Thickness = 3
+	local close = UI.make("ImageButton", {
+		Name = "Close", BackgroundTransparency = 1, Image = `rbxassetid://{UI.Icons.Close}`, AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.new(1, 10, 0, -10), Size = UDim2.fromOffset(44, 44), ZIndex = 5,
+	}, frame)
+	close.Activated:Connect(function()
+		Sfx.Play("Click")
 		frame.Visible = false
-	end
-	close.Activated:Connect(hide)
-	dim.Activated:Connect(hide)
+	end)
+	local content = UI.make("Frame", {
+		Position = UDim2.fromOffset(16, 70), Size = UDim2.new(1, -32, 1, -84), BackgroundTransparency = 1, ZIndex = 1,
+	}, frame)
 
-	-- Animación de apertura (pop) y fondo oscuro sincronizado
+	-- El fondo oscuro sigue a las ventanas de esta pantalla
 	frame:GetPropertyChangedSignal("Visible"):Connect(function()
-		dim.Visible = frame.Visible
+		local any = false
+		for _, f in gui:GetChildren() do
+			if f:IsA("Frame") and f.ZIndex == 10 and f.Visible then
+				any = true
+			end
+		end
+		dim.Visible = any
 		if frame.Visible then
-			scale.Scale = fitScale * 0.86
-			TweenService:Create(scale, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = fitScale }):Play()
-			Sfx.Play("Click")
+			frame.Position = UDim2.new(0.5, 0, 0.5, 30)
+			TweenService:Create(frame, TweenInfo.new(0.25, Enum.EasingStyle.Back), { Position = UDim2.fromScale(0.5, 0.5) }):Play()
 		end
 	end)
-
-	local content = UI.make("Frame", {
-		Position = UDim2.fromOffset(16, 70), Size = UDim2.new(1, -32, 1, -84), BackgroundTransparency = 1, ZIndex = 11,
-	}, frame)
+	dim.Activated:Connect(function()
+		frame.Visible = false
+	end)
 	table.insert(modals, frame)
 	return frame, content
 end

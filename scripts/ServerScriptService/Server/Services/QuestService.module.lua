@@ -76,7 +76,7 @@ function QuestService.Add(player: Player?, kind: string, amount: number?)
 			end)
 			dirty[player] = true
 			if before < quest.Goal and entry.Progress >= quest.Goal then
-				services.EconomyFeedback:FireClient(player, "Reward", { Reason = `¡Misión completada: {quest.Text}! Cóbrala en Misiones` })
+				services.EconomyFeedback:FireClient(player, "Reward", { Reason = `Quest completed: {quest.Text}! Claim it in Quests` })
 			end
 		end
 	end
@@ -96,20 +96,20 @@ QuestService.Handlers.ClaimQuest = function(player: Player, index: any)
 	local entry = data.Quests.List[index]
 	local quest = entry and QuestConfig.Get(entry.Id)
 	if not quest then
-		return result(false, "Misión desconocida")
+		return result(false, "Unknown quest")
 	end
 	if entry.Claimed then
-		return result(false, "Ya la has cobrado")
+		return result(false, "You already claimed it")
 	end
 	if entry.Progress < quest.Goal then
-		return result(false, "Aún no la has completado")
+		return result(false, "You haven't completed it yet")
 	end
 	services.DataService.Update(player, function()
 		entry.Claimed = true
 	end)
 	local text = grantText(player, quest.Reward, `Mision:{quest.Id}`)
 	services.DataService.PushState(player)
-	return result(true, `Misión cobrada: {text}`)
+	return result(true, `Quest claimed: {text}`)
 end
 
 QuestService.Handlers.ClaimQuestBonus = function(player: Player)
@@ -118,11 +118,11 @@ QuestService.Handlers.ClaimQuestBonus = function(player: Player)
 		return result(false, "")
 	end
 	if data.Quests.BonusClaimed then
-		return result(false, "Ya has abierto el cofre de hoy")
+		return result(false, "You already opened today's chest")
 	end
 	for _, entry in data.Quests.List do
 		if not entry.Claimed then
-			return result(false, "Cobra las 3 misiones primero")
+			return result(false, "Claim the 3 quests first")
 		end
 	end
 	services.DataService.Update(player, function(d)
@@ -130,7 +130,7 @@ QuestService.Handlers.ClaimQuestBonus = function(player: Player)
 	end)
 	local text = grantText(player, QuestConfig.AllDoneBonus, "Mision:Cofre")
 	services.DataService.PushState(player)
-	return result(true, `¡Cofre de misiones! {text}`)
+	return result(true, `Quest chest! {text}`)
 end
 
 function QuestService.Start(s)

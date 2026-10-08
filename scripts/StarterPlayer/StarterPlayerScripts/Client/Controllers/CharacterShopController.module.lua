@@ -55,23 +55,23 @@ end
 local function statusText(id: string): (string, Color3)
 	if owns(id) then
 		if player:GetAttribute("SelectedCharacter") == id then
-			return "EN USO", UI.Colors.Green
+			return "IN USE", UI.Colors.Green
 		end
-		return "TUYO", UI.Colors.Green
+		return "OWNED", UI.Colors.Green
 	end
 	local now = StateController.Now()
 	local status, endsAt = CatalogConfig.GetCharacterStatus(id, now)
 	local coins, gems, level = CatalogConfig.GetPrices(id)
 	if status == "EarlyAccess" then
-		return `ACCESO ANTICIPADO · {UI.formatDuration(endsAt - now)}`, Color3.fromRGB(255, 120, 60)
+		return `EARLY ACCESS · {UI.formatDuration(endsAt - now)}`, Color3.fromRGB(255, 120, 60)
 	elseif status == "Upcoming" then
-		return `PRÓXIMAMENTE · {UI.formatDuration(endsAt - now)}`, UI.Colors.Muted
+		return `COMING SOON · {UI.formatDuration(endsAt - now)}`, UI.Colors.Muted
 	elseif not coins then
-		return `晶 EXCLUSIVO · {UI.formatNumber(gems or 0)} {GEM}`, CatalogConfig.Rarities.Exclusive.Color
+		return `晶 EXCLUSIVE · {UI.formatNumber(gems or 0)} {GEM}`, CatalogConfig.Rarities.Exclusive.Color
 	end
 	local text = `{UI.formatNumber(coins)} {COIN}`
 	if level and (player:GetAttribute("Level") or 1) < level then
-		text ..= `  ·  Nv {level}`
+		text ..= `  ·  Lv {level}`
 	end
 	return text, EconomyConfig.Currencies.Coins.Color
 end
@@ -151,7 +151,7 @@ local function skinRow(parent: Instance, order: number, skinId: string, skin)
 		UI.stroke(swatch, skin.Aura, 2)
 	end
 	UI.label(row, { Position = UDim2.fromOffset(44, 4), Size = UDim2.new(1, -180, 0, 20), Text = skin.Name, TextSize = 14 })
-	local tag = if skin.Premium then `PREMIUM · +{math.floor(CatalogConfig.PremiumSkinBoost * 100)}% {COIN}/XP` else "Cosmética"
+	local tag = if skin.Premium then `PREMIUM · +{math.floor(CatalogConfig.PremiumSkinBoost * 100)}% {COIN}/XP` else "Cosmetic"
 	UI.label(row, {
 		Position = UDim2.fromOffset(44, 23), Size = UDim2.new(1, -180, 0, 16), Text = tag, TextSize = 11,
 		Font = Enum.Font.GothamBlack, TextColor3 = if skin.Premium then UI.Colors.Gold else UI.Colors.Muted,
@@ -160,20 +160,20 @@ local function skinRow(parent: Instance, order: number, skinId: string, skin)
 	local props = { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.fromOffset(128, 30), TextSize = 12 }
 	if ownsSkin then
 		if equipped then
-			UI.button(row, "Quitar", UI.Colors.Disabled, props).Activated:Connect(function()
+			UI.button(row, "Remove", UI.Colors.Disabled, props).Activated:Connect(function()
 				request("EquipSkin", skin.Character, false)
 			end)
 		else
-			UI.button(row, "Equipar", UI.Colors.Accent, props).Activated:Connect(function()
+			UI.button(row, "Equip", UI.Colors.Accent, props).Activated:Connect(function()
 				request("EquipSkin", skin.Character, skinId)
 			end)
 		end
 	elseif skin.BattlePassOnly then
-		UI.button(row, "Pase de Batalla", UI.Colors.Disabled, props).AutoButtonColor = false
+		UI.button(row, "Battle Pass", UI.Colors.Disabled, props).AutoButtonColor = false
 	elseif skin.StoryOnly then
-		UI.button(row, "Modo Historia", UI.Colors.Disabled, props).AutoButtonColor = false
+		UI.button(row, "Story Mode", UI.Colors.Disabled, props).AutoButtonColor = false
 	elseif skin.RouletteOnly then
-		local b = UI.button(row, "Ruleta Maldita", Color3.fromRGB(255, 50, 90), props)
+		local b = UI.button(row, "Cursed Roulette", Color3.fromRGB(255, 50, 90), props)
 		b.Activated:Connect(function()
 			require(script.Parent:WaitForChild("RouletteController")).Open()
 		end)
@@ -247,9 +247,9 @@ function refreshDetail()
 	local stats = UI.make("Frame", { Size = UDim2.new(1, -10, 0, 54), BackgroundTransparency = 1, LayoutOrder = nextOrder() }, detailFrame)
 	UI.make("UIGridLayout", { CellSize = UDim2.new(1 / 3, -8, 0, 50), CellPadding = UDim2.fromOffset(8, 0) }, stats)
 	for _, stat in {
-		{ "PESO", data.Weight, 70, 130, Color3.fromRGB(255, 150, 70) },
-		{ "VELOCIDAD", data.WalkSpeed, 14, 32, Color3.fromRGB(90, 220, 255) },
-		{ "SALTO", data.JumpPower, 45, 80, Color3.fromRGB(120, 255, 140) },
+		{ "WEIGHT", data.Weight, 70, 130, Color3.fromRGB(255, 150, 70) },
+		{ "SPEED", data.WalkSpeed, 14, 32, Color3.fromRGB(90, 220, 255) },
+		{ "JUMP", data.JumpPower, 45, 80, Color3.fromRGB(120, 255, 140) },
 	} do
 		local cell = UI.make("Frame", { BackgroundColor3 = Color3.fromRGB(28, 24, 42) }, stats)
 		UI.corner(cell, 8)
@@ -265,14 +265,14 @@ function refreshDetail()
 
 	if owns(id) then
 		local inUse = player:GetAttribute("SelectedCharacter") == id
-		local b = UI.button(actions, if inUse then "EN USO" else "ELEGIR", if inUse then UI.Colors.Disabled else UI.Colors.Green, { Size = UDim2.fromOffset(170, 42), TextSize = 17 })
+		local b = UI.button(actions, if inUse then "IN USE" else "CHOOSE", if inUse then UI.Colors.Disabled else UI.Colors.Green, { Size = UDim2.fromOffset(170, 42), TextSize = 17 })
 		if not inUse then
 			b.Activated:Connect(function()
 				request("SelectCharacter", id)
 			end)
 		end
 	elseif status == "Upcoming" then
-		info.Text = `Sale en {UI.formatDuration(endsAt - now)} · después, 14 días de Acceso Anticipado solo con {GEM}`
+		info.Text = `Releases in {UI.formatDuration(endsAt - now)} · then 14 days of Early Access with {GEM} only`
 	else
 		if status ~= "EarlyAccess" and priceCoins then
 			local coinsBtn = UI.priceButton(actions, "Coins", priceCoins, Color3.fromRGB(150, 80, 230), { Size = UDim2.fromOffset(170, 42), TextSize = 17 })
@@ -282,11 +282,11 @@ function refreshDetail()
 			local have = player:GetAttribute("Coins") or 0
 			local lines = {}
 			if level and (player:GetAttribute("Level") or 1) < level then
-				table.insert(lines, `Necesitas Nivel {level} para comprarlo con {COIN}`)
+				table.insert(lines, `You need Level {level} to buy it with {COIN}`)
 			end
 			if have < priceCoins then
 				local hours = (priceCoins - have) / EconomyConfig.EstimatedCoinsPerHour
-				table.insert(lines, `Te faltan {UI.formatNumber(priceCoins - have)} {COIN} (~{math.max(1, math.ceil(hours))} h de juego)`)
+				table.insert(lines, `You need {UI.formatNumber(priceCoins - have)} more {COIN} (~{math.max(1, math.ceil(hours))} h of play)`)
 			end
 			info.Text = table.concat(lines, "   ·   ")
 		end
@@ -298,23 +298,23 @@ function refreshDetail()
 			end)
 		end
 		-- Probarlo gratis contra el muñeco del Dojo antes de comprarlo
-		local tryBtn = UI.button(actions, "PROBAR", Color3.fromRGB(60, 160, 220), { Size = UDim2.fromOffset(110, 42), TextSize = 15 })
+		local tryBtn = UI.button(actions, "TRY", Color3.fromRGB(60, 160, 220), { Size = UDim2.fromOffset(110, 42), TextSize = 15 })
 		tryBtn.Activated:Connect(function()
 			if request("TryCharacter", id) then
 				frame.Visible = false
 			end
 		end)
 		if status == "EarlyAccess" then
-			info.Text = `Acceso Anticipado: gratis con {COIN} en {UI.formatDuration(endsAt - now)}`
+			info.Text = `Early Access: free with {COIN} in {UI.formatDuration(endsAt - now)}`
 			info.TextColor3 = Color3.fromRGB(255, 150, 80)
 		elseif not priceCoins then
-			info.Text = "晶 Personaje exclusivo: solo se consigue con Gemas"
+			info.Text = "晶 Exclusive character: only available with Gems"
 			info.TextColor3 = CatalogConfig.Rarities.Exclusive.Color
 		end
 	end
 
 	-- Técnicas especiales (+ la ULTI)
-	section("Técnicas", nextOrder())
+	section("Techniques", nextOrder())
 	local function techniqueRow(key: string, name: string, detail: string, color: Color3, big: boolean?)
 		local row = UI.make("Frame", { Size = UDim2.new(1, -10, 0, if big then 44 else 34), BackgroundColor3 = Color3.new(1, 1, 1), LayoutOrder = nextOrder() }, detailFrame)
 		UI.corner(row, 8)
@@ -332,11 +332,11 @@ function refreshDetail()
 	for _, slot in SPECIAL_SLOTS do
 		local move = data.Moves[slot.Key]
 		if move then
-			techniqueRow(slot.Input, move.Name or slot.Key, if move.Damage then `{move.Damage}%` else "movilidad", data.Color)
+			techniqueRow(slot.Input, move.Name or slot.Key, if move.Damage then `{move.Damage}%` else "mobility", data.Color)
 		end
 	end
 	if ult then
-		local kindText = if ult.Kind == "Domain" then "Expansión de Dominio" elseif ult.Kind == "Transform" then "Transformación" else "Técnica definitiva"
+		local kindText = if ult.Kind == "Domain" then "Domain Expansion" elseif ult.Kind == "Transform" then "Transformation" else "Ultimate Technique"
 		techniqueRow("ULTI R", `{ult.Name}`, kindText, ult.Color, true)
 	end
 
@@ -353,7 +353,7 @@ function refreshDetail()
 		skinRow(detailFrame, nextOrder(), skinId, CatalogConfig.Skins[skinId])
 	end
 	if #ids == 0 then
-		UI.label(detailFrame, { Size = UDim2.new(1, -6, 0, 20), Text = "Próximamente", TextColor3 = UI.Colors.Muted, TextSize = 13, LayoutOrder = nextOrder() })
+		UI.label(detailFrame, { Size = UDim2.new(1, -6, 0, 20), Text = "Coming soon", TextColor3 = UI.Colors.Muted, TextSize = 13, LayoutOrder = nextOrder() })
 	end
 end
 
@@ -383,7 +383,7 @@ end
 function CharacterShopController.Start()
 	local gui = UI.screenGui("CharacterShop", 10)
 	local content
-	frame, content = UI.modal(gui, "🥋 Personajes", UDim2.fromOffset(820, 540), UI.Colors.Accent)
+	frame, content = UI.modal(gui, "🥋 Characters", UDim2.fromOffset(820, 540), UI.Colors.Accent)
 
 	listFrame = UI.make("ScrollingFrame", {
 		Size = UDim2.new(0, 270, 1, 0), BackgroundTransparency = 1, ScrollBarThickness = 4, ScrollBarImageColor3 = UI.Colors.Accent,

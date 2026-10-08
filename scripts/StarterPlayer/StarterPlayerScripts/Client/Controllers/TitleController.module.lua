@@ -93,18 +93,18 @@ local function build()
 	end)
 
 	local entries = {
-		{ "Comenzar", "Play", Color3.fromRGB(230, 50, 60), function()
+		{ "Start", "Play", Color3.fromRGB(230, 50, 60), function()
 			player:SetAttribute("TitleStart", true)
 		end },
-		{ "Modos de juego", "Duel", Color3.fromRGB(255, 170, 40), PlayMenuController.Toggle },
-		{ "Personajes", "Characters", Color3.fromRGB(150, 90, 255), CharacterShopController.Toggle },
-		{ "Premios y códigos", "Codes", Color3.fromRGB(80, 220, 120), function()
+		{ "Game modes", "Duel", Color3.fromRGB(255, 170, 40), PlayMenuController.Toggle },
+		{ "Characters", "Characters", Color3.fromRGB(150, 90, 255), CharacterShopController.Toggle },
+		{ "Rewards and codes", "Codes", Color3.fromRGB(80, 220, 120), function()
 			local ok, rewards = pcall(require, script.Parent:WaitForChild("RewardsController"))
 			if ok then
 				rewards.Open()
 			end
 		end },
-		{ "Tienda", "Store", Color3.fromRGB(90, 200, 255), StoreController.Toggle },
+		{ "Shop", "Store", Color3.fromRGB(90, 200, 255), StoreController.Toggle },
 	}
 	local first
 	for i, e in entries do
@@ -135,7 +135,7 @@ local function build()
 
 	local hint = UI.label(root, {
 		AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -20), Size = UDim2.fromOffset(600, 26),
-		Text = if UserInputService.GamepadEnabled then "Pulsa Ⓐ para elegir" else "Elige una opción para empezar",
+		Text = if UserInputService.GamepadEnabled then "Press Ⓐ to choose" else "Choose an option to start",
 		TextSize = 18, Font = Enum.Font.GothamBlack, TextXAlignment = Enum.TextXAlignment.Center, TextStrokeTransparency = 0.4,
 	})
 	task.spawn(function()

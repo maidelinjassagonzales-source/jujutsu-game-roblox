@@ -23,7 +23,7 @@ end
 function StateController.Request(action: string, ...): { ok: boolean, msg: string }
 	local ok, response = pcall(shopRequest.InvokeServer, shopRequest, action, ...)
 	if not ok or type(response) ~= "table" then
-		return { ok = false, msg = "No se pudo contactar con el servidor" }
+		return { ok = false, msg = "Couldn't reach the server" }
 	end
 	return response
 end

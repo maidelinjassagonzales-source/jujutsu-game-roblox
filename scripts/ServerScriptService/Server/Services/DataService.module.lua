@@ -217,7 +217,7 @@ local function onPlayerAdded(player: Player)
 			warn("[DataService] No se pudo cargar el perfil; usando datos temporales.")
 			data = deepCopy(Template)
 		else
-			player:Kick("No pudimos cargar tus datos de forma segura. Vuelve a entrar en un momento.")
+			player:Kick("We couldn't load your data safely. Please rejoin in a moment.")
 			return
 		end
 	end

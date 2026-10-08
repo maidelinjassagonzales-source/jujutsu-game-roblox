@@ -61,18 +61,18 @@ end
 
 ObbyService.Handlers.EnterObby = function(player: Player)
 	if player:GetAttribute("ArenaId") ~= "Lobby" then
-		return result(false, "La obby se juega desde el Lobby")
+		return result(false, "The obby is played from the Lobby")
 	end
 	local activity = player:GetAttribute("Activity")
 	if activity ~= "Hub" and activity ~= nil then
-		return result(false, "Termina lo que estás haciendo primero")
+		return result(false, "Finish what you're doing first")
 	end
 	progress[player] = { Checkpoint = 0, StartedAt = os.clock() }
 	player:SetAttribute("InObby", true)
 	player:SetAttribute("ObbyCheckpoint", 0)
 	player:SetAttribute("ObbyStartedAt", workspace:GetServerTimeNow())
 	teleportTo(player, 0)
-	return result(true, "¡Ascenso Maldito! Llega a la meta sin caerte")
+	return result(true, "Cursed Ascent! Reach the finish without falling")
 end
 
 ObbyService.Handlers.LeaveObby = function(player: Player)
@@ -83,7 +83,7 @@ ObbyService.Handlers.LeaveObby = function(player: Player)
 	if c then
 		c:PivotTo(services.ArenaService.LobbySpawnCFrame())
 	end
-	return result(true, "De vuelta al Lobby")
+	return result(true, "Back to the Lobby")
 end
 
 ObbyService.Handlers.ObbyCheckpoint = function(player: Player, index: any)
@@ -95,7 +95,7 @@ ObbyService.Handlers.ObbyCheckpoint = function(player: Player, index: any)
 		return result(true, "")
 	end
 	if index ~= state.Checkpoint + 1 then
-		return result(false, "Te has saltado un checkpoint")
+		return result(false, "You skipped a checkpoint")
 	end
 	local p, r = checkpointPart(index), root(player)
 	if not p or not r or (p.Position - r.Position).Magnitude > 16 then
@@ -103,7 +103,7 @@ ObbyService.Handlers.ObbyCheckpoint = function(player: Player, index: any)
 	end
 	state.Checkpoint = index
 	player:SetAttribute("ObbyCheckpoint", index)
-	return result(true, `¡Checkpoint {index}/{ObbyBuilder.Checkpoints}!`)
+	return result(true, `Checkpoint {index}/{ObbyBuilder.Checkpoints}!`)
 end
 
 ObbyService.Handlers.ObbyRespawn = function(player: Player)
@@ -129,7 +129,7 @@ ObbyService.Handlers.ObbyFinish = function(player: Player)
 		return result(false, "")
 	end
 	if state.Checkpoint < ObbyBuilder.Checkpoints then
-		return result(false, "Te faltan checkpoints")
+		return result(false, "You're missing checkpoints")
 	end
 	local finish
 	for _, p in CollectionService:GetTagged("ObbyFinish") do
@@ -143,7 +143,7 @@ ObbyService.Handlers.ObbyFinish = function(player: Player)
 	end
 	local elapsed = os.clock() - state.StartedAt
 	if elapsed < MIN_TIME then
-		return result(false, "Demasiado rápido... ¿seguro?")
+		return result(false, "Too fast... are you sure?")
 	end
 	progress[player] = nil
 	player:SetAttribute("InObby", nil)
@@ -172,12 +172,12 @@ ObbyService.Handlers.ObbyFinish = function(player: Player)
 		services.EconomyService.AddXP(player, REWARD.XP)
 		text = `  +{REWARD.Coins} 呪 +{REWARD.XP} XP`
 	else
-		text = "  (premio de hoy ya cobrado)"
+		text = "  (today's reward already claimed)"
 	end
 	services.DataService.PushState(player)
 	services.QuestService.Add(player, "Obby", 1)
 	local t = string.format("%d:%04.1f", elapsed // 60, elapsed % 60)
-	return { ok = true, msg = `¡Obby completada en {t}!{if isRecord then " ¡NUEVO RÉCORD!" else ""}{text}`, Time = elapsed, Record = isRecord }
+	return { ok = true, msg = `Obby completed in {t}!{if isRecord then " NEW RECORD!" else ""}{text}`, Time = elapsed, Record = isRecord }
 end
 
 function ObbyService.Start(s)

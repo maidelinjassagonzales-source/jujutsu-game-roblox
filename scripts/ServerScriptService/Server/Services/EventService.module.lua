@@ -16,11 +16,11 @@ EventService.Handlers = {}
 local C = Color3.fromRGB
 
 local EVENTS = {
-	BloodMoon = { Name = "Luna de Sangre", Description = "x2 Monedas Malditas en todo", Duration = 240, Weight = 3, Color = C(230, 40, 50) },
-	XPRush = { Name = "Hora del Hechicero", Description = "x2 XP en todo", Duration = 240, Weight = 3, Color = C(120, 200, 255) },
-	CurseRain = { Name = "Lluvia de Maldiciones", Description = "Toca los espíritus malditos del patio: +monedas", Duration = 150, Weight = 3, Color = C(170, 80, 255) },
-	GemFall = { Name = "Gemas Caídas", Description = "¡Llueven gemas en el patio! Cógelas rápido", Duration = 100, Weight = 1, Color = C(90, 220, 255) },
-	Fortune = { Name = "Fortuna Maldita", Description = "Ruleta Maldita a mitad de precio", Duration = 240, Weight = 2, Color = C(255, 200, 60) },
+	BloodMoon = { Name = "Blood Moon", Description = "x2 Cursed Coins on everything", Duration = 240, Weight = 3, Color = C(230, 40, 50) },
+	XPRush = { Name = "Sorcerer's Hour", Description = "x2 XP on everything", Duration = 240, Weight = 3, Color = C(120, 200, 255) },
+	CurseRain = { Name = "Rain of Curses", Description = "Touch the cursed spirits in the courtyard: +coins", Duration = 150, Weight = 3, Color = C(170, 80, 255) },
+	GemFall = { Name = "Falling Gems", Description = "Gems are raining in the courtyard! Grab them fast", Duration = 100, Weight = 1, Color = C(90, 220, 255) },
+	Fortune = { Name = "Cursed Fortune", Description = "Cursed Roulette at half price", Duration = 240, Weight = 2, Color = C(255, 200, 60) },
 }
 local FIRST_DELAY = 180
 local GAP_MIN, GAP_MAX = 480, 840
@@ -95,11 +95,11 @@ local function spawnPickup(kind: string)
 			taken = true
 			gemCount[player] = (gemCount[player] or 0) + 2
 			services.EconomyService.AddCurrency(player, "Gems", 2, "Evento:GemFall")
-			services.EconomyFeedback:FireClient(player, "Reward", { Gems = 2, Reason = "Gemas Caídas" })
+			services.EconomyFeedback:FireClient(player, "Reward", { Gems = 2, Reason = "Falling Gems" })
 		else
 			taken = true
 			services.EconomyService.AddCurrency(player, "Coins", 40, "Evento:CurseRain")
-			services.EconomyFeedback:FireClient(player, "Reward", { Coins = 40, Reason = "Espíritu maldito" })
+			services.EconomyFeedback:FireClient(player, "Reward", { Coins = 40, Reason = "Cursed spirit" })
 		end
 		orb:Destroy()
 	end)

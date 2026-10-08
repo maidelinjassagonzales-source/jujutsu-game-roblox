@@ -417,7 +417,7 @@ function Scenery.Clap(ctx)
 	task.spawn(function()
 		local t0 = os.clock()
 		while os.clock() - t0 < dur do
-			floatText(c + back * math.random(5, 20) + Vector3.new(math.random(-40, 40), math.random(5, 25), 0), "¡CLAP!", Color3.fromRGB(255, 220, 160), 30, 0.6)
+			floatText(c + back * math.random(5, 20) + Vector3.new(math.random(-40, 40), math.random(5, 25), 0), "CLAP!", Color3.fromRGB(255, 220, 160), 30, 0.6)
 			task.wait(0.3)
 		end
 	end)
@@ -523,7 +523,7 @@ function Ticks.Blood(pos)
 end
 function Ticks.Clap(pos)
 	ringAt(pos, Color3.fromRGB(255, 220, 160), 12, 0.3)
-	floatText(pos + Vector3.new(0, 2, 0), "¡CLAP!", Color3.fromRGB(255, 220, 160), 30, 0.5)
+	floatText(pos + Vector3.new(0, 2, 0), "CLAP!", Color3.fromRGB(255, 220, 160), 30, 0.5)
 end
 function Ticks.Nails(pos)
 	local from = pos + Vector3.new(math.random(-10, 10), math.random(4, 10), 0)
@@ -587,7 +587,7 @@ function Auras.Gear5(model, torso, duration)
 	loop(model, duration, 0.6, function(r)
 		ringAt(r.Position, WHITE, 10, 0.45)
 		if math.random() < 0.5 then
-			floatText(r.Position + Vector3.new(0, 4, 0), "¡JAJAJA!", WHITE, 26, 0.7)
+			floatText(r.Position + Vector3.new(0, 4, 0), "HAHAHA!", WHITE, 26, 0.7)
 		else
 			floatText(r.Position + Vector3.new(0, 4, 0), "DON DON", Color3.fromRGB(255, 240, 200), 24, 0.6)
 		end
@@ -706,7 +706,7 @@ function DomainThemes.Jackpot(model: Model, won: boolean)
 		return
 	end
 	if won then
-		floatText(r.Position + Vector3.new(0, 6, 0), "¡¡JACKPOT!!", Color3.fromRGB(255, 225, 60), 60, 1.6)
+		floatText(r.Position + Vector3.new(0, 6, 0), "JACKPOT!!", Color3.fromRGB(255, 225, 60), 60, 1.6)
 		ringAt(r.Position, Color3.fromRGB(255, 225, 60), 40, 0.6)
 		ringAt(r.Position, Color3.fromRGB(90, 255, 140), 28, 0.8)
 	else

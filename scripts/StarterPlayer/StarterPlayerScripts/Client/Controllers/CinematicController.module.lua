@@ -22,7 +22,7 @@ local player = Players.LocalPlayer
 local CinematicController = {}
 
 local GAME_TITLE = "JUJUTSU SMASH"
-local GAME_SUBTITLE = "Arena de hechiceros"
+local GAME_SUBTITLE = "Arena of Sorcerers"
 
 local gui: ScreenGui
 local topBar: Frame
@@ -192,11 +192,11 @@ local function playIntro()
 	Sfx.Play("Domain", nil, 0.5)
 	CinematicController.Play({
 		{ From = CFrame.lookAt(o(-60, 150, -260), o(-260, 40, -560)), To = CFrame.lookAt(o(80, 110, -220), o(-200, 60, -560)), Time = 3.6, Fov = -10,
-			Title = { "東京 · TOKIO", "El Velo ha caído sobre la ciudad...", Color3.fromRGB(200, 160, 255) } },
+			Title = { "東京 · TOKIO", "The Veil has fallen over the city...", Color3.fromRGB(200, 160, 255) } },
 		{ From = CFrame.lookAt(o(0, 70, -40), o(0, 30, -128)), To = CFrame.lookAt(o(0, 22, -60), o(0, 18, -128)), Time = 3,
 			Title = { GAME_TITLE, GAME_SUBTITLE, Color3.fromRGB(255, 215, 120) } },
 		{ From = CFrame.lookAt(o(60, 48, 20), o(0, 6, 0)), To = CFrame.lookAt(o(-40, 34, 30), o(0, 6, 0)), Time = 3,
-			Title = { "呪術高専", "Escuela de Hechicería", Color3.fromRGB(255, 190, 210) } },
+			Title = { "呪術高専", "Sorcery School", Color3.fromRGB(255, 190, 210) } },
 		{ From = CFrame.lookAt(o(0, 30, 110), o(0, 4, 60)), To = playerView, Time = 2 },
 	}, { Skippable = true, HideUI = true })
 end
@@ -288,10 +288,10 @@ local function playFinish(winner: Model?)
 			local p = root.Position
 			return CFrame.lookAt(p + Vector3.new(0, 5, 16), p + Vector3.new(0, 1.5, 0))
 		end
-		table.insert(shots, { From = start, To = target, Time = 1.2, Fov = 10, Title = { "¡GAME!", nil, Color3.fromRGB(255, 220, 90) } })
+		table.insert(shots, { From = start, To = target, Time = 1.2, Fov = 10, Title = { "GAME!", nil, Color3.fromRGB(255, 220, 90) } })
 		table.insert(shots, { From = target, To = target, Time = 1.3 })
 	else
-		table.insert(shots, { From = start, To = start, Time = 2.5, Title = { "¡GAME!", nil, Color3.fromRGB(255, 220, 90) } })
+		table.insert(shots, { From = start, To = start, Time = 2.5, Title = { "GAME!", nil, Color3.fromRGB(255, 220, 90) } })
 	end
 	CinematicController.Play(shots)
 end
@@ -318,7 +318,7 @@ function CinematicController.Start()
 		TextTransparency = 1, TextStrokeTransparency = 1, ZIndex = 3,
 	})
 	UI.make("UITextSizeConstraint", { MaxTextSize = 34 }, subtitleLabel)
-	skipButton = UI.button(gui, "Saltar ", UI.Colors.Panel, {
+	skipButton = UI.button(gui, "Skip ", UI.Colors.Panel, {
 		AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, -16, 1, -16), Size = UDim2.fromOffset(120, 36), Visible = false, ZIndex = 4,
 	})
 	skipButton.Activated:Connect(CinematicController.Stop)

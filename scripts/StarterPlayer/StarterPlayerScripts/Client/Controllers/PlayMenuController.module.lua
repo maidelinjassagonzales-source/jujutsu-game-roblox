@@ -15,11 +15,21 @@ local queueBanner: Frame
 local queueLabel: TextLabel
 
 local MODES = {
-	{ Id = "FFA", Icon = "FFA", Title = "Partida rápida", Desc = "2 a 4 jugadores · todos contra todos · 3 vidas", Color = Color3.fromRGB(220, 60, 70) },
-	{ Id = "Duel", Icon = "Duel", Title = "Duelo 1v1", Desc = "Uno contra uno · 3 vidas · ¿quién es el más fuerte?", Color = Color3.fromRGB(230, 130, 30) },
-	{ Id = "Story", Icon = "Story", Title = "Modo Historia", Desc = "Crónicas del Sello Maldito · 8 capítulos", Color = Color3.fromRGB(150, 70, 220) },
-	{ Id = "Practice", Icon = "Dojo", Title = "Dojo de práctica", Desc = "Entrena tus combos contra el muñeco", Color = Color3.fromRGB(60, 160, 220) },
-	{ Id = "Lobby", Icon = "Lobby", Title = "Volver al Lobby", Desc = "El patio de la Escuela: tablas, personajes, pase y tienda", Color = Color3.fromRGB(255, 190, 40) },
+	{ Id = "FFA", Icon = "FFA", Title = "Quick match", Desc = "2 to 4 players · free-for-all · 3 lives", Color = Color3.fromRGB(220, 60, 70) },
+	{ Id = "Duel", Icon = "Duel", Title = "1v1 Duel", Desc = "One on one · 3 lives · who's the strongest?", Color = Color3.fromRGB(230, 130, 30) },
+	{ Id = "Team2", Icon = "Duel", Title = "Teams 2v2", Desc = "Red vs Blue · no friendly fire · bots if players are missing", Color = Color3.fromRGB(200, 50, 120) },
+	{ Id = "Team3", Icon = "Duel", Title = "Teams 3v3", Desc = "6-player battle · no friendly fire · bots if players are missing", Color = Color3.fromRGB(120, 60, 210) },
+	{ Id = "FFA3", Icon = "FFA", Title = "Free-for-all · 3 players", Desc = "You vs 2 opponents · bots if players are missing", Color = Color3.fromRGB(40, 150, 110) },
+	{ Id = "FFA4", Icon = "FFA", Title = "Free-for-all · 4 players", Desc = "You vs 3 opponents · bots if players are missing", Color = Color3.fromRGB(30, 120, 170) },
+	{ Id = "Story", Icon = "Story", Title = "Story Mode", Desc = "Chronicles of the Cursed Seal · 8 chapters", Color = Color3.fromRGB(150, 70, 220) },
+	{ Id = "Practice", Icon = "Dojo", Title = "Practice Dojo", Desc = "Practice your combos on the dummy", Color = Color3.fromRGB(60, 160, 220) },
+	{ Id = "Lobby", Icon = "Lobby", Title = "Back to Lobby", Desc = "The School courtyard: leaderboards, characters, pass and shop", Color = Color3.fromRGB(255, 190, 40) },
+}
+
+-- Modos con cola (nombre que sale en el aviso "Buscando...")
+local QUEUE_NAMES = {
+	FFA = "Quick match", Duel = "1v1 Duel", Team2 = "Teams 2v2", Team3 = "Teams 3v3",
+	FFA3 = "Free-for-all · 3", FFA4 = "Free-for-all · 4",
 }
 
 local function request(action: string, ...)
@@ -39,11 +49,11 @@ local function choose(modeId: string)
 		request("GoPractice")
 	elseif modeId == "Lobby" then
 		if player:GetAttribute("ArenaId") == "Lobby" then
-			CurrencyController.Toast("Ya estás en el Lobby", UI.Colors.Muted)
+			CurrencyController.Toast("You're already in the Lobby", UI.Colors.Muted)
 		else
 			request("ReturnToLobby")
 		end
-	elseif modeId == "FFA" or modeId == "Duel" then
+	elseif QUEUE_NAMES[modeId] then
 		request("JoinQueue", modeId)
 	elseif modeId == "Story" then
 		frame.Visible = false
@@ -60,24 +70,56 @@ end
 function PlayMenuController.Start()
 	local gui = UI.screenGui("PlayMenu", 10)
 	local content
-	frame, content = UI.modal(gui, "⚔️ Jugar", UDim2.fromOffset(540, 470), Color3.fromRGB(220, 60, 70))
-	UI.make("UIListLayout", { Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder, HorizontalAlignment = Enum.HorizontalAlignment.Center }, content)
+	frame, content = UI.modal(gui, "⚔️ Play", UDim2.fromOffset(660, 640), Color3.fromRGB(220, 60, 70))
 
-	for i, mode in MODES do
+	-- Tarjetas: arriba partida rápida y duelo, luego equipos, luego todos contra todos,
+	-- después historia y dojo, y abajo el Lobby
+	local LAYOUT = {
+		FFA = { 0, 0, 0.5, 104 }, Duel = { 0.5, 0, 0.5, 104 },
+		Team2 = { 0, 110, 0.5, 92 }, Team3 = { 0.5, 110, 0.5, 92 },
+		FFA3 = { 0, 208, 0.5, 92 }, FFA4 = { 0.5, 208, 0.5, 92 },
+		Story = { 0, 306, 0.5, 92 }, Practice = { 0.5, 306, 0.5, 92 },
+		Lobby = { 0, 404, 1, 76 },
+	}
+	for _, mode in MODES do
+		local l = LAYOUT[mode.Id]
 		local card = UI.make("TextButton", {
-			Size = UDim2.new(1, -8, 0, 64), BackgroundColor3 = Color3.new(1, 1, 1), Text = "", AutoButtonColor = false, LayoutOrder = i,
+			Position = UDim2.new(l[1], if l[1] > 0 then 4 else 0, 0, l[2]), Size = UDim2.new(l[3], if l[3] < 1 then -4 else 0, 0, l[4]),
+			BackgroundTransparency = 1, Text = "", AutoButtonColor = false, ClipsDescendants = true,
 		}, content)
-		UI.corner(card, 12)
-		UI.gradient(card, mode.Color:Lerp(Color3.fromRGB(20, 18, 30), 0.6), Color3.fromRGB(22, 20, 34), 0)
-		UI.stroke(card, mode.Color, 2)
-		UI.bounce(card, 1.03)
-		UI.icon(card, mode.Icon, { Position = UDim2.fromOffset(4, 2), Size = UDim2.fromOffset(60, 60) })
-		UI.label(card, { Position = UDim2.fromOffset(70, 6), Size = UDim2.new(1, -110, 0, 28), Text = mode.Title, TextSize = 22, Font = UI.TitleFont, TextStrokeTransparency = 0.5 })
-		UI.label(card, {
-			AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -14, 0.5, 0), Size = UDim2.fromOffset(20, 30), Text = ">",
-			TextSize = 24, Font = Enum.Font.GothamBlack, TextColor3 = mode.Color, TextXAlignment = Enum.TextXAlignment.Center,
+		local bg = UI.card(card, mode.Color, { Size = UDim2.fromScale(1, 1), ZIndex = 0 })
+		UI.rays(card, mode.Color:Lerp(Color3.new(1, 1, 1), 0.5), {
+			Position = UDim2.new(0, 56, 0.5, 0), Size = UDim2.fromOffset(l[4] * 1.6, l[4] * 1.6), ImageTransparency = 0.45,
 		})
-		UI.label(card, { Position = UDim2.fromOffset(70, 34), Size = UDim2.new(1, -110, 0, 20), Text = mode.Desc, TextSize = 13, TextColor3 = UI.Colors.Muted })
+		local big = l[4] >= 130
+		local iconSize = if big then 92 else 70
+		local icon = UI.icon(card, mode.Icon, {
+			AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0, 56, 0.5, 0), Size = UDim2.fromOffset(iconSize, iconSize), ZIndex = 2,
+		})
+		UI.display(card, {
+			Position = UDim2.fromOffset(108, if big then 18 else 14), Size = UDim2.new(1, -150, 0, if big then 34 else 30),
+			Text = string.upper(mode.Title), TextSize = if big then 26 else 24, TextScaled = true, ZIndex = 2,
+		})
+		UI.label(card, {
+			Position = UDim2.fromOffset(108, if big then 56 else 46), Size = UDim2.new(1, -150, 0, 40), Text = mode.Desc, TextSize = 14,
+			Font = Enum.Font.FredokaOne, TextWrapped = true, TextYAlignment = Enum.TextYAlignment.Top, ZIndex = 2,
+			TextColor3 = Color3.fromRGB(235, 230, 245), TextStrokeTransparency = 0.6,
+		})
+		local play = UI.make("ImageLabel", {
+			AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, -12, 1, -10), Size = UDim2.fromOffset(40, 40), BackgroundTransparency = 1,
+			Image = `rbxassetid://{UI.Icons.PlayArrow}`, ZIndex = 2, ImageTransparency = 0.1,
+		}, card)
+		local scale = UI.make("UIScale", {}, card)
+		card.MouseEnter:Connect(function()
+			game:GetService("TweenService"):Create(scale, TweenInfo.new(0.12), { Scale = 1.03 }):Play()
+			bg.ImageColor3 = mode.Color:Lerp(Color3.new(1, 1, 1), 0.2)
+			icon.Rotation = -6
+		end)
+		card.MouseLeave:Connect(function()
+			game:GetService("TweenService"):Create(scale, TweenInfo.new(0.12), { Scale = 1 }):Play()
+			bg.ImageColor3 = mode.Color
+			icon.Rotation = 0
+		end)
 		card.Activated:Connect(function()
 			choose(mode.Id)
 		end)
@@ -92,7 +134,7 @@ function PlayMenuController.Start()
 	UI.stroke(queueBanner, Color3.fromRGB(220, 60, 70), 2)
 	UI.autoScale(queueBanner)
 	queueLabel = UI.label(queueBanner, { Position = UDim2.fromOffset(12, 0), Size = UDim2.new(1, -120, 1, 0), TextSize = 15 })
-	local cancel = UI.button(queueBanner, "Cancelar", UI.Colors.Red, {
+	local cancel = UI.button(queueBanner, "Cancel", UI.Colors.Red, {
 		AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.fromOffset(96, 28), TextSize = 13,
 	})
 	cancel.Activated:Connect(function()
@@ -107,7 +149,7 @@ function PlayMenuController.Start()
 			queueBanner.Visible = queue ~= nil
 			if queue then
 				dots = dots % 3 + 1
-				queueLabel.Text = `Buscando {if queue == "Duel" then "Duelo 1v1" else "Partida rápida"}{string.rep(".", dots)}`
+				queueLabel.Text = `Searching {QUEUE_NAMES[queue] or "match"}{string.rep(".", dots)}`
 			end
 		end
 	end)

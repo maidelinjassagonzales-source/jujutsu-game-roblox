@@ -9,7 +9,7 @@ end
 
 return {
 	Id = "Brawler",
-	DisplayName = "Brawler Maldito",
+	DisplayName = "Cursed Brawler",
 	Color = Color3.fromRGB(255, 110, 140),
 	Weight = 100,
 	WalkSpeed = 24,
@@ -41,22 +41,22 @@ return {
 		Heavy_Down = { Damage = 13, BaseKnockback = 28, KnockbackGrowth = 92, Angle = 25, Startup = 0.3, Active = 0.1, Endlag = 0.4, Cooldown = 0.6, Hitbox = hb(14, 3, 0, -2) },
 
 		-- Especiales (E / L)
-		Special_Neutral = { Name = "Puño Divergente", Pose = "Haymaker", -- "Puño Divergente": golpe + impacto retardado
+		Special_Neutral = { Name = "Divergent Fist", Pose = "Haymaker", -- "Puño Divergente": golpe + impacto retardado
 			Damage = 6, BaseKnockback = 5, KnockbackGrowth = 10, Angle = 50,
 			Startup = 0.2, Active = 0.1, Endlag = 0.35, Cooldown = 2, Hitbox = hb(6, 5, 3.5, 0),
 			FollowUp = { Delay = 0.25, Damage = 8, BaseKnockback = 30, KnockbackGrowth = 85, Angle = 40 },
 		},
-		Special_Side = { Name = "Embestida Maldita", Pose = "Haymaker", -- Embestida
+		Special_Side = { Name = "Cursed Rush", Pose = "Haymaker", -- Embestida
 			Damage = 9, BaseKnockback = 22, KnockbackGrowth = 70, Angle = 35,
 			Startup = 0.1, Active = 0.3, Endlag = 0.3, Cooldown = 2.5, Hitbox = hb(6, 5, 3, 0),
 			SelfVelocity = Vector3.new(85, 8, 0),
 		},
-		Special_Up = { Name = "Patada Ascendente", Pose = "HighKick", -- Recuperación: patada ascendente (1 vez por salto)
+		Special_Up = { Name = "Rising Kick", Pose = "HighKick", -- Recuperación: patada ascendente (1 vez por salto)
 			Damage = 7, BaseKnockback = 20, KnockbackGrowth = 60, Angle = 80,
 			Startup = 0.05, Active = 0.3, Endlag = 0.3, Cooldown = 0.5, Hitbox = hb(6, 6, 0, 2),
 			SelfVelocity = Vector3.new(10, 95, 0), OncePerAir = true,
 		},
-		Special_Down = { Name = "Impacto Sísmico", Pose = "Slam", -- Impacto sísmico
+		Special_Down = { Name = "Seismic Impact", Pose = "Slam", -- Impacto sísmico
 			Damage = 11, BaseKnockback = 26, KnockbackGrowth = 80, Angle = 75,
 			Startup = 0.12, Active = 0.35, Endlag = 0.35, Cooldown = 3, Hitbox = hb(10, 5, 0, -2),
 			SelfVelocity = Vector3.new(0, -110, 0),

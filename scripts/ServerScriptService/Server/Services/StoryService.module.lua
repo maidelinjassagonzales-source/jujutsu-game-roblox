@@ -74,7 +74,7 @@ end
 local function runChapter(player: Player, chapter)
 	local arena = services.ArenaService.Allocate(chapter.Stage, "Story")
 	if not arena then
-		matchFeedback:FireClient(player, "StoryResult", { Won = false, Chapter = chapter.Id, Reason = "Servidor lleno, inténtalo en un momento" })
+		matchFeedback:FireClient(player, "StoryResult", { Won = false, Chapter = chapter.Id, Reason = "Server full, try again in a moment" })
 		sessions[player] = nil
 		return
 	end
@@ -157,7 +157,7 @@ local function runChapter(player: Player, chapter)
 		local firstClear = data and not data.Story.Completed[tostring(chapter.Id)]
 		local mult = if firstClear then 1 else StoryConfig.ReplayRewardMultiplier
 		local reward = chapter.Reward
-		services.EconomyService.GrantCombatReward(player, math.floor(reward.Coins * mult), math.floor(reward.XP * mult), "Historia", true)
+		services.EconomyService.GrantCombatReward(player, math.floor(reward.Coins * mult), math.floor(reward.XP * mult), "Story", true)
 		if firstClear and reward.Gems then
 			services.EconomyService.AddCurrency(player, "Gems", reward.Gems, `Historia:{chapter.Id}`)
 		end
@@ -193,21 +193,21 @@ end
 
 StoryService.Handlers.StartChapter = function(player: Player, chapterId: any)
 	if type(chapterId) ~= "number" then
-		return result(false, "Capítulo inválido")
+		return result(false, "Invalid chapter")
 	end
 	local chapter = StoryConfig.Get(chapterId)
 	local data = services.DataService.Get(player)
 	if not chapter or not data then
-		return result(false, "Capítulo inválido")
+		return result(false, "Invalid chapter")
 	end
 	if chapterId > data.Story.Unlocked then
-		return result(false, "Completa el capítulo anterior primero")
+		return result(false, "Complete the previous chapter first")
 	end
 	if player:GetAttribute("Activity") ~= "Hub" then
-		return result(false, "Vuelve al Lobby para empezar un capítulo")
+		return result(false, "Go back to the Lobby to start a chapter")
 	end
 	if sessions[player] then
-		return result(false, "Ya estás en un capítulo")
+		return result(false, "You're already in a chapter")
 	end
 	sessions[player] = { Pending = true }
 	task.spawn(function()
@@ -220,7 +220,7 @@ StoryService.Handlers.StartChapter = function(player: Player, chapterId: any)
 			end
 		end
 	end)
-	return result(true, `Capítulo {chapterId}: {chapter.Title}`)
+	return result(true, `Chapter {chapterId}: {chapter.Title}`)
 end
 
 StoryService.Handlers.DialogueDone = function(player: Player)
@@ -235,17 +235,17 @@ end
 StoryService.Handlers.StoryRevive = function(player: Player, choice: any)
 	local session = sessions[player]
 	if not session or not session.Lost then
-		return result(false, "No hay nada que revivir")
+		return result(false, "There's nothing to revive")
 	end
 	if choice == "revive" then
 		if not services.EconomyService.SpendCurrency(player, "Gems", StoryConfig.ReviveGems, "Historia:Revivir") then
-			return result(false, "No tienes suficientes Gemas")
+			return result(false, "You don't have enough Gems")
 		end
 		session.ReviveChoice = "revive"
-		return result(true, "¡Has revivido!")
+		return result(true, "You've been revived!")
 	end
 	session.ReviveChoice = "quit"
-	return result(true, "Te has rendido")
+	return result(true, "You gave up")
 end
 
 StoryService.Handlers.QuitStory = function(player: Player)
@@ -254,7 +254,7 @@ StoryService.Handlers.QuitStory = function(player: Player)
 		session.Ended = true
 		session.ReviveChoice = "quit"
 	end
-	return result(true, "Has abandonado el capítulo")
+	return result(true, "You left the chapter")
 end
 
 function StoryService.Start(remotes: Folder, s)

@@ -140,14 +140,14 @@ local function rewardBox(parent: Instance, tier: number, trackName: string, y: n
 		UI.corner(veil, 10)
 		local stamp = UI.label(veil, {
 			AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.45), Size = UDim2.new(1, -8, 0, 22),
-			Text = "RECLAMADO", TextSize = 13, Font = Enum.Font.GothamBlack, TextColor3 = Color3.fromRGB(90, 230, 130),
+			Text = "CLAIMED", TextSize = 13, Font = Enum.Font.GothamBlack, TextColor3 = Color3.fromRGB(90, 230, 130),
 			TextXAlignment = Enum.TextXAlignment.Center, Rotation = -12, ZIndex = 6, BackgroundColor3 = Color3.fromRGB(10, 40, 20),
 			BackgroundTransparency = 0.2,
 		})
 		UI.corner(stamp, 4)
 		UI.stroke(stamp, Color3.fromRGB(90, 230, 130), 1.5)
 	elseif unlocked then
-		local b = UI.button(box, "RECLAMAR", UI.Colors.Green, btnProps)
+		local b = UI.button(box, "CLAIM", UI.Colors.Green, btnProps)
 		UI.shine(b, 1.2)
 		b.Activated:Connect(function()
 			claim(tier, trackName)
@@ -158,7 +158,7 @@ local function rewardBox(parent: Instance, tier: number, trackName: string, y: n
 		UI.label(veil, {
 			Position = UDim2.new(0, 0, 1, -26), Size = UDim2.new(1, 0, 0, 20), ZIndex = 6, TextSize = 10,
 			Font = Enum.Font.GothamBlack, TextXAlignment = Enum.TextXAlignment.Center,
-			Text = if premiumTrack and reached then "SOLO PREMIUM" else `NIVEL {tier}`,
+			Text = if premiumTrack and reached then "PREMIUM ONLY" else `TIER {tier}`,
 			TextColor3 = if premiumTrack then PREMIUM_COLOR else UI.Colors.Muted,
 		})
 	end
@@ -192,7 +192,7 @@ local function refreshHeader()
 	UI.gradient(title, Color3.fromRGB(255, 245, 210), PREMIUM_COLOR)
 	UI.label(header, {
 		Position = UDim2.fromOffset(x, 26), Size = UDim2.new(1, -x - 260, 0, 16), TextSize = 12, TextColor3 = UI.Colors.Muted,
-		Text = if remaining > 0 then `Termina en {UI.formatDuration(remaining)}` else "Temporada terminada",
+		Text = if remaining > 0 then `Ends in {UI.formatDuration(remaining)}` else "Season over",
 	})
 
 	local inTier = if tier >= BattlePassConfig.MaxTier then BattlePassConfig.XPPerTier else xp % BattlePassConfig.XPPerTier
@@ -206,7 +206,7 @@ local function refreshHeader()
 
 	local right = { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, 0, 0, 0), Size = UDim2.fromOffset(240, 40), TextSize = 15 }
 	if premium then
-		local b = UI.button(header, "PREMIUM ACTIVO", Color3.fromRGB(190, 140, 25), right)
+		local b = UI.button(header, "PREMIUM ACTIVE", Color3.fromRGB(190, 140, 25), right)
 		b.AutoButtonColor = false
 		UI.shine(b, 3)
 	else
@@ -216,19 +216,19 @@ local function refreshHeader()
 		UI.shine(b, 1.6)
 		b.Activated:Connect(function()
 			if BattlePassConfig.PremiumProductId == 0 then
-				CurrencyController.Toast("Pase Premium sin configurar (pon su ID en BattlePassConfig)", UI.Colors.Red)
+				CurrencyController.Toast("Premium Pass not set up (put its ID in BattlePassConfig)", UI.Colors.Red)
 			else
 				MarketplaceService:PromptProductPurchase(player, BattlePassConfig.PremiumProductId)
 			end
 		end)
 		UI.label(header, {
 			AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, 0, 0, 42), Size = UDim2.fromOffset(240, 16),
-			Text = "Incluye 500 gemas y 2 skins exclusivas", TextSize = 11, TextColor3 = PREMIUM_COLOR, Font = Enum.Font.GothamBlack,
+			Text = "Includes 500 gems and 2 exclusive skins", TextSize = 11, TextColor3 = PREMIUM_COLOR, Font = Enum.Font.GothamBlack,
 			TextXAlignment = Enum.TextXAlignment.Right,
 		})
 	end
 
-	local claimAll = UI.button(header, `Reclamar todo ({BattlePassController.ClaimableCount()})`, UI.Colors.Green, {
+	local claimAll = UI.button(header, `Claim all ({BattlePassController.ClaimableCount()})`, UI.Colors.Green, {
 		AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, 0, 0, 60), Size = UDim2.fromOffset(240, 24), TextSize = 12,
 		Visible = BattlePassController.ClaimableCount() > 0,
 	})
@@ -306,13 +306,13 @@ end
 function BattlePassController.Start()
 	local gui = UI.screenGui("BattlePass", 10)
 	local content
-	frame, content = UI.modal(gui, "🎫 Pase de Batalla", UDim2.fromOffset(860, 500), PREMIUM_COLOR)
+	frame, content = UI.modal(gui, "🎫 Battle Pass", UDim2.fromOffset(860, 500), PREMIUM_COLOR)
 
 	header = UI.make("Frame", { Size = UDim2.new(1, 0, 0, 86), BackgroundTransparency = 1 }, content)
 
 	-- Etiquetas fijas de las dos rutas (a la izquierda del carril)
 	local rails = UI.make("Frame", { Position = UDim2.fromOffset(0, 120), Size = UDim2.new(0, 34, 1, -120), BackgroundTransparency = 1 }, content)
-	for i, info in { { "GRATIS", Color3.fromRGB(150, 110, 255), 30 }, { "PREMIUM", PREMIUM_COLOR, 154 } } do
+	for i, info in { { "FREE", Color3.fromRGB(150, 110, 255), 30 }, { "PREMIUM", PREMIUM_COLOR, 154 } } do
 		local tag = UI.make("Frame", {
 			Position = UDim2.fromOffset(0, info[3]), Size = UDim2.fromOffset(30, 118), BackgroundColor3 = info[2], BackgroundTransparency = 0.15,
 		}, rails)
@@ -333,7 +333,7 @@ function BattlePassController.Start()
 	})
 	UI.label(content, {
 		AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -156, 0, 90), Size = UDim2.fromOffset(120, 24),
-		Text = "Saltar nivel", TextSize = 12, Font = Enum.Font.GothamBlack, TextColor3 = UI.Colors.Muted,
+		Text = "Skip tier", TextSize = 12, Font = Enum.Font.GothamBlack, TextColor3 = UI.Colors.Muted,
 		TextXAlignment = Enum.TextXAlignment.Right,
 	})
 	UI.confirmButton(skip, function()

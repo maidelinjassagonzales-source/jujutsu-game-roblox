@@ -98,7 +98,7 @@ local function celebrate(text: string, record: boolean?)
 	local gui = panel.Parent :: ScreenGui
 	local title = UI.label(gui, {
 		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.36), Size = UDim2.fromOffset(760, 90),
-		Text = if record then "¡NUEVO RÉCORD!" else "¡OBBY COMPLETADA!", TextSize = 58, Font = UI.TitleFont,
+		Text = if record then "NEW RECORD!" else "OBBY COMPLETE!", TextSize = 58, Font = UI.TitleFont,
 		TextXAlignment = Enum.TextXAlignment.Center, TextStrokeTransparency = 0, ZIndex = 20,
 	})
 	UI.gradient(title, Color3.new(1, 1, 1), ORANGE)
@@ -177,12 +177,12 @@ local function step()
 	cpLabel.Text = `CHECKPOINT {cp}/{total}`
 	local st = StateController.Get()
 	local best = st and st.Obby and st.Obby.BestTime or 0
-	bestLabel.Text = if best > 0 then `RÉCORD {fmt(best)}` else "SIN RÉCORD"
+	bestLabel.Text = if best > 0 then `RECORD {fmt(best)}` else "NO RECORD"
 
 	-- Caída al vacío
 	local baseY = model and model:GetAttribute("BaseY")
 	if baseY and r.Position.Y < baseY then
-		respawn("¡Te has caído! Vuelves al checkpoint")
+		respawn("You fell! Back to the checkpoint")
 		return
 	end
 
@@ -190,7 +190,7 @@ local function step()
 	overlap.FilterDescendantsInstances = { c }
 	for _, kill in CollectionService:GetTagged("ObbyKill") do
 		if kill:IsA("BasePart") and #workspace:GetPartBoundsInBox(kill.CFrame, kill.Size + Vector3.new(0.4, 0.6, 0.4), overlap) > 0 then
-			respawn(if kill.Name == "Lava" then "¡La lava maldita quema!" else "¡Te ha barrido!")
+			respawn(if kill.Name == "Lava" then "The cursed lava burns!" else "You got swept!")
 			return
 		end
 	end
@@ -251,7 +251,7 @@ function ObbyController.Start()
 	UI.gradient(panel, Color3.fromRGB(60, 36, 20), Color3.fromRGB(16, 12, 10))
 	UI.animatedStroke(panel, ORANGE, 2)
 	local title = UI.label(panel, {
-		Position = UDim2.fromOffset(14, 4), Size = UDim2.new(1, -28, 0, 24), Text = "OBBY · ASCENSO MALDITO", TextSize = 18,
+		Position = UDim2.fromOffset(14, 4), Size = UDim2.new(1, -28, 0, 24), Text = "OBBY · CURSED ASCENT", TextSize = 18,
 		Font = UI.TitleFont, TextStrokeTransparency = 0.5,
 	})
 	UI.gradient(title, Color3.new(1, 1, 1), ORANGE)
@@ -266,13 +266,13 @@ function ObbyController.Start()
 	local function btn(text: string, color: Color3, fn: () -> ())
 		UI.button(row, text, color, { Size = UDim2.fromOffset(120, 24), TextSize = 12 }).Activated:Connect(fn)
 	end
-	btn("Al checkpoint", Color3.fromRGB(90, 70, 140), function()
+	btn("To checkpoint", Color3.fromRGB(90, 70, 140), function()
 		respawn(nil)
 	end)
-	btn("Reiniciar", Color3.fromRGB(200, 120, 40), function()
+	btn("Restart", Color3.fromRGB(200, 120, 40), function()
 		StateController.Request("ObbyRestart")
 	end)
-	btn("Salir", UI.Colors.Red, function()
+	btn("Exit", UI.Colors.Red, function()
 		StateController.Request("LeaveObby")
 	end)
 

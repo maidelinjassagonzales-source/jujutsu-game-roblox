@@ -94,27 +94,27 @@ local function refreshList()
 		end
 		UI.label(row, {
 			Position = UDim2.fromOffset(12, 6), Size = UDim2.new(1, -150, 0, 22),
-			Text = `Capítulo {chapter.Id} · {chapter.Title}`, TextSize = 16, Font = Enum.Font.GothamBlack,
+			Text = `Chapter {chapter.Id} · {chapter.Title}`, TextSize = 16, Font = Enum.Font.GothamBlack,
 			TextColor3 = if available then UI.Colors.Text else UI.Colors.Muted,
 		})
 		UI.label(row, {
 			Position = UDim2.fromOffset(12, 28), Size = UDim2.new(1, -150, 0, 16),
-			Text = `{StageConfig.Stages[chapter.Stage].Name} · {#chapter.Waves} oleada(s)`, TextSize = 12, TextColor3 = UI.Colors.Muted,
+			Text = `{StageConfig.Stages[chapter.Stage].Name} · {#chapter.Waves} wave(s)`, TextSize = 12, TextColor3 = UI.Colors.Muted,
 		})
 		UI.label(row, {
 			Position = UDim2.fromOffset(12, 46), Size = UDim2.new(1, -150, 0, 16),
-			Text = if done then `Completado · repetir da el {math.floor(StoryConfig.ReplayRewardMultiplier * 100)}%` else `{rewardText(chapter.Reward)}`,
+			Text = if done then `Completed · replaying gives {math.floor(StoryConfig.ReplayRewardMultiplier * 100)}%` else `{rewardText(chapter.Reward)}`,
 			TextSize = 12, TextColor3 = if done then UI.Colors.Green else UI.Colors.Gold,
 		})
 		local btnProps = { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -10, 0.5, 0), Size = UDim2.fromOffset(120, 38) }
 		if available then
-			local b = UI.button(row, if done then "Repetir" else "▶ Jugar", if done then UI.Colors.Accent else UI.Colors.Green, btnProps)
+			local b = UI.button(row, if done then "Replay" else "▶ Play", if done then UI.Colors.Accent else UI.Colors.Green, btnProps)
 			b.Activated:Connect(function()
 				listFrame.Visible = false
 				request("StartChapter", chapter.Id)
 			end)
 		else
-			UI.button(row, "Bloqueado", UI.Colors.Disabled, btnProps).AutoButtonColor = false
+			UI.button(row, "Locked", UI.Colors.Disabled, btnProps).AutoButtonColor = false
 		end
 	end
 end
@@ -181,17 +181,17 @@ local function showPrompt(gems: number)
 	end
 	prompt.Visible = true
 	UI.label(prompt, {
-		Position = UDim2.fromOffset(0, 14), Size = UDim2.new(1, 0, 0, 30), Text = "Has caído...",
+		Position = UDim2.fromOffset(0, 14), Size = UDim2.new(1, 0, 0, 30), Text = "You fell...",
 		TextSize = 24, Font = Enum.Font.GothamBlack, TextXAlignment = Enum.TextXAlignment.Center,
 	})
 	UI.label(prompt, {
-		Position = UDim2.fromOffset(0, 46), Size = UDim2.new(1, 0, 0, 20), Text = "¿Seguir luchando con 3 vidas nuevas?",
+		Position = UDim2.fromOffset(0, 46), Size = UDim2.new(1, 0, 0, 20), Text = "Keep fighting with 3 new lives?",
 		TextSize = 14, TextColor3 = UI.Colors.Muted, TextXAlignment = Enum.TextXAlignment.Center,
 	})
-	local revive = UI.button(prompt, `Revivir · {gems} {GEM}`, UI.Colors.Gems, {
+	local revive = UI.button(prompt, `Revive · {gems} {GEM}`, UI.Colors.Gems, {
 		Position = UDim2.new(0, 16, 1, -54), Size = UDim2.new(0.5, -22, 0, 40),
 	})
-	local quit = UI.button(prompt, "Rendirse", UI.Colors.Disabled, {
+	local quit = UI.button(prompt, "Give up", UI.Colors.Disabled, {
 		Position = UDim2.new(0.5, 6, 1, -54), Size = UDim2.new(0.5, -22, 0, 40),
 	})
 	revive.Activated:Connect(function()
@@ -213,7 +213,7 @@ function StoryController.Start()
 
 	-- Lista de capítulos
 	local content
-	listFrame, content = UI.modal(gui, "📖 Crónicas del Sello Maldito", UDim2.fromOffset(620, 460), Color3.fromRGB(150, 70, 220))
+	listFrame, content = UI.modal(gui, "📖 Chronicles of the Cursed Seal", UDim2.fromOffset(620, 460), Color3.fromRGB(150, 70, 220))
 	listContent = UI.make("ScrollingFrame", {
 		Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, ScrollBarThickness = 5, BorderSizePixel = 0,
 		CanvasSize = UDim2.new(), AutomaticCanvasSize = Enum.AutomaticSize.Y,
@@ -245,9 +245,9 @@ function StoryController.Start()
 	})
 	UI.label(dialogue, {
 		AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, -14, 1, -8), Size = UDim2.fromOffset(200, 18),
-		Text = "Clic / toca para continuar ▶", TextSize = 12, TextColor3 = UI.Colors.Muted, TextXAlignment = Enum.TextXAlignment.Right,
+		Text = "Click / tap to continue ▶", TextSize = 12, TextColor3 = UI.Colors.Muted, TextXAlignment = Enum.TextXAlignment.Right,
 	})
-	local skip = UI.button(dialogue, "Saltar ", UI.Colors.Disabled, {
+	local skip = UI.button(dialogue, "Skip ", UI.Colors.Disabled, {
 		AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -12, 0, 12), Size = UDim2.fromOffset(100, 28), TextSize = 13,
 	})
 	skip.Activated:Connect(function()
@@ -272,7 +272,7 @@ function StoryController.Start()
 	UI.make("UIScale", {}, banner)
 
 	-- Abandonar capítulo
-	quitButton = UI.button(gui, "Abandonar", UI.Colors.Disabled, {
+	quitButton = UI.button(gui, "Leave", UI.Colors.Disabled, {
 		AnchorPoint = Vector2.new(0, 0), Position = UDim2.fromOffset(16, 110), Size = UDim2.fromOffset(130, 32), TextSize = 13, Visible = false,
 	})
 	quitButton.Activated:Connect(function()
@@ -295,7 +295,7 @@ function StoryController.Start()
 			local chapter = StoryConfig.Get(a)
 			if chapter then
 				if b == "Intro" then
-					showBanner(`Capítulo {chapter.Id}`, Color3.fromRGB(200, 160, 255), 1.5)
+					showBanner(`Chapter {chapter.Id}`, Color3.fromRGB(200, 160, 255), 1.5)
 					task.wait(1.2)
 				end
 				playDialogue(chapter[b] or {})
@@ -303,21 +303,21 @@ function StoryController.Start()
 				request("DialogueDone")
 			end
 		elseif kind == "Wave" then
-			showBanner(if a == b and b > 1 then "¡OLEADA FINAL!" else `Oleada {a}/{b}`, Color3.fromRGB(255, 200, 80), 1.6)
+			showBanner(if a == b and b > 1 then "FINAL WAVE!" else `Wave {a}/{b}`, Color3.fromRGB(255, 200, 80), 1.6)
 		elseif kind == "StoryDefeat" then
 			showPrompt(a)
 		elseif kind == "StoryResult" then
 			prompt.Visible = false
 			if a.Won then
-				showBanner("¡CAPÍTULO COMPLETADO!", UI.Colors.Gold, 2.5)
+				showBanner("CHAPTER COMPLETE!", UI.Colors.Gold, 2.5)
 				if a.Gems then
-					CurrencyController.Toast(`+{a.Gems} {GEM} (Historia)`, EconomyConfig.Currencies.Gems.Color)
+					CurrencyController.Toast(`+{a.Gems} {GEM} (Story)`, EconomyConfig.Currencies.Gems.Color)
 				end
 				if a.Skin then
-					CurrencyController.Toast("¡Nueva skin desbloqueada!", UI.Colors.Gold)
+					CurrencyController.Toast("New skin unlocked!", UI.Colors.Gold)
 				end
 			else
-				showBanner(a.Reason or "DERROTA", UI.Colors.Red, 2.5)
+				showBanner(a.Reason or "DEFEAT", UI.Colors.Red, 2.5)
 			end
 		end
 	end)

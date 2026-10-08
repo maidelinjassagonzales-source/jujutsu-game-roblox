@@ -44,11 +44,11 @@ end
 RewardsService.Handlers.ClaimDaily = function(player: Player)
 	local data = services.DataService.Get(player)
 	if not data then
-		return result(false, "Cargando tus datos...")
+		return result(false, "Loading your data...")
 	end
 	local day, claimed = RewardsService.DailyStatus(data)
 	if claimed then
-		return result(false, "Ya reclamaste la recompensa de hoy. ¡Vuelve mañana!")
+		return result(false, "You already claimed today's reward. Come back tomorrow!")
 	end
 	services.DataService.Update(player, function(d)
 		d.Login.LastDay = RewardsConfig.Today(os.time())
@@ -57,31 +57,31 @@ RewardsService.Handlers.ClaimDaily = function(player: Player)
 	local multiplier = 1 + (if player:GetAttribute("VIP") then RewardsConfig.VIPDailyBonus else 0)
 	local text = grant(player, RewardsConfig.Daily[day], multiplier, `Diaria:{day}`)
 	services.DataService.PushState(player)
-	return result(true, `Día {day}: {text}`)
+	return result(true, `Day {day}: {text}`)
 end
 
 RewardsService.Handlers.RedeemCode = function(player: Player, code: any)
 	if type(code) ~= "string" or #code > 32 then
-		return result(false, "Código no válido")
+		return result(false, "Invalid code")
 	end
 	code = string.upper((code:gsub("%s", "")))
 	local reward = RewardsConfig.Codes[code]
 	if not reward or (reward.Expires and os.time() >= reward.Expires) then
-		return result(false, "Ese código no existe o ha caducado")
+		return result(false, "That code doesn't exist or has expired")
 	end
 	local data = services.DataService.Get(player)
 	if not data then
-		return result(false, "Cargando tus datos...")
+		return result(false, "Loading your data...")
 	end
 	if data.RedeemedCodes[code] then
-		return result(false, "Ya canjeaste ese código")
+		return result(false, "You already redeemed that code")
 	end
 	services.DataService.Update(player, function(d)
 		d.RedeemedCodes[code] = true
 	end)
 	local text = grant(player, reward, 1, `Codigo:{code}`)
 	services.DataService.PushState(player)
-	return result(true, `Código {code}: {text}`)
+	return result(true, `Code {code}: {text}`)
 end
 
 -- Recompensa del tutorial (una sola vez)
@@ -91,14 +91,14 @@ RewardsService.Handlers.CompleteTutorial = function(player: Player)
 		return result(false, "")
 	end
 	if data.Tutorial.Done then
-		return result(true, "Tutorial completado")
+		return result(true, "Tutorial completed")
 	end
 	services.DataService.Update(player, function(d)
 		d.Tutorial.Done = true
 	end)
 	local text = grant(player, { Coins = 1000, Gems = 30 }, 1, "Tutorial")
 	services.DataService.PushState(player)
-	return result(true, `¡Tutorial completado! {text}`)
+	return result(true, `Tutorial completed! {text}`)
 end
 
 function RewardsService.Start(s)

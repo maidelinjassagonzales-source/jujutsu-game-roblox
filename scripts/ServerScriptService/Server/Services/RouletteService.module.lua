@@ -45,33 +45,33 @@ end
 
 RouletteService.Handlers.Spin = function(player: Player, mode: any)
 	if mode ~= "Free" and mode ~= "Coins" then
-		return result(false, "Petición inválida")
+		return result(false, "Invalid request")
 	end
 	if busy[player] then
 		return result(false, "")
 	end
 	local data = services.DataService.Get(player)
 	if not data then
-		return result(false, "Tus datos aún se están cargando")
+		return result(false, "Your data is still loading")
 	end
 	busy[player] = true
 	local ok, response = pcall(function()
 		services.DataService.Update(player, ensureDay)
 		if mode == "Free" then
 			if data.Roulette.FreeUsed then
-				return result(false, "Ya has usado la tirada gratis de hoy")
+				return result(false, "You already used today's free spin")
 			end
 			services.DataService.Update(player, function(d)
 				d.Roulette.FreeUsed = true
 			end)
 		else
 			if data.Roulette.Paid >= RouletteConfig.MaxPaidPerDay then
-				return result(false, `Máximo {RouletteConfig.MaxPaidPerDay} tiradas al día. ¡Vuelve mañana!`)
+				return result(false, `Max {RouletteConfig.MaxPaidPerDay} spins per day. Come back tomorrow!`)
 			end
 			-- Evento "Fortuna Maldita": mitad de precio
 			local cost = if services.EventService and services.EventService.Active() == "Fortune" then RouletteConfig.SpinCostCoins // 2 else RouletteConfig.SpinCostCoins
-			if not services.EconomyService.SpendCurrency(player, "Coins", cost, "Ruleta") then
-				return result(false, "No tienes suficientes Monedas Malditas")
+			if not services.EconomyService.SpendCurrency(player, "Coins", cost, "Roulette") then
+				return result(false, "You don't have enough Cursed Coins")
 			end
 			services.DataService.Update(player, function(d)
 				d.Roulette.Paid += 1
@@ -83,7 +83,7 @@ RouletteService.Handlers.Spin = function(player: Player, mode: any)
 		local text = RouletteConfig.Describe(prize)
 		local skinId = nil
 		if prize.Kind == "Coins" or prize.Kind == "Gems" then
-			services.EconomyService.AddCurrency(player, prize.Kind, prize.Amount, "Ruleta")
+			services.EconomyService.AddCurrency(player, prize.Kind, prize.Amount, "Roulette")
 		elseif prize.Kind == "XP" then
 			services.EconomyService.AddXP(player, prize.Amount)
 		elseif prize.Kind == "Boost" then
@@ -100,18 +100,28 @@ RouletteService.Handlers.Spin = function(player: Player, mode: any)
 			end
 			if #missing > 0 then
 				skinId = missing[rng:NextInteger(1, #missing)]
+				local skin = CatalogConfig.Skins[skinId]
+				-- Antes solo se daba la skin: si no tenías el personaje (p. ej. Sukuna) no podías usarla.
+				-- Ahora, si no lo tienes, la ruleta te regala también el personaje.
+				local unlockedCharacter = skin and skin.Character and not data.OwnedCharacters[skin.Character]
 				services.DataService.Update(player, function(d)
 					d.OwnedSkins[skinId] = true
+					if unlockedCharacter then
+						d.OwnedCharacters[skin.Character] = true
+					end
+					d.EquippedSkins[skin.Character] = skinId -- ya equipada para que se vea al momento
 				end)
-				local skin = CatalogConfig.Skins[skinId]
-				text = `SKIN EXCLUSIVA: {skin.Name}`
+				local CharacterRegistry = require(ReplicatedStorage.Shared:WaitForChild("CharacterRegistry"))
+				local charData = CharacterRegistry.Get(skin.Character)
+				local charName = if charData then charData.DisplayName else skin.Character
+				text = if unlockedCharacter then `{charName} UNLOCKED + {skin.Name} skin!` else `EXCLUSIVE SKIN: {skin.Name}`
 				-- ¡Que se entere todo el servidor!
 				for _, other in Players:GetPlayers() do
-					services.EconomyFeedback:FireClient(other, "Reward", { Reason = `¡{player.DisplayName} ha ganado la skin {skin.Name} en la Ruleta Maldita!` })
+					services.EconomyFeedback:FireClient(other, "Reward", { Reason = `{player.DisplayName} won the {skin.Name} skin on the Cursed Roulette!` })
 				end
 			else
 				services.EconomyService.AddCurrency(player, "Gems", RouletteConfig.DuplicateSkinGems, "Ruleta:SkinRepetida")
-				text = `Ya tenías todas las skins: +{RouletteConfig.DuplicateSkinGems} Gemas`
+				text = `You already had every skin: +{RouletteConfig.DuplicateSkinGems} Gems`
 			end
 		end
 		task.spawn(services.DataService.Save, player, false)
@@ -122,7 +132,7 @@ RouletteService.Handlers.Spin = function(player: Player, mode: any)
 	busy[player] = nil
 	if not ok then
 		warn("[RouletteService]", response)
-		return result(false, "Error en la ruleta, inténtalo otra vez")
+		return result(false, "Roulette error, try again")
 	end
 	return response
 end

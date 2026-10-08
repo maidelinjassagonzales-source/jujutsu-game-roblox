@@ -35,7 +35,7 @@ end
 
 local function create(id: string, stageId: string, center: Vector3, kind: string)
 	local stage = StageConfig.Stages[stageId]
-	assert(stage, `Escenario desconocido: {stageId}`)
+	assert(stage, `Unknown stage: {stageId}`)
 
 	local model = stageModel(stageId)
 	model.Name = id
@@ -130,6 +130,15 @@ end
 
 function ArenaService.Hub()
 	return arenas.Hub
+end
+
+-- Todas las arenas activas (Dojo + partidas + historia)
+function ArenaService.All()
+	local list = {}
+	for _, arena in arenas do
+		table.insert(list, arena)
+	end
+	return list
 end
 
 -- ===== Lobby 3D

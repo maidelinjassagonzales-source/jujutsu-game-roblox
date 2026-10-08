@@ -190,7 +190,7 @@ function LobbyBuilder.Build(): Model
 	torii(Vector3.new(0, 0, 92), 22, 22, C(200, 40, 35))
 	local spawn = part({ Name = "SpawnPoint", Size = Vector3.new(10, 0.4, 10), Position = Vector3.new(0, 0.2, 64), Color = C(200, 180, 255), Material = M.Neon, CanCollide = false, Transparency = 0.6 })
 	spawn:SetAttribute("Facing", Vector3.new(0, 0, -1))
-	sign(Vector3.new(0, 30, 92), "呪術高専 · ESCUELA DE HECHICERÍA", C(255, 230, 200), 34)
+	sign(Vector3.new(0, 30, 92), "呪術高専 · SORCERY SCHOOL", C(255, 230, 200), 34)
 
 	-- ===== Escuela al fondo (hueca: dentro está la Sala de Personajes)
 	local WALL = C(235, 225, 205)
@@ -238,7 +238,7 @@ function LobbyBuilder.Build(): Model
 	end
 	part({ Size = Vector3.new(20, 1.6, 3.2), Position = Vector3.new(0, 16.6, -110.5), Color = DARK_WOOD })
 	part({ Size = Vector3.new(22, 0.6, 6), Position = Vector3.new(0, 0.3, -107), Color = C(150, 145, 140), Material = M.Slate })
-	sign(Vector3.new(0, 20.5, -108), "SALA DE PERSONAJES", C(255, 170, 210), 22, "none") -- va pegado a la fachada
+	sign(Vector3.new(0, 20.5, -108), "CHARACTER HALL", C(255, 170, 210), 22, "none") -- va pegado a la fachada
 	-- Tejadillo sobre la entrada
 	part({ Size = Vector3.new(26, 0.8, 6), CFrame = CFrame.new(0, 18.2, -106.5) * CFrame.Angles(math.rad(-12), 0, 0), Color = C(55, 58, 72), Material = M.Slate })
 	for _, x in { -11, 11 } do
@@ -387,7 +387,7 @@ function LobbyBuilder.Build(): Model
 	end
 
 	-- ===== Tablas de clasificación (a los lados de la escuela)
-	for _, info in { { "LeaderboardWins", -62, "MURO DE LEYENDAS" }, { "LeaderboardLevel", 62, "TOP NIVELES" } } do
+	for _, info in { { "LeaderboardWins", -62, "WALL OF LEGENDS" }, { "LeaderboardLevel", 62, "TOP LEVELS" } } do
 		local board = part({ Name = info[1], Size = Vector3.new(34, 26, 1), Position = Vector3.new(info[2], 17, -90), Color = C(20, 16, 34) })
 		part({ Size = Vector3.new(35, 27, 0.6), Position = Vector3.new(info[2], 17, -90.6), Color = C(150, 70, 220), Material = M.Neon })
 		cylY(Vector3.new(info[2] - 16, 2, -90), 4, 1.4, C(60, 50, 55))
@@ -449,8 +449,8 @@ function LobbyBuilder.Build(): Model
 	veil.Speed = NumberRange.new(1, 3)
 	veil.SpreadAngle = Vector2.new(180, 180)
 	veil.Parent = storyGate
-	prompt(storyGate, "OpenStory", "Abrir", "Modo Historia")
-	sign(Vector3.new(-72, 23, -10), "MODO HISTORIA", C(210, 170, 255), 20, "gate")
+	prompt(storyGate, "OpenStory", "Open", "Story Mode")
+	sign(Vector3.new(-72, 23, -10), "STORY MODE", C(210, 170, 255), 20, "gate")
 	for _, z in { -26, 6 } do
 		lantern(Vector3.new(-86, 1, z))
 	end
@@ -481,9 +481,9 @@ function LobbyBuilder.Build(): Model
 		gl.Range = 26
 		gl.Brightness = 2.5
 		gl.Parent = gate
-		prompt(gate, "Obby", "Entrar", "Obby · Ascenso Maldito")
-		sign(Vector3.new(-120, 21, OZ), "OBBY · ASCENSO MALDITO", obbyColor, 18)
-		sign(Vector3.new(-112, 4, OZ), "Parkour con premio diario", C(255, 255, 255), 13)
+		prompt(gate, "Obby", "Enter", "Obby · Cursed Ascent")
+		sign(Vector3.new(-120, 21, OZ), "OBBY · CURSED ASCENT", obbyColor, 18)
+		sign(Vector3.new(-112, 4, OZ), "Parkour with a daily reward", C(255, 255, 255), 13)
 		for _, z in { OZ - 12, OZ + 12 } do
 			lantern(Vector3.new(-110, 1, z))
 		end
@@ -492,7 +492,7 @@ function LobbyBuilder.Build(): Model
 	-- ===== Derecha: Sala de Combate (portales + plataformas de cola)
 	part({ Size = Vector3.new(72, 1, 100), Position = Vector3.new(92, 0.5, -10), Color = C(50, 45, 60), Material = M.Slate })
 	-- Puerta de entrada a la Sala de Combate (antes el cartel flotaba en el aire)
-	sign(Vector3.new(62, 18, -10), "SALA DE COMBATE", C(255, 120, 120), 24, "gate")
+	sign(Vector3.new(62, 18, -10), "BATTLE HALL", C(255, 120, 120), 24, "gate")
 	-- Barandilla de madera alrededor de la sala (con hueco en la entrada)
 	for _, seg in { { 56.5, -58, 56.5, -26 }, { 56.5, 6, 56.5, 38 }, { 56.5, 38, 128, 38 }, { 56.5, -58, 128, -58 } } do
 		local a, b = Vector3.new(seg[1], 2.4, seg[2]), Vector3.new(seg[3], 2.4, seg[4])
@@ -504,9 +504,9 @@ function LobbyBuilder.Build(): Model
 		end
 	end
 	local portals = {
-		{ Mode = "FFA", Z = -40, Color = C(220, 60, 70), Title = "PARTIDA RÁPIDA" },
+		{ Mode = "FFA", Z = -40, Color = C(220, 60, 70), Title = "QUICK MATCH" },
 		{ Mode = "Duel", Z = -10, Color = C(230, 140, 30), Title = "DUELO 1V1" },
-		{ Mode = "Dojo", Z = 20, Color = C(60, 160, 220), Title = "DOJO · PRÁCTICA" },
+		{ Mode = "Dojo", Z = 20, Color = C(60, 160, 220), Title = "DOJO · PRACTICE" },
 	}
 	for _, p in portals do
 		local portalMesh = nil
@@ -545,7 +545,7 @@ function LobbyBuilder.Build(): Model
 		label.Name = "QueueText"
 		label.Parent.Parent.Name = `QueueSign_{p.Mode}`
 		if p.Mode == "Dojo" then
-			prompt(swirl, "Practice", "Entrar", "Dojo de práctica")
+			prompt(swirl, "Practice", "Enter", "Practice Dojo")
 		else
 			-- Súbete al círculo para entrar en la cola
 			local pad = part({
@@ -555,14 +555,14 @@ function LobbyBuilder.Build(): Model
 			})
 			pad:SetAttribute("Mode", p.Mode)
 			CollectionService:AddTag(pad, "QueuePad")
-			sign(Vector3.new(100, 4, p.Z), "Súbete aquí para buscar partida", C(255, 255, 255), 14)
+			sign(Vector3.new(100, 4, p.Z), "Step here to find a match", C(255, 255, 255), 14)
 		end
 	end
 
 	-- ===== Delante: Pase de Batalla y Tienda
 	local stalls = {
-		{ X = -40, Color = C(255, 190, 40), Cloth = C(150, 30, 35), Title = "PASE DE BATALLA", Action = "OpenPass", Prompt = "Ver el pase" },
-		{ X = 40, Color = C(90, 220, 255), Cloth = C(30, 50, 120), Title = "TIENDA", Action = "OpenStore", Prompt = "Comprar" },
+		{ X = -40, Color = C(255, 190, 40), Cloth = C(150, 30, 35), Title = "BATTLE PASS", Action = "OpenPass", Prompt = "View the pass" },
+		{ X = 40, Color = C(90, 220, 255), Cloth = C(30, 50, 120), Title = "SHOP", Action = "OpenStore", Prompt = "Buy" },
 	}
 	for _, s in stalls do
 		if useMeshes then

@@ -28,6 +28,8 @@ local airJumpsUsed = 0
 local lastJumpTime = 0
 local externalMove = Vector3.zero
 local dropUntil = 0
+local facing = 1 -- 1 = derecha, -1 = izquierda (en las arenas 2D el giro es instantáneo, como en Smash)
+local lockedUntil = 0 -- cargando un smash / agarrando: ni andar ni girarse
 
 local FREE_WALK_SPEED, FREE_RUN_SPEED = 14, 26 -- Lobby: caminar / correr
 local CharacterRegistry = require(Shared:WaitForChild("CharacterRegistry"))
@@ -105,6 +107,30 @@ function MovementController.GetCharacter()
 	return character, humanoid, hrp
 end
 
+-- Hacia dónde mira el luchador (1 = derecha, -1 = izquierda). Úsalo en vez de LookVector.
+function MovementController.GetFacing(): number
+	return facing
+end
+
+-- Bloquea andar y girarse durante `seconds` (0 = desbloquear)
+function MovementController.LockFor(seconds: number)
+	lockedUntil = if seconds > 0 then os.clock() + seconds else 0
+end
+
+-- Gira al instante hacia dir (sin la rotación progresiva del Humanoid)
+local function faceDirection(dir: number)
+	facing = dir
+	if not hrp then
+		return
+	end
+	local look = hrp.CFrame.LookVector
+	if math.abs(look.X - dir) < 0.001 then
+		return -- ya mira hacia ahí
+	end
+	local pos = hrp.Position
+	hrp.CFrame = CFrame.lookAt(pos, pos + Vector3.new(dir, 0, 0))
+end
+
 -- Saltos en el aire usados desde que tocó el suelo (el tutorial lo usa para el doble salto)
 function MovementController.AirJumpsUsed(): number
 	return airJumpsUsed
@@ -125,6 +151,8 @@ local function onCharacterAdded(char: Model)
 	end
 	humanoid, hrp = hum, root
 	airJumpsUsed = 0
+	facing = if root.CFrame.LookVector.X < 0 then -1 else 1
+	lockedUntil = 0
 
 	hum:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
 	hum.StateChanged:Connect(function(_, new)
@@ -184,6 +212,11 @@ function MovementController.Start()
 		end
 		if KnockbackSimulator.IsActive(character) then
 			humanoid:Move(Vector3.zero, false)
+			-- Al salir volando se queda mirando hacia donde le deje el golpe
+			local lookX = hrp.CFrame.LookVector.X
+			if math.abs(lookX) > 0.3 then
+				facing = if lookX < 0 then -1 else 1
+			end
 			return
 		end
 
@@ -191,6 +224,9 @@ function MovementController.Start()
 
 		-- Modo libre (Lobby): movimiento 3D relativo a la cámara
 		if isFreeMode() then
+			if not humanoid.AutoRotate then
+				humanoid.AutoRotate = true -- en el Lobby 3D sí gira de forma progresiva
+			end
 			local camCF = workspace.CurrentCamera.CFrame
 			local forward = Vector3.new(camCF.LookVector.X, 0, camCF.LookVector.Z)
 			local right = Vector3.new(camCF.RightVector.X, 0, camCF.RightVector.Z)
@@ -207,12 +243,31 @@ function MovementController.Start()
 			return
 		end
 
+		-- Arenas 2D: el giro lo hacemos nosotros, al instante. Con el AutoRotate del Humanoid un toque
+		-- corto de A/D dejaba al personaje a medio girar (de espaldas, golpeando a la nada).
+		if humanoid.AutoRotate then
+			humanoid.AutoRotate = false
+		end
+		if os.clock() < lockedUntil then
+			humanoid:Move(Vector3.zero, false)
+			faceDirection(facing)
+			return
+		end
+
 		-- Con el escudo puesto no se camina (las direcciones sirven para esquivar)
 		if character:GetAttribute("Shielding") then
 			humanoid:Move(Vector3.zero, false)
+			faceDirection(facing)
 			return
 		end
 		humanoid:Move(Vector3.new(mv.X, 0, 0), false)
+		if mv.X > 0.3 then
+			faceDirection(1)
+		elseif mv.X < -0.3 then
+			faceDirection(-1)
+		else
+			faceDirection(facing)
+		end
 
 		-- Correr: velocidad base del luchador (x transformación) x RUN_MULT
 		local sign = if mv.X > 0.5 then 1 elseif mv.X < -0.5 then -1 else 0

@@ -201,7 +201,7 @@ local function addCard(model: Model)
 		local ready = ult >= 100
 		ultFill.BackgroundColor3 = if ready then Color3.fromRGB(255, 240, 120) else Color3.fromRGB(255, 190, 40)
 		ultText.Text = if model:GetAttribute("Transformed") then string.upper(model:GetAttribute("Transformed"))
-			elseif ready then (if isMe then "¡ULTI LISTA! (R)" else "¡ULTI LISTA!") else ""
+			elseif ready then (if isMe then "ULT READY! (R)" else "ULT READY!") else ""
 	end
 
 	local connections = {}
@@ -255,13 +255,13 @@ function HUDController.Start()
 	keysLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
 	local KEYBOARD_ROWS = {
-		{ { "A", "D" }, "Moverse" }, { { "ESPACIO" }, "Saltar ×2" }, { { "J" }, "Golpe" }, { { "K" }, "Fuerte" },
-		{ { "E" }, "Especial" }, { { "Q" }, "Escudo / esquivar" }, { { "G" }, "Agarre" }, { { "R" }, "Ulti" },
-		{ { "SHIFT" }, "Correr" }, { { "W", "S" }, "+ ataque: variantes" }, { { "T" }, "Cambiar personaje" },
+		{ { "A", "D" }, "Move" }, { { "SPACE" }, "Jump ×2" }, { { "J" }, "Attack" }, { { "K" }, "Heavy" },
+		{ { "E" }, "Special" }, { { "Q" }, "Shield / dodge" }, { { "G" }, "Grab" }, { { "R" }, "Ult" },
+		{ { "SHIFT" }, "Run" }, { { "W", "S" }, "+ attack: variants" }, { { "T" }, "Switch character" },
 	}
 	local GAMEPAD_ROWS = {
-		{ { "A" }, "Saltar ×2" }, { { "X" }, "Golpe" }, { { "Y" }, "Fuerte" }, { { "B" }, "Especial" },
-		{ { "↑" }, "Ulti (cruceta)" }, { { "L1" }, "Escudo / esquivar" }, { { "R1" }, "Agarre" }, { { "R3" }, "Cambiar personaje" },
+		{ { "A" }, "Jump ×2" }, { { "X" }, "Attack" }, { { "Y" }, "Heavy" }, { { "B" }, "Special" },
+		{ { "↑" }, "Ult (D-pad)" }, { { "L1" }, "Shield / dodge" }, { { "R1" }, "Grab" }, { { "R3" }, "Switch character" },
 	}
 	local function buildKeys(rows)
 		for _, child in keys:GetChildren() do
@@ -289,7 +289,7 @@ function HUDController.Start()
 			label(line, {
 				Position = UDim2.fromOffset(x + 4, 0), Size = UDim2.new(1, -x - 4, 1, 0), Text = row[2], TextSize = 13,
 				Font = Enum.Font.GothamBlack, TextXAlignment = Enum.TextXAlignment.Left, TextStrokeTransparency = 0.3,
-				TextColor3 = if row[2]:find("Ulti") then Color3.fromRGB(255, 215, 90) else Color3.new(1, 1, 1),
+				TextColor3 = if row[2]:find("Ult") then Color3.fromRGB(255, 215, 90) else Color3.new(1, 1, 1),
 			})
 		end
 	end
@@ -329,18 +329,28 @@ function HUDController.Start()
 		tiles[name] = { Square = sq, Stroke = stroke, Scale = scale, Key = key, Text = text, Color = color }
 		return tiles[name]
 	end
-	local ult = tile("Ulti", "R", Vector2.new(120, 62), 64, Color3.fromRGB(255, 200, 50))
-	tile("Golpe", "J", Vector2.new(62, 120), 52, Color3.fromRGB(230, 70, 80))
-	tile("Especial", "E", Vector2.new(166, 140), 52, Color3.fromRGB(120, 140, 255))
-	tile("Fuerte", "K", Vector2.new(110, 170), 46, Color3.fromRGB(255, 140, 50))
-	-- Relleno de la ulti (sube desde abajo; va girado al revés para quedar horizontal dentro del rombo)
+	local ult = tile("Ult", "R", Vector2.new(120, 62), 64, Color3.fromRGB(255, 200, 50))
+	tile("Attack", "J", Vector2.new(62, 120), 52, Color3.fromRGB(230, 70, 80))
+	tile("Special", "E", Vector2.new(166, 140), 52, Color3.fromRGB(120, 140, 255))
+	tile("Heavy", "K", Vector2.new(110, 170), 46, Color3.fromRGB(255, 140, 50))
+	-- Relleno de la ulti (sube desde abajo; va girado al revés para quedar horizontal dentro del rombo).
+	-- ClipsDescendants NO recorta en marcos girados (por eso se veía un cuadrado saliéndose del rombo):
+	-- un CanvasGroup sí recorta a sus hijos aunque esté girado, así el líquido queda DENTRO del rombo.
+	-- Sin recortes (en algunos dispositivos no funcionan con marcos girados): el relleno es un rombo
+	-- EXACTO encima del de la ulti, y un degradado de transparencia hace de "nivel de líquido".
+	-- Va girado como su padre, así que el degradado a 45° queda vertical en pantalla
+	-- (0 = punta de arriba, 1 = punta de abajo).
 	local ultFill = Instance.new("Frame")
-	ultFill.AnchorPoint = Vector2.new(0.5, 0.5)
-	ultFill.BackgroundColor3 = Color3.fromRGB(255, 190, 40)
-	ultFill.BackgroundTransparency = 0.35
+	ultFill.Name = "UltFill"
+	ultFill.Size = UDim2.fromScale(1, 1)
+	ultFill.BackgroundColor3 = Color3.new(1, 1, 1)
 	ultFill.BorderSizePixel = 0
-	ultFill.Rotation = -45
+	ultFill.ZIndex = 2
 	ultFill.Parent = ult.Square
+	local ultLevel = UI.make("UIGradient", {
+		Rotation = 45, Color = ColorSequence.new(Color3.fromRGB(255, 235, 140), Color3.fromRGB(255, 140, 20)),
+		Transparency = NumberSequence.new(1),
+	}, ultFill)
 	local ultPercent = label(diamond, {
 		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromOffset(120, 16), Size = UDim2.fromOffset(80, 18),
 		Text = "", TextSize = 14, Font = Enum.Font.LuckiestGuy, TextColor3 = Color3.fromRGB(255, 215, 90), ZIndex = 3,
@@ -356,18 +366,18 @@ function HUDController.Start()
 		end
 	end
 	local KEY_TILES = {
-		[Enum.KeyCode.J] = "Golpe", [Enum.KeyCode.K] = "Fuerte", [Enum.KeyCode.E] = "Especial", [Enum.KeyCode.L] = "Especial",
-		[Enum.KeyCode.R] = "Ulti", [Enum.KeyCode.ButtonX] = "Golpe", [Enum.KeyCode.ButtonY] = "Fuerte", [Enum.KeyCode.ButtonB] = "Especial",
-		[Enum.KeyCode.DPadUp] = "Ulti",
+		[Enum.KeyCode.J] = "Attack", [Enum.KeyCode.K] = "Heavy", [Enum.KeyCode.E] = "Special", [Enum.KeyCode.L] = "Special",
+		[Enum.KeyCode.R] = "Ult", [Enum.KeyCode.ButtonX] = "Attack", [Enum.KeyCode.ButtonY] = "Heavy", [Enum.KeyCode.ButtonB] = "Special",
+		[Enum.KeyCode.DPadUp] = "Ult",
 	}
 	UserInputService.InputBegan:Connect(function(input, processed)
 		if processed then
 			return
 		end
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
-			pulse("Golpe")
+			pulse("Attack")
 		elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
-			pulse("Fuerte")
+			pulse("Heavy")
 		elseif KEY_TILES[input.KeyCode] then
 			pulse(KEY_TILES[input.KeyCode])
 		end
@@ -379,7 +389,7 @@ function HUDController.Start()
 		local lastTouch = UserInputService:GetLastInputType() == Enum.UserInputType.Touch
 		local touchOnly = UserInputService.TouchEnabled and (lastTouch or not UserInputService.KeyboardEnabled) and not gamepad
 		buildKeys(if gamepad then GAMEPAD_ROWS else KEYBOARD_ROWS)
-		local labels = if gamepad then { Golpe = "X", Fuerte = "Y", Especial = "B", Ulti = "↑" } else { Golpe = "J", Fuerte = "K", Especial = "E", Ulti = "R" }
+		local labels = if gamepad then { Attack = "X", Heavy = "Y", Special = "B", Ult = "↑" } else { Attack = "J", Heavy = "K", Special = "E", Ult = "R" }
 		for name, t in tiles do
 			t.Key.Text = labels[name]
 		end
@@ -403,11 +413,22 @@ function HUDController.Start()
 		local ready = value >= 100
 		-- El cuadrado va girado 45°: el relleno (horizontal en pantalla) crece desde la esquina de abajo
 		-- (la esquina local (1,1)). Roblox gira sobre el centro, así que se coloca el centro a mano.
-		local h = math.min(value, 100) / 100 * 64 * 1.42
-		local d = h / 2 * 0.707
-		ultFill.Size = UDim2.fromOffset(64 * 1.5, h)
-		ultFill.Position = UDim2.new(1, -d, 1, -d)
-		ultPercent.Text = if ready then "¡LISTA!" else `{math.floor(value)}%`
+		-- Nivel del líquido: por debajo de "cut" opaco, por encima transparente (con un borde suave)
+		local level = math.clamp(value / 100, 0, 1)
+		if level <= 0.001 then
+			ultLevel.Transparency = NumberSequence.new(1)
+		elseif level >= 0.999 then
+			ultLevel.Transparency = NumberSequence.new(0.05)
+		else
+			local cut = 1 - level
+			ultLevel.Transparency = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, 1),
+				NumberSequenceKeypoint.new(math.max(0.002, cut - 0.015), 1),
+				NumberSequenceKeypoint.new(math.min(0.998, cut + 0.015), 0.15),
+				NumberSequenceKeypoint.new(1, 0.15),
+			})
+		end
+		ultPercent.Text = if ready then "READY!" else `{math.floor(value)}%`
 		local glow = 0.5 + 0.5 * math.sin(os.clock() * 8)
 		ult.Stroke.Color = if ready then Color3.fromRGB(255, 240, 150):Lerp(Color3.new(1, 1, 1), glow) else ult.Color
 		ult.Stroke.Thickness = if ready then 3 + glow * 2 else 2.5

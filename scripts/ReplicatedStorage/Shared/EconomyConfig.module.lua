@@ -4,8 +4,8 @@
 local EconomyConfig = {}
 
 EconomyConfig.Currencies = {
-	Coins = { DisplayName = "Monedas Malditas", Icon = "呪", Color = Color3.fromRGB(190, 120, 255) },
-	Gems = { DisplayName = "Gemas", Icon = "晶", Color = Color3.fromRGB(90, 220, 255) },
+	Coins = { DisplayName = "Cursed Coins", Icon = "呪", Color = Color3.fromRGB(190, 120, 255) },
+	Gems = { DisplayName = "Gems", Icon = "晶", Color = Color3.fromRGB(90, 220, 255) },
 }
 
 -- Recompensas de combate (solo contra jugadores reales; los muñecos no dan nada en servidores públicos)
@@ -34,11 +34,11 @@ end
 -- Developer Products de gemas. Crea cada producto en el Creator Hub
 -- (Monetization > Developer Products) y pega aquí su ID. Con Id = 0 el botón avisa de que falta.
 EconomyConfig.GemPacks = {
-	{ Id = 0, Gems = 100, Name = "Puñado de Gemas", RobuxHint = 80 },
-	{ Id = 0, Gems = 550, Name = "Bolsa de Gemas", RobuxHint = 400, Tag = "+10%" },
-	{ Id = 0, Gems = 1200, Name = "Cofre de Gemas", RobuxHint = 800, Tag = "+20%" },
-	{ Id = 0, Gems = 2700, Name = "Arca de Gemas", RobuxHint = 1700, Tag = "+35%" },
-	{ Id = 0, Gems = 7500, Name = "Tesoro Maldito", RobuxHint = 4500, Tag = "MEJOR VALOR" },
+	{ Id = 3717315328, Gems = 100, Name = "Handful of Gems", RobuxHint = 80 },
+	{ Id = 3717315416, Gems = 550, Name = "Bag of Gems", RobuxHint = 400, Tag = "+10%" },
+	{ Id = 3717315495, Gems = 1200, Name = "Chest of Gems", RobuxHint = 800, Tag = "+20%" },
+	{ Id = 3717315580, Gems = 2700, Name = "Ark of Gems", RobuxHint = 1700, Tag = "+35%" },
+	{ Id = 3717315845, Gems = 7500, Name = "Cursed Treasure", RobuxHint = 4500, Tag = "BEST VALUE" },
 }
 
 return EconomyConfig

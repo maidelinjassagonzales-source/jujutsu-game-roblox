@@ -50,6 +50,19 @@ local ACTIONS = {
 	LeaveObby = function()
 		request("LeaveObby")
 	end,
+	-- NPCs del patio: dicen una frase al azar (bocadillo encima de la cabeza + aviso)
+	Talk = function(prompt: ProximityPrompt)
+		local lines = string.split(prompt:GetAttribute("Lines") or "", "|")
+		local line = lines[math.random(1, math.max(1, #lines))] or ""
+		if line == "" then
+			return
+		end
+		local speaker = prompt:GetAttribute("Speaker") or ""
+		pcall(function()
+			game:GetService("TextChatService"):DisplayBubble(prompt.Parent, line)
+		end)
+		CurrencyController.Toast(`{speaker}: {line}`, UI.Colors.Gold)
+	end,
 }
 
 -- ===== Pétalos de cerezo
@@ -193,15 +206,15 @@ function LobbyController.Start()
 	UI.corner(dojoBar, 10)
 	UI.stroke(dojoBar, Color3.fromRGB(60, 160, 220), 2)
 	UI.autoScale(dojoBar)
-	UI.label(dojoBar, { Position = UDim2.fromOffset(12, 0), Size = UDim2.new(1, -270, 1, 0), Text = "Dojo de práctica", TextSize = 15 })
-	local back = UI.button(dojoBar, "Volver al Lobby", Color3.fromRGB(60, 160, 220), {
+	UI.label(dojoBar, { Position = UDim2.fromOffset(12, 0), Size = UDim2.new(1, -270, 1, 0), Text = "Practice Dojo", TextSize = 15 })
+	local back = UI.button(dojoBar, "Back to Lobby", Color3.fromRGB(60, 160, 220), {
 		AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.fromOffset(136, 28), TextSize = 13,
 	})
 	back.Activated:Connect(function()
 		request("ReturnToLobby")
 	end)
 	-- Elegir el escenario del Dojo
-	local stageBtn = UI.button(dojoBar, "Escenario", Color3.fromRGB(150, 70, 220), {
+	local stageBtn = UI.button(dojoBar, "Stage", Color3.fromRGB(150, 70, 220), {
 		AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -152, 0.5, 0), Size = UDim2.fromOffset(110, 28), TextSize = 13,
 	})
 	stageBtn.Activated:Connect(function()
@@ -218,12 +231,12 @@ function LobbyController.Start()
 	UI.autoScale(guide)
 	UI.label(guide, {
 		Position = UDim2.fromOffset(14, 6), Size = UDim2.new(1, -28, 0, 24), TextSize = 17, Font = Enum.Font.GothamBlack,
-		Text = "Escuela de Hechicería", TextColor3 = UI.Colors.Gold,
+		Text = "Sorcery School", TextColor3 = UI.Colors.Gold,
 	})
 	UI.label(guide, {
 		Position = UDim2.fromOffset(14, 32), Size = UDim2.new(1, -28, 0, 36), TextSize = 13, TextWrapped = true,
 		TextColor3 = UI.Colors.Text,
-		Text = "Derecha: Sala de Combate (pisa un círculo para buscar rivales) · Dentro de la Escuela: Personajes · Izquierda: Historia · Pase y Tienda delante · Pulsa E en cada puesto",
+		Text = "Right: Battle Hall (step on a circle to find opponents) · Inside the School: Characters · Left: Story · Pass and Shop in front · Press E at each stall",
 	})
 
 	local lastZone = nil

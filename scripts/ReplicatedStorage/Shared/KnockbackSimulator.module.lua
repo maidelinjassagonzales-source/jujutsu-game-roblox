@@ -43,6 +43,9 @@ function KnockbackSimulator.Apply(model: Model, velocity: Vector3, hitstun: numb
 
 	local LAUNCH_LOCK = 0.06 -- durante los primeros frames se reafirma la velocidad de salida
 	local elapsed = 0
+	-- Siempre de pie (el giro de "tumble" es solo visual, lo hace PoseController). Si el cuerpo
+	-- se tumba, el HumanoidRootPart queda a ras de suelo y las hitboxes le pasan por encima.
+	local faceX = if hrp.CFrame.LookVector.X >= 0 then 1 else -1
 	local conn
 	conn = RunService.Heartbeat:Connect(function(dt)
 		if active[model] ~= token or not hrp.Parent then
@@ -61,6 +64,12 @@ function KnockbackSimulator.Apply(model: Model, velocity: Vector3, hitstun: numb
 			hrp.AssemblyLinearVelocity = Vector3.new(vx, v.Y, 0)
 		end
 		hrp.AssemblyAngularVelocity = Vector3.zero
+		local look = hrp.CFrame.LookVector
+		if math.abs(look.X) > 0.3 then
+			faceX = if look.X >= 0 then 1 else -1 -- respeta giros externos (p. ej. al ser agarrado)
+		end
+		local pos = hrp.Position
+		hrp.CFrame = CFrame.lookAt(pos, pos + Vector3.new(faceX, 0, 0))
 
 		if elapsed >= hitstun then
 			conn:Disconnect()

@@ -28,8 +28,11 @@ local function findTarget(npc: Model): Model?
 	if not hrp then
 		return nil
 	end
+	-- En partidas (bots) se va a por cualquiera de otro equipo; en la historia, solo a los jugadores
+	local myTeam = npc:GetAttribute("Team")
 	for _, model in CollectionService:GetTagged("Fighter") do
-		if model ~= npc and not model:GetAttribute("IsNPC") and model:GetAttribute("ArenaId") == arenaId
+		local isEnemy = if myTeam ~= nil then model:GetAttribute("Team") ~= myTeam else not model:GetAttribute("IsNPC")
+		if model ~= npc and isEnemy and model:GetAttribute("ArenaId") == arenaId
 			and not model:GetAttribute("Eliminated") and not model:GetAttribute("KOing") then
 			local thrp = getHRP(model)
 			if thrp then

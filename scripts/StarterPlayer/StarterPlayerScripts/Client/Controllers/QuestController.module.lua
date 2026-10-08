@@ -83,7 +83,7 @@ local function refresh()
 	end
 	local q = quests()
 	if not q then
-		UI.label(list, { Size = UDim2.new(1, 0, 0, 30), Text = "Cargando misiones...", TextColor3 = UI.Colors.Muted, TextXAlignment = Enum.TextXAlignment.Center })
+		UI.label(list, { Size = UDim2.new(1, 0, 0, 30), Text = "Loading quests...", TextColor3 = UI.Colors.Muted, TextXAlignment = Enum.TextXAlignment.Center })
 		return
 	end
 	local allClaimed = #q.List > 0
@@ -114,15 +114,15 @@ local function refresh()
 			rewardRow(card, quest.Reward, { Position = UDim2.fromOffset(82, 56) })
 			local props = { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -12, 0.5, 0), Size = UDim2.fromOffset(130, 40), TextSize = 15 }
 			if entry.Claimed then
-				UI.button(card, "COBRADA", UI.Colors.Disabled, props)
+				UI.button(card, "CLAIMED", UI.Colors.Disabled, props)
 			elseif done then
-				local b = UI.button(card, "COBRAR", UI.Colors.Green, props)
+				local b = UI.button(card, "CLAIM", UI.Colors.Green, props)
 				UI.shine(b, 1.2)
 				b.Activated:Connect(function()
 					request("ClaimQuest", i)
 				end)
 			else
-				UI.button(card, "EN CURSO", Color3.fromRGB(70, 60, 95), props)
+				UI.button(card, "IN PROGRESS", Color3.fromRGB(70, 60, 95), props)
 			end
 		end
 	end
@@ -132,19 +132,19 @@ local function refresh()
 	UI.gradient(chest, Color3.fromRGB(96, 70, 20), Color3.fromRGB(30, 22, 12), 0)
 	UI.stroke(chest, UI.Colors.Gold, 1.5)
 	UI.icon(chest, "Chest", { Position = UDim2.fromOffset(10, 5), Size = UDim2.fromOffset(60, 60) })
-	UI.label(chest, { Position = UDim2.fromOffset(82, 10), Size = UDim2.new(1, -240, 0, 22), Text = "Cofre: completa las 3 misiones", TextSize = 16, Font = Enum.Font.GothamBlack })
+	UI.label(chest, { Position = UDim2.fromOffset(82, 10), Size = UDim2.new(1, -240, 0, 22), Text = "Chest: complete the 3 quests", TextSize = 16, Font = Enum.Font.GothamBlack })
 	rewardRow(chest, QuestConfig.AllDoneBonus, { Position = UDim2.fromOffset(82, 38) })
 	local props = { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -12, 0.5, 0), Size = UDim2.fromOffset(130, 40), TextSize = 15 }
 	if q.BonusClaimed then
-		UI.button(chest, "ABIERTO", UI.Colors.Disabled, props)
+		UI.button(chest, "OPEN", UI.Colors.Disabled, props)
 	elseif allClaimed then
-		local b = UI.button(chest, "ABRIR", Color3.fromRGB(235, 165, 20), props)
+		local b = UI.button(chest, "OPEN", Color3.fromRGB(235, 165, 20), props)
 		UI.shine(b, 1)
 		b.Activated:Connect(function()
 			request("ClaimQuestBonus")
 		end)
 	else
-		UI.button(chest, "BLOQUEADO", Color3.fromRGB(70, 60, 95), props)
+		UI.button(chest, "LOCKED", Color3.fromRGB(70, 60, 95), props)
 	end
 end
 
@@ -167,7 +167,7 @@ end
 function QuestController.Start()
 	local gui = UI.screenGui("Quests", 10)
 	local content
-	frame, content = UI.modal(gui, "📜 Misiones diarias", UDim2.fromOffset(640, 480), Color3.fromRGB(80, 230, 130))
+	frame, content = UI.modal(gui, "📜 Daily Quests", UDim2.fromOffset(640, 480), Color3.fromRGB(80, 230, 130))
 	resetLabel = UI.label(content, { Size = UDim2.new(1, 0, 0, 18), TextSize = 12, TextColor3 = UI.Colors.Muted, Text = "" })
 	list = UI.make("Frame", { Position = UDim2.fromOffset(0, 24), Size = UDim2.new(1, 0, 1, -24), BackgroundTransparency = 1 }, content)
 	UI.make("UIListLayout", { Padding = UDim.new(0, 10), SortOrder = Enum.SortOrder.LayoutOrder }, list)
@@ -180,7 +180,7 @@ function QuestController.Start()
 		StateController.Request("GetQuests")
 		while true do
 			local now = StateController.Now()
-			resetLabel.Text = `Nuevas misiones en {UI.formatDuration(86400 - now % 86400)}`
+			resetLabel.Text = `New quests in {UI.formatDuration(86400 - now % 86400)}`
 			task.wait(1)
 		end
 	end)

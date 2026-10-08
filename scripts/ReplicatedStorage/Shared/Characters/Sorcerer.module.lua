@@ -7,7 +7,7 @@ end
 
 return {
 	Id = "Sorcerer",
-	DisplayName = "Hechicero del Infinito",
+	DisplayName = "Sorcerer of Infinity",
 	Color = Color3.fromRGB(110, 170, 255),
 	Weight = 92,
 	WalkSpeed = 22,
@@ -35,21 +35,21 @@ return {
 		Heavy_Up = { Damage = 14, BaseKnockback = 30, KnockbackGrowth = 95, Angle = 88, Startup = 0.3, Active = 0.12, Endlag = 0.4, Cooldown = 0.6, Hitbox = hb(7, 7, 1, 4) },
 		Heavy_Down = { Damage = 12, BaseKnockback = 26, KnockbackGrowth = 90, Angle = 28, Startup = 0.3, Active = 0.1, Endlag = 0.4, Cooldown = 0.6, Hitbox = hb(14, 3, 0, -2) },
 
-		Special_Neutral = { Name = "Azul: Atracción", Pose = "Palms", -- "Azul": proyectil que ATRAE (ángulo > 90 = hacia el lanzador)
+		Special_Neutral = { Name = "Blue: Attraction", Pose = "Palms", -- "Azul": proyectil que ATRAE (ángulo > 90 = hacia el lanzador)
 			Damage = 5, BaseKnockback = 18, KnockbackGrowth = 30, Angle = 160,
 			Startup = 0.2, Active = 0, Endlag = 0.3, Cooldown = 1.5,
 			Projectile = { Speed = 70, Lifetime = 0.8, Size = Vector3.new(4, 4, 4), Color = Color3.fromRGB(60, 140, 255), Pierce = true },
 		},
-		Special_Side = { Name = "Rojo: Repulsión", Pose = "Palms", -- "Rojo": proyectil que REPELE
+		Special_Side = { Name = "Red: Repulsion", Pose = "Palms", -- "Rojo": proyectil que REPELE
 			Damage = 13, BaseKnockback = 35, KnockbackGrowth = 92, Angle = 35,
 			Startup = 0.4, Active = 0, Endlag = 0.4, Cooldown = 4,
 			Projectile = { Speed = 90, Lifetime = 1, Size = Vector3.new(5, 5, 5), Color = Color3.fromRGB(255, 60, 60), Pierce = false },
 		},
-		Special_Up = { Name = "Paso Infinito", Pose = "Rise", -- Recuperación sin hitbox
+		Special_Up = { Name = "Infinite Step", Pose = "Rise", -- Recuperación sin hitbox
 			Startup = 0.05, Active = 0, Endlag = 0.25, Cooldown = 0.5,
 			SelfVelocity = Vector3.new(0, 100, 0), OncePerAir = true,
 		},
-		Special_Down = { Name = "Púrpura Hueco", Pose = "Beam", -- "Púrpura": lento, enorme, cooldown largo
+		Special_Down = { Name = "Hollow Purple", Pose = "Beam", -- "Púrpura": lento, enorme, cooldown largo
 			Damage = 22, BaseKnockback = 45, KnockbackGrowth = 95, Angle = 40,
 			Startup = 0.9, Active = 0, Endlag = 0.6, Cooldown = 15,
 			Projectile = { Speed = 45, Lifetime = 2.5, Size = Vector3.new(9, 9, 9), Color = Color3.fromRGB(170, 60, 255), Pierce = true },

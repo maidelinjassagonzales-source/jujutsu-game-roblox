@@ -43,6 +43,28 @@ function MobileController.Start()
 	if not UserInputService.TouchEnabled then
 		return
 	end
+	-- Fuera los controles táctiles de Roblox (joystick y botón de salto): se superponían con los nuestros
+	pcall(function()
+		game:GetService("GuiService").TouchControlsEnabled = false
+	end)
+	task.spawn(function()
+		local playerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+		local function hide(child: Instance)
+			if child.Name == "TouchGui" and child:IsA("ScreenGui") then
+				child.Enabled = false
+				child:GetPropertyChangedSignal("Enabled"):Connect(function()
+					child.Enabled = false
+				end)
+			end
+		end
+		for _, child in playerGui:GetChildren() do
+			hide(child)
+		end
+		playerGui.ChildAdded:Connect(hide)
+	end)
+
+	local gui = UI.screenGui("MobileControls", 6)
+
 
 	local gui = UI.screenGui("MobileControls", 6, true)
 
@@ -120,22 +142,22 @@ function MobileController.Start()
 		BackgroundTransparency = 1,
 	}, gui)
 	UI.autoScale(pad, 480) -- botones grandes: cómodos para el pulgar incluso en móviles pequeños
-	actionButton(pad, "Golpe", Color3.fromRGB(220, 60, 70), 84, UDim2.fromOffset(160, 150), function()
+	actionButton(pad, "Attack", Color3.fromRGB(220, 60, 70), 84, UDim2.fromOffset(160, 150), function()
 		CombatController.Attack("Light")
 	end)
-	actionButton(pad, "Fuerte", Color3.fromRGB(230, 130, 30), 64, UDim2.fromOffset(70, 160), function()
+	actionButton(pad, "Heavy", Color3.fromRGB(230, 130, 30), 64, UDim2.fromOffset(70, 160), function()
 		CombatController.Attack("Heavy")
 	end)
-	actionButton(pad, "Especial", Color3.fromRGB(150, 70, 220), 64, UDim2.fromOffset(110, 80), function()
+	actionButton(pad, "Special", Color3.fromRGB(150, 70, 220), 64, UDim2.fromOffset(110, 80), function()
 		CombatController.Attack("Special")
 	end)
-	actionButton(pad, "Saltar", Color3.fromRGB(40, 150, 230), 64, UDim2.fromOffset(196, 60), function()
+	actionButton(pad, "Jump", Color3.fromRGB(40, 150, 230), 64, UDim2.fromOffset(196, 60), function()
 		MovementController.TryJump()
 	end)
-	actionButton(pad, "Agarre", Color3.fromRGB(60, 160, 90), 54, UDim2.fromOffset(40, 90), function()
+	actionButton(pad, "Grab", Color3.fromRGB(60, 160, 90), 54, UDim2.fromOffset(40, 90), function()
 		CombatController.Grab()
 	end)
-	local ult = actionButton(pad, "ULTI", Color3.fromRGB(255, 190, 40), 58, UDim2.fromOffset(230, 0), function()
+	local ult = actionButton(pad, "ULT", Color3.fromRGB(255, 190, 40), 58, UDim2.fromOffset(230, 0), function()
 		CombatController.Ultimate()
 	end)
 	task.spawn(function()
@@ -144,12 +166,12 @@ function MobileController.Start()
 			local c = player.Character
 			local ready = c ~= nil and (c:GetAttribute("Ult") or 0) >= 100
 			ult.BackgroundTransparency = if ready then 0 else 0.7
-			ult.Text = if ready then "ULTI" else `{math.floor(c and c:GetAttribute("Ult") or 0)}%`
+			ult.Text = if ready then "ULT" else `{math.floor(c and c:GetAttribute("Ult") or 0)}%`
 			task.wait(0.2)
 		end
 	end)
 	-- Escudo: se mantiene pulsado. Con él puesto, el joystick hace esquivas.
-	local shield = actionButton(pad, "Escudo", Color3.fromRGB(80, 120, 200), 54, UDim2.fromOffset(0, 150), function()
+	local shield = actionButton(pad, "Shield", Color3.fromRGB(80, 120, 200), 54, UDim2.fromOffset(0, 150), function()
 		CombatController.Shield(true)
 	end)
 	shield.InputEnded:Connect(function(input)

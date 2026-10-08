@@ -59,6 +59,7 @@ local services = {
 	RouletteService = load("RouletteService"),
 	QuestService = load("QuestService"),
 	EventService = load("EventService"),
+	ItemService = load("ItemService"),
 	EconomyFeedback = remotes.EconomyFeedback,
 }
 local S = services
@@ -85,6 +86,7 @@ S.ObbyService.Start(services) -- obby "Ascenso Maldito"
 S.RouletteService.Start(services) -- Ruleta Maldita
 S.QuestService.Start(services) -- misiones diarias
 S.EventService.Start(services) -- eventos aleatorios
+S.ItemService.Start(remotes, services) -- objetos en las partidas
 
 -- Enrutador de peticiones: el cliente pide, el servidor valida y responde { ok, msg }
 local handlers = {}
@@ -134,24 +136,50 @@ if game:GetService("RunService"):IsStudio() then
 		S.DataService.PushState(player)
 		return { ok = true, msg = "[Studio] Historia desbloqueada" }
 	end
+	-- Crear un bot en tu arena (para probar el choque de dominios en el Dojo):
+	-- ShopRequest:InvokeServer("DevSpawnBot", "CursedKing")
+	handlers.DevSpawnBot = function(player, characterId)
+		local arena = S.ArenaService.Get(player:GetAttribute("ArenaId") or "")
+		if not arena then
+			return { ok = false, msg = "Enter the Dojo or an arena first" }
+		end
+		local npc = S.NPCService.Spawn(arena, { Character = characterId or "CursedKing", Name = "Test CPU", Level = 3, Stocks = 3 }, 2)
+		npc:SetAttribute("Team", 99) -- rival de todos (hace daño y recibe)
+		return { ok = true, msg = "[Studio] Bot creado: " .. tostring(characterId or "CursedKing") }
+	end
+	-- Llenar la ulti: "me" = la tuya (sin lanzarla) · "bots" = la de los bots de tu arena y la lanzan
+	handlers.DevUlt = function(player, who)
+		local arenaId = player:GetAttribute("ArenaId")
+		if who == "bots" then
+			for _, m in game:GetService("CollectionService"):GetTagged("Fighter") do
+				if m:GetAttribute("IsNPC") and m:GetAttribute("ArenaId") == arenaId then
+					m:SetAttribute("Ult", 100)
+					S.UltimateService.Activate(m)
+				end
+			end
+		elseif player.Character then
+			player.Character:SetAttribute("Ult", 100)
+		end
+		return { ok = true, msg = "[Studio] Ulti llena" }
+	end
 end
 
 local lastRequest = setmetatable({}, { __mode = "k" })
 shopRequest.OnServerInvoke = function(player, action, ...)
 	local now = os.clock()
 	if now - (lastRequest[player] or 0) < 0.1 then
-		return { ok = false, msg = "Vas demasiado rápido" }
+		return { ok = false, msg = "You're going too fast" }
 	end
 	lastRequest[player] = now
 
 	local handler = type(action) == "string" and handlers[action]
 	if not handler then
-		return { ok = false, msg = "Acción desconocida" }
+		return { ok = false, msg = "Unknown action" }
 	end
 	local ok, response = pcall(handler, player, ...)
 	if not ok then
 		warn(`[ShopRequest] {action} falló:`, response)
-		return { ok = false, msg = "Error del servidor" }
+		return { ok = false, msg = "Server error" }
 	end
 	return response
 end

@@ -2,12 +2,20 @@
 -- Cambia aquí el "feel" del juego sin tocar la lógica.
 local CombatConfig = {
 	-- Físicas generales
-	Gravity = 140, -- más flotante que el 196.2 por defecto (sensación Smash)
+	Gravity = 80, -- muy flotante: más tiempo en el aire para pelear y hacer combos (antes 140)
 	WalkSpeed = 22,
 	JumpPower = 62,
+	JumpScale = 0.6, -- multiplica el JumpPower de cada personaje: saltos más bajos (~8.5 studs en vez de ~14)
+	-- Compensa la gravedad baja en lanzamientos y recuperaciones: llegan a la MISMA altura que con
+	-- gravedad 140 (no se adelantan los KOs por arriba), pero tardan más en caer = más combos aéreos
+	VerticalScale = math.sqrt(80 / 140),
 	MaxAirJumps = 1, -- salto doble
-	DoubleJumpVelocity = 68,
-	FastFallSpeed = 95, -- mantener S/abajo en el aire
+	DoubleJumpVelocity = 42,
+	FastFallSpeed = 80, -- mantener S/abajo en el aire
+
+	-- Ataques fuertes cargables (mantener el botón en el suelo, como los smash)
+	SmashChargeTime = 1, -- segundos hasta la carga máxima (se suelta solo al llegar)
+	SmashChargeBonus = 0.4, -- +40% de daño a carga máxima
 	PlaneZ = 0, -- el combate ocurre en el plano X/Y
 
 	-- Knockback estilo Smash

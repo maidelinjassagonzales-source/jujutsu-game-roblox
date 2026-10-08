@@ -209,7 +209,7 @@ local function koEffect(pos: Vector3, killer: Model?)
 	else
 		burst(pos, item.Color, 4, 45, 0.6)
 	end
-	floatingText(pos, "¡K.O.!", item.Accent or item.Color, 40)
+	floatingText(pos, "K.O.!", item.Accent or item.Color, 40)
 end
 
 local function setTransparency(model: Model, value: number)
@@ -426,12 +426,12 @@ function EffectsController.Start()
 		elseif kind == "ShieldBreak" then
 			burst(b, Color3.fromRGB(120, 200, 255), 4, 22, 0.5)
 			scatter(b, Color3.fromRGB(160, 220, 255), 16, 10)
-			floatingText(b, "¡ESCUDO ROTO!", Color3.fromRGB(255, 90, 90), 30)
+			floatingText(b, "SHIELD BROKEN!", Color3.fromRGB(255, 90, 90), 30)
 			CameraController.Shake(1, 0.3)
 		elseif kind == "Grabbed" then
 			local hrp = b and b:FindFirstChild("HumanoidRootPart")
 			if hrp then
-				floatingText(hrp.Position, "¡AGARRE!", Color3.fromRGB(120, 255, 150), 24)
+				floatingText(hrp.Position, "GRAB!", Color3.fromRGB(120, 255, 150), 24)
 			end
 		elseif kind == "Swap" then
 			for _, model in { a, b } do

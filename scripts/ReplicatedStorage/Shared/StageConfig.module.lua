@@ -4,13 +4,17 @@ local StageConfig = {}
 
 local C = Color3.fromRGB
 
+-- 6 puntos (3 vs 3). Impares = lado izquierdo (equipo 1), pares = lado derecho (equipo 2)
 local function spawns(y)
-	return { Vector3.new(-30, y, 0), Vector3.new(30, y, 0), Vector3.new(-10, y, 0), Vector3.new(10, y, 0) }
+	return {
+		Vector3.new(-30, y, 0), Vector3.new(30, y, 0), Vector3.new(-10, y, 0), Vector3.new(10, y, 0),
+		Vector3.new(-20, y, 0), Vector3.new(20, y, 0),
+	}
 end
 
 StageConfig.Stages = {
 	Academy = {
-		Name = "Escuela de Hechicería",
+		Name = "Sorcery School",
 		HalfWidth = 55, -- mitad del suelo principal (la IA lo usa para no caerse)
 		Bounds = { Left = -140, Right = 140, Top = 95, Bottom = -50 },
 		Spawns = spawns(6),
@@ -23,7 +27,7 @@ StageConfig.Stages = {
 		},
 	},
 	Shibuya = {
-		Name = "Shibuya Nocturno",
+		Name = "Shibuya at Night",
 		HalfWidth = 50,
 		Bounds = { Left = -130, Right = 130, Top = 95, Bottom = -50 },
 		Spawns = spawns(6),
@@ -36,7 +40,7 @@ StageConfig.Stages = {
 		},
 	},
 	Infinity = {
-		Name = "Dominio Infinito",
+		Name = "Infinite Domain",
 		HalfWidth = 45,
 		Bounds = { Left = -125, Right = 125, Top = 100, Bottom = -50 },
 		Spawns = spawns(5),
@@ -49,7 +53,7 @@ StageConfig.Stages = {
 		},
 	},
 	Temple = {
-		Name = "Santuario Maldito",
+		Name = "Cursed Shrine",
 		HalfWidth = 52,
 		Bounds = { Left = -135, Right = 135, Top = 95, Bottom = -50 },
 		Spawns = spawns(5),
@@ -81,10 +85,10 @@ StageConfig.MatchPool = { "Shibuya", "Infinity", "Temple", "Academy" }
 
 -- Para las ventanas de elegir escenario (Dojo y votación antes de cada partida)
 StageConfig.Cards = {
-	Academy = { Kanji = "校", Description = "El patio de la Escuela al atardecer", Colors = { C(255, 150, 130), C(70, 40, 80) } },
-	Shibuya = { Kanji = "渋", Description = "Calles de neón bajo el Velo", Colors = { C(130, 90, 230), C(20, 15, 50) } },
-	Infinity = { Kanji = "無", Description = "Un vacío lleno de estrellas", Colors = { C(90, 140, 255), C(8, 10, 35) } },
-	Temple = { Kanji = "寺", Description = "El santuario del Rey Maldito", Colors = { C(230, 90, 60), C(60, 12, 10) } },
+	Academy = { Kanji = "校", Description = "The School courtyard at sunset", Colors = { C(255, 150, 130), C(70, 40, 80) } },
+	Shibuya = { Kanji = "渋", Description = "Neon streets under the Veil", Colors = { C(130, 90, 230), C(20, 15, 50) } },
+	Infinity = { Kanji = "無", Description = "A void full of stars", Colors = { C(90, 140, 255), C(8, 10, 35) } },
+	Temple = { Kanji = "寺", Description = "The Cursed King's shrine", Colors = { C(230, 90, 60), C(60, 12, 10) } },
 }
 StageConfig.VoteTime = 8 -- segundos para votar el escenario antes de un duelo / partida
 

@@ -6,17 +6,17 @@ QuestConfig.PerDay = 3
 
 -- Kind = qué cuenta: KOs · Damage (% hecho) · Matches · Wins · Specials · Ults · Obby · Roulette
 QuestConfig.Pool = {
-	{ Id = "KO5", Kind = "KOs", Goal = 5, Text = "Consigue 5 KOs", Reward = { Coins = 300, XP = 100 } },
-	{ Id = "KO12", Kind = "KOs", Goal = 12, Text = "Consigue 12 KOs", Reward = { Coins = 700, XP = 200 } },
-	{ Id = "DMG300", Kind = "Damage", Goal = 300, Text = "Haz 300% de daño", Reward = { Coins = 250, XP = 100 } },
-	{ Id = "DMG800", Kind = "Damage", Goal = 800, Text = "Haz 800% de daño", Reward = { Coins = 600, XP = 200 } },
-	{ Id = "PLAY3", Kind = "Matches", Goal = 3, Text = "Juega 3 partidas", Reward = { Coins = 400, XP = 150 } },
-	{ Id = "WIN1", Kind = "Wins", Goal = 1, Text = "Gana 1 partida", Reward = { Coins = 500, Gems = 5 } },
-	{ Id = "WIN3", Kind = "Wins", Goal = 3, Text = "Gana 3 partidas", Reward = { Coins = 900, Gems = 10 } },
-	{ Id = "SPEC25", Kind = "Specials", Goal = 25, Text = "Usa 25 técnicas especiales", Reward = { Coins = 250, XP = 120 } },
-	{ Id = "ULT2", Kind = "Ults", Goal = 2, Text = "Usa tu ULTI 2 veces", Reward = { Coins = 450, XP = 150 } },
-	{ Id = "OBBY1", Kind = "Obby", Goal = 1, Text = "Completa la obby Ascenso Maldito", Reward = { Coins = 300, XP = 150 } },
-	{ Id = "SPIN1", Kind = "Roulette", Goal = 1, Text = "Gira la Ruleta Maldita", Reward = { Coins = 150 } },
+	{ Id = "KO5", Kind = "KOs", Goal = 5, Text = "Get 5 KOs", Reward = { Coins = 300, XP = 100 } },
+	{ Id = "KO12", Kind = "KOs", Goal = 12, Text = "Get 12 KOs", Reward = { Coins = 700, XP = 200 } },
+	{ Id = "DMG300", Kind = "Damage", Goal = 300, Text = "Deal 300% damage", Reward = { Coins = 250, XP = 100 } },
+	{ Id = "DMG800", Kind = "Damage", Goal = 800, Text = "Deal 800% damage", Reward = { Coins = 600, XP = 200 } },
+	{ Id = "PLAY3", Kind = "Matches", Goal = 3, Text = "Play 3 matches", Reward = { Coins = 400, XP = 150 } },
+	{ Id = "WIN1", Kind = "Wins", Goal = 1, Text = "Win 1 match", Reward = { Coins = 500, Gems = 5 } },
+	{ Id = "WIN3", Kind = "Wins", Goal = 3, Text = "Win 3 matches", Reward = { Coins = 900, Gems = 10 } },
+	{ Id = "SPEC25", Kind = "Specials", Goal = 25, Text = "Use 25 special techniques", Reward = { Coins = 250, XP = 120 } },
+	{ Id = "ULT2", Kind = "Ults", Goal = 2, Text = "Use your ULT 2 times", Reward = { Coins = 450, XP = 150 } },
+	{ Id = "OBBY1", Kind = "Obby", Goal = 1, Text = "Complete the Cursed Ascent obby", Reward = { Coins = 300, XP = 150 } },
+	{ Id = "SPIN1", Kind = "Roulette", Goal = 1, Text = "Spin the Cursed Roulette", Reward = { Coins = 150 } },
 }
 
 QuestConfig.AllDoneBonus = { Coins = 500, Gems = 15 }

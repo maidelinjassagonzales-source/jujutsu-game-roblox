@@ -1,8 +1,9 @@
--- StoreController: la tienda principal.
---   Gemas (Robux) · Pases (Robux) · Boosters · Efectos de KO · Títulos
+-- StoreController: la tienda principal, con pestañas y tarjetas de producto.
+--   Gemas (Robux) · Pases permanentes (Robux) · Boosters · Efectos de KO · Títulos
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local MarketplaceService = game:GetService("MarketplaceService")
+local TweenService = game:GetService("TweenService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local CatalogConfig = require(Shared:WaitForChild("CatalogConfig"))
@@ -15,9 +16,22 @@ local player = Players.LocalPlayer
 
 local StoreController = {}
 
+local ROBUX = utf8.char(0xE002) -- icono de Robux de las fuentes de Roblox
+local GEM_COLOR = Color3.fromRGB(50, 140, 240)
+local GREEN = Color3.fromRGB(40, 190, 80)
+
+local TABS = {
+	{ Id = "Gems", Name = "Gems", Icon = "GemBig", Color = GEM_COLOR },
+	{ Id = "Passes", Name = "Passes", Icon = "Crown", Color = Color3.fromRGB(255, 185, 40) },
+	{ Id = "Boosts", Name = "Boosters", Icon = "X2", Color = Color3.fromRGB(240, 80, 60) },
+	{ Id = "Effect", Name = "KO Effects", Icon = "KO", Color = Color3.fromRGB(160, 70, 240) },
+	{ Id = "Title", Name = "Titles", Icon = "Title", Color = Color3.fromRGB(220, 60, 90) },
+}
+
 local frame: Frame
-local scroll: ScrollingFrame
-local sectionOrder = {}
+local grid: ScrollingFrame
+local tabButtons = {}
+local currentTab = "Gems"
 
 local function request(action: string, ...)
 	local response = StateController.Request(action, ...)
@@ -26,64 +40,66 @@ local function request(action: string, ...)
 end
 
 local function clear()
-	for _, c in scroll:GetChildren() do
+	for _, c in grid:GetChildren() do
 		if c:IsA("GuiObject") then
 			c:Destroy()
 		end
 	end
 end
 
-local order = 0
-local function nextOrder(): number
-	order += 1
-	return order
-end
-
--- Encabezado de sección con su icono estilo Jujutsu
-local HEADER_ICONS = { Gems = "Gems", Passes = "Pass", Boosts = "Boost", Effect = "Characters", Title = "Rewards" }
-local HEADER_COLORS = {
-	Gems = Color3.fromRGB(90, 220, 255), Passes = Color3.fromRGB(255, 200, 60), Boosts = Color3.fromRGB(255, 150, 60),
-	Effect = Color3.fromRGB(190, 90, 255), Title = Color3.fromRGB(255, 90, 130),
-}
-local function header(id: string, text: string)
-	sectionOrder[id] = UI.sectionHeader(scroll, HEADER_ICONS[id] or "Store", text, HEADER_COLORS[id] or UI.Colors.Gold, nextOrder())
-end
-
--- Fila de producto: icono a la izquierda en una "losa" de color, textos y botón a la derecha
-local function row(title: string, subtitle: string?, tag: string?, accent: Color3?, iconName: string?)
-	accent = accent or UI.Colors.Accent
-	local r = UI.make("Frame", { Size = UDim2.new(1, -12, 0, 66), BackgroundColor3 = Color3.new(1, 1, 1), LayoutOrder = nextOrder() }, scroll)
-	UI.corner(r, 12)
-	UI.gradient(r, Color3.fromRGB(44, 36, 66), Color3.fromRGB(24, 20, 36), 0)
-	UI.stroke(r, accent, 1.2).Transparency = 0.45
-	local tile = UI.make("Frame", { Position = UDim2.fromOffset(8, 8), Size = UDim2.fromOffset(50, 50), BackgroundColor3 = accent }, r)
-	UI.corner(tile, 10)
-	UI.gradient(tile, Color3.new(1, 1, 1), Color3.fromRGB(90, 90, 100))
-	UI.stroke(tile, accent:Lerp(Color3.new(1, 1, 1), 0.5), 1.5)
-	if iconName then
-		UI.icon(tile, iconName, { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromScale(1.1, 1.1) })
-	end
-	UI.label(r, { Position = UDim2.fromOffset(68, 10), Size = UDim2.new(1, -220, 0, 24), Text = title, TextSize = 16, Font = Enum.Font.GothamBlack, TextTruncate = Enum.TextTruncate.AtEnd })
-	if subtitle then
-		UI.label(r, { Position = UDim2.fromOffset(68, 34), Size = UDim2.new(1, -220, 0, 18), Text = subtitle, TextSize = 12, TextColor3 = UI.Colors.Muted, TextTruncate = Enum.TextTruncate.AtEnd })
-	end
-	if tag then
-		UI.ribbon(r, tag, Color3.fromRGB(230, 60, 90))
-	end
-	return r, tile
-end
-
-local function rowButton(r: Frame, text: string, color: Color3)
-	return UI.button(r, text, color, {
-		AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -12, 0.5, 0), Size = UDim2.fromOffset(136, 40), TextSize = 14,
+-- Tarjeta de producto: fondo del color del producto, rayos girando detrás del icono grande,
+-- nombre, descripción, etiqueta inclinada y botón de precio abajo.
+local function productCard(order: number, opts)
+	local card = UI.make("Frame", { BackgroundTransparency = 1, LayoutOrder = order }, grid)
+	UI.card(card, opts.Color, { Size = UDim2.fromScale(1, 1), ZIndex = 0 })
+	local inner = UI.make("Frame", {
+		Position = UDim2.fromOffset(6, 6), Size = UDim2.new(1, -12, 0, 112), BackgroundColor3 = Color3.fromRGB(10, 8, 18),
+		BackgroundTransparency = 0.55, ClipsDescendants = true,
+	}, card)
+	UI.corner(inner, 10)
+	UI.rays(inner, opts.Color:Lerp(Color3.new(1, 1, 1), 0.6), {
+		Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromOffset(220, 220), ImageTransparency = 0.35,
 	})
-end
-
-local function rowPrice(r: Frame, currency: string, amount: number, color: Color3)
-	local b = UI.priceButton(r, currency, amount, color, {
-		AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -12, 0.5, 0), Size = UDim2.fromOffset(136, 40), TextSize = 15,
+	local icon = UI.icon(inner, opts.Icon, {
+		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.52), Size = UDim2.fromOffset(opts.IconSize or 84, opts.IconSize or 84), ZIndex = 2,
 	})
-	return b
+	if opts.Amount then
+		UI.display(inner, {
+			AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -2), Size = UDim2.new(1, 0, 0, 28), Text = opts.Amount,
+			TextSize = 26, TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 3,
+		})
+	end
+	UI.label(card, {
+		Position = UDim2.fromOffset(8, 122), Size = UDim2.new(1, -16, 0, 22), Text = opts.Title, TextSize = 16, Font = Enum.Font.FredokaOne,
+		TextXAlignment = Enum.TextXAlignment.Center, TextScaled = true, TextStrokeTransparency = 0.5,
+	})
+	UI.label(card, {
+		Position = UDim2.fromOffset(8, 144), Size = UDim2.new(1, -16, 0, 30), Text = opts.Subtitle or "", TextSize = 11,
+		Font = Enum.Font.GothamBold, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Center, TextYAlignment = Enum.TextYAlignment.Top,
+		TextColor3 = Color3.fromRGB(230, 225, 240),
+	})
+	if opts.Tag then
+		UI.badge(card, opts.Tag, Color3.fromRGB(230, 40, 60), { Position = UDim2.fromOffset(-6, -6) })
+	end
+	local button = UI.button(card, opts.ButtonText or "", opts.ButtonColor or GREEN, {
+		AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -8), Size = UDim2.new(1, -16, 0, 36), TextSize = 17,
+	})
+	if opts.PriceIcon then
+		local label = button:FindFirstChild("Label") :: TextLabel
+		label.Position = UDim2.fromOffset(18, 0)
+		UI.icon(button, opts.PriceIcon, { AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0.5, -46, 0.5, -2), Size = UDim2.fromOffset(26, 26), ZIndex = 2 })
+	end
+	-- Al pasar el ratón la tarjeta "salta" y el icono gira un poco
+	local scale = UI.make("UIScale", {}, card)
+	card.MouseEnter:Connect(function()
+		TweenService:Create(scale, TweenInfo.new(0.12), { Scale = 1.04 }):Play()
+		TweenService:Create(icon, TweenInfo.new(0.2, Enum.EasingStyle.Back), { Rotation = -8 }):Play()
+	end)
+	card.MouseLeave:Connect(function()
+		TweenService:Create(scale, TweenInfo.new(0.12), { Scale = 1 }):Play()
+		TweenService:Create(icon, TweenInfo.new(0.2), { Rotation = 0 }):Play()
+	end)
+	return card, button
 end
 
 local function sortedItems(kind: string)
@@ -99,160 +115,124 @@ local function sortedItems(kind: string)
 	return list
 end
 
--- Paquetes de gemas como tarjetas grandes en rejilla (la parte que más tiene que "vender")
-local function gemGrid()
-	local grid = UI.make("Frame", { Size = UDim2.new(1, -12, 0, 0), AutomaticSize = Enum.AutomaticSize.Y, BackgroundTransparency = 1, LayoutOrder = nextOrder() }, scroll)
-	UI.make("UIGridLayout", {
-		CellSize = UDim2.new(1 / 3, -8, 0, 176), CellPadding = UDim2.fromOffset(10, 14), SortOrder = Enum.SortOrder.LayoutOrder,
-	}, grid)
-	UI.make("UIPadding", { PaddingTop = UDim.new(0, 8) }, grid)
-	local gemColor = EconomyConfig.Currencies.Gems.Color
-	for i, pack in EconomyConfig.GemPacks do
-		local best = i == #EconomyConfig.GemPacks
-		local card = UI.make("Frame", { BackgroundColor3 = Color3.new(1, 1, 1), LayoutOrder = i }, grid)
-		UI.corner(card, 14)
-		UI.gradient(card, if best then Color3.fromRGB(120, 60, 170) else Color3.fromRGB(30, 90, 130), Color3.fromRGB(16, 18, 34))
-		if best then
-			UI.animatedStroke(card, UI.Colors.Gold, 2.5)
-		else
-			UI.stroke(card, gemColor, 1.5).Transparency = 0.3
-		end
-		-- Rayos de luz detrás del icono
-		local rays = UI.make("Frame", {
-			AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0, 56), Size = UDim2.fromOffset(86, 86),
-			BackgroundColor3 = if best then UI.Colors.Gold else gemColor, BackgroundTransparency = 0.75,
-		}, card)
-		UI.corner(rays, 999)
-		local iconSize = 54 + math.min(i, 5) * 8
-		UI.icon(card, if i >= 3 then "GemBig" else "Gems", {
-			AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0, 56), Size = UDim2.fromOffset(iconSize, iconSize),
-		})
-		local amount = UI.label(card, {
-			Position = UDim2.fromOffset(0, 100), Size = UDim2.new(1, 0, 0, 24), Text = UI.formatNumber(pack.Gems), TextSize = 24,
-			Font = Enum.Font.GothamBlack, TextXAlignment = Enum.TextXAlignment.Center, TextStrokeTransparency = 0.4,
-		})
-		UI.gradient(amount, Color3.new(1, 1, 1), gemColor)
-		UI.label(card, {
-			Position = UDim2.fromOffset(0, 122), Size = UDim2.new(1, 0, 0, 14), Text = pack.Name, TextSize = 11,
-			TextColor3 = UI.Colors.Muted, TextXAlignment = Enum.TextXAlignment.Center,
-		})
-		if pack.Tag then
-			UI.ribbon(card, pack.Tag, if best then Color3.fromRGB(230, 160, 20) else Color3.fromRGB(230, 60, 90))
-		end
-		local b = UI.priceButton(card, "Robux", pack.RobuxHint, UI.Colors.Green, {
-			AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -8), Size = UDim2.new(1, -16, 0, 30), TextSize = 14,
-		})
-		if best then
-			UI.shine(b, 1.4)
-		end
-		b.Activated:Connect(function()
-			if pack.Id == 0 then
-				CurrencyController.Toast("Producto sin configurar (pon su ID en EconomyConfig)", UI.Colors.Red)
-			else
-				MarketplaceService:PromptProductPurchase(player, pack.Id)
-			end
-		end)
-	end
-end
-
 local function refresh()
 	if not frame.Visible then
 		return
 	end
 	clear()
-	order = 0
+	for id, b in tabButtons do
+		local on = id == currentTab
+		b.BackgroundColor3 = if on then b:GetAttribute("Color") else Color3.fromRGB(45, 40, 62)
+		b.Size = UDim2.new(1, 0, 0, if on then 58 else 52)
+	end
 	local state = StateController.Get() or {}
+	local order = 0
+	local function nextOrder()
+		order += 1
+		return order
+	end
 
-	-- Gemas con Robux
-	header("Gems", "Gemas")
-	gemGrid()
-
-	-- Gamepasses con Robux: banners dorados
-	header("Passes", "Pases permanentes")
-	for key, pass in CatalogConfig.GamePasses do
-		local ownedPass = player:GetAttribute(key) == true
-		local r = row(pass.Name, pass.Description, if key == "CoinsX2" then "¡El más vendido!" else nil, UI.Colors.Gold, if key == "CoinsX2" then "CoinPile" else "Pass")
-		r.Size = UDim2.new(1, -12, 0, 74)
-		r:FindFirstChildOfClass("UIGradient").Color = ColorSequence.new(Color3.fromRGB(96, 70, 20), Color3.fromRGB(30, 22, 12))
-		if ownedPass then
-			rowButton(r, "TUYO", UI.Colors.Disabled)
-		else
-			local b = rowPrice(r, "Robux", pass.RobuxHint, UI.Colors.Green)
-			UI.shine(b, 2)
+	if currentTab == "Gems" then
+		for i, pack in EconomyConfig.GemPacks do
+			local _, b = productCard(nextOrder(), {
+				Color = GEM_COLOR:Lerp(Color3.fromRGB(150, 60, 255), (i - 1) / 5), Icon = if i >= 4 then "Chest" else "GemBig",
+				IconSize = 70 + i * 6, Amount = UI.formatNumber(pack.Gems), Title = pack.Name, Subtitle = "Gems for characters, skins and more",
+				Tag = pack.Tag, ButtonText = `{ROBUX} {pack.RobuxHint}`, ButtonColor = GREEN,
+			})
 			b.Activated:Connect(function()
-				if pass.Id == 0 then
-					CurrencyController.Toast("Gamepass sin configurar (pon su ID en CatalogConfig)", UI.Colors.Red)
+				if pack.Id == 0 then
+					CurrencyController.Toast("Product not set up (put its ID in EconomyConfig)", UI.Colors.Red)
 				else
-					MarketplaceService:PromptGamePassPurchase(player, pass.Id)
+					MarketplaceService:PromptProductPurchase(player, pack.Id)
 				end
 			end)
 		end
-	end
-
-	-- Boosters
-	header("Boosts", "Boosters (se acumulan)")
-	local now = StateController.Now()
-	local boosts = state.Boosts or { CoinsUntil = 0, XPUntil = 0 }
-	for _, entry in sortedItems("Boost") do
-		local item = entry.Item
-		local untilTime = if item.Boost == "Coins" then boosts.CoinsUntil else boosts.XPUntil
-		local active = untilTime > now
-		local r = row(item.Name, if active then `Activo · quedan {UI.formatDuration(untilTime - now)}` else "Dobla lo que ganas jugando",
-			item.Tag, Color3.fromRGB(255, 150, 60), "Boost")
-		UI.confirmButton(rowPrice(r, "Gems", item.Gems, UI.Colors.Gems), function()
-			request("BuyItem", entry.Id)
-		end)
-	end
-
-	-- Efectos de KO y Títulos
-	for _, kind in { "Effect", "Title" } do
-		header(kind, if kind == "Effect" then "Efectos de KO (los ve todo el servidor)" else "Títulos (bajo tu nombre)")
+	elseif currentTab == "Passes" then
+		for key, pass in CatalogConfig.GamePasses do
+			local owned = player:GetAttribute(key) == true
+			local _, b = productCard(nextOrder(), {
+				Color = if key == "VIP" then Color3.fromRGB(255, 185, 40) else Color3.fromRGB(240, 80, 60),
+				Icon = if key == "VIP" then "Crown" else "X2", Title = pass.Name, Subtitle = pass.Description,
+				Tag = if key == "CoinsX2" then "BEST SELLER!" else nil,
+				ButtonText = if owned then "IT'S YOURS!" else `{ROBUX} {pass.RobuxHint}`, ButtonColor = if owned then UI.Colors.Disabled else GREEN,
+			})
+			if not owned then
+				b.Activated:Connect(function()
+					if pass.Id == 0 then
+						CurrencyController.Toast("Gamepass not set up (put its ID in CatalogConfig)", UI.Colors.Red)
+					else
+						MarketplaceService:PromptGamePassPurchase(player, pass.Id)
+					end
+				end)
+			end
+		end
+	elseif currentTab == "Boosts" then
+		local now = StateController.Now()
+		local boosts = state.Boosts or { CoinsUntil = 0, XPUntil = 0 }
+		for _, entry in sortedItems("Boost") do
+			local item = entry.Item
+			local untilTime = if item.Boost == "Coins" then boosts.CoinsUntil else boosts.XPUntil
+			local active = untilTime > now
+			local _, b = productCard(nextOrder(), {
+				Color = if item.Boost == "Coins" then Color3.fromRGB(240, 150, 30) else Color3.fromRGB(60, 190, 255),
+				Icon = if item.Boost == "Coins" then "X2" else "Star", Title = item.Name,
+				Subtitle = if active then `Active! {UI.formatDuration(untilTime - now)} left` else "Double what you earn playing (stacks)",
+				Tag = item.Tag, ButtonText = tostring(item.Gems), ButtonColor = GEM_COLOR, PriceIcon = "GemBig",
+			})
+			UI.confirmButton(b, function()
+				request("BuyItem", entry.Id)
+			end)
+		end
+	else
+		local kind = currentTab
 		local owned = if kind == "Effect" then state.OwnedEffects or {} else state.OwnedTitles or {}
 		local equipped = if kind == "Effect" then state.EquippedEffect else state.EquippedTitle
 		for _, entry in sortedItems(kind) do
 			local item = entry.Item
 			local has = owned[entry.Id] == true
+			local isOn = equipped == entry.Id
 			local color = item.Accent or item.Color
-			local r, tile = row(item.Name, if item.StoryOnly then "Se consigue completando el Modo Historia" elseif kind == "Effect" then "Explota al eliminar a un rival" else "Se ve encima de tu nombre",
-				nil, color, nil)
-			if kind == "Effect" then
-				-- Muestra del efecto: estallido con los colores del efecto
-				UI.label(tile, {
-					Size = UDim2.fromScale(1, 1), Text = "KO", TextSize = 20, Font = Enum.Font.GothamBlack,
-					TextXAlignment = Enum.TextXAlignment.Center, TextStrokeTransparency = 0, TextStrokeColor3 = UI.darker(color, 0.6),
-				})
-			else
-				-- Vista previa del título con su color
-				UI.label(tile, {
-					Size = UDim2.fromScale(1, 1), Text = "称", TextSize = 28, Font = Enum.Font.GothamBlack,
-					TextXAlignment = Enum.TextXAlignment.Center, TextStrokeTransparency = 0.3,
-				})
-			end
+			local opts = {
+				Color = color, Icon = if kind == "Effect" then "KO" else "Title", Title = item.Name,
+				Subtitle = if item.StoryOnly then "Earned by completing Story Mode"
+					elseif kind == "Effect" then "The whole server sees it when you eliminate someone" else "Shows under your name",
+			}
 			if has then
-				local isOn = equipped == entry.Id
-				rowButton(r, if isOn then "Quitar" else "Equipar", if isOn then UI.Colors.Disabled else UI.Colors.Accent).Activated:Connect(function()
+				opts.ButtonText = if isOn then "REMOVE" else "EQUIP"
+				opts.ButtonColor = if isOn then UI.Colors.Disabled else UI.Colors.Accent
+				opts.Tag = if isOn then "EQUIPPED" else nil
+			elseif item.Gems then
+				opts.ButtonText = tostring(item.Gems)
+				opts.ButtonColor = GEM_COLOR
+				opts.PriceIcon = "GemBig"
+			else
+				opts.ButtonText = "STORY"
+				opts.ButtonColor = UI.Colors.Disabled
+			end
+			local _, b = productCard(nextOrder(), opts)
+			if has then
+				b.Activated:Connect(function()
 					request("EquipCosmetic", kind, if isOn then false else entry.Id)
 				end)
 			elseif item.Gems then
-				UI.confirmButton(rowPrice(r, "Gems", item.Gems, UI.Colors.Gems), function()
+				UI.confirmButton(b, function()
 					request("BuyItem", entry.Id)
 				end)
-			else
-				rowButton(r, "Historia", UI.Colors.Disabled)
 			end
 		end
 	end
 end
 
 function StoreController.Open(section: string?)
+	if section then
+		for _, tab in TABS do
+			if tab.Id == section then
+				currentTab = section
+			end
+		end
+	end
 	UI.show(frame)
 	refresh()
-	local target = section and sectionOrder[section]
-	if target then
-		task.defer(function()
-			scroll.CanvasPosition = Vector2.new(0, target.AbsolutePosition.Y - scroll.AbsolutePosition.Y + scroll.CanvasPosition.Y)
-		end)
-	end
 end
 
 function StoreController.Toggle()
@@ -266,13 +246,37 @@ end
 function StoreController.Start()
 	local gui = UI.screenGui("Store", 10)
 	local content
-	frame, content = UI.modal(gui, "🛒 Tienda", UDim2.fromOffset(680, 540), UI.Colors.Gold)
-	scroll = UI.make("ScrollingFrame", {
-		Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, ScrollBarThickness = 5, BorderSizePixel = 0,
-		CanvasSize = UDim2.new(), AutomaticCanvasSize = Enum.AutomaticSize.Y, ScrollBarImageColor3 = UI.Colors.Gold,
+	frame, content = UI.modal(gui, "🛒 Shop", UDim2.fromOffset(820, 520), UI.Colors.Gold)
+
+	-- Pestañas a la izquierda
+	local tabs = UI.make("Frame", { Size = UDim2.new(0, 150, 1, 0), BackgroundTransparency = 1 }, content)
+	UI.make("UIListLayout", { Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder }, tabs)
+	for i, tab in TABS do
+		local b = UI.button(tabs, "", tab.Color, { Size = UDim2.new(1, 0, 0, 52), LayoutOrder = i, TextSize = 16 })
+		b:SetAttribute("Color", tab.Color)
+		local label = b:FindFirstChild("Label") :: TextLabel
+		label.Text = tab.Name
+		label.TextXAlignment = Enum.TextXAlignment.Left
+		label.Position = UDim2.fromOffset(50, 0)
+		label.Size = UDim2.new(1, -54, 1, -4)
+		UI.icon(b, tab.Icon, { AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 6, 0.5, -2), Size = UDim2.fromOffset(40, 40), ZIndex = 2 })
+		b.Activated:Connect(function()
+			currentTab = tab.Id
+			refresh()
+		end)
+		tabButtons[tab.Id] = b
+	end
+
+	grid = UI.make("ScrollingFrame", {
+		Position = UDim2.fromOffset(162, 0), Size = UDim2.new(1, -162, 1, 0), BackgroundTransparency = 1, ScrollBarThickness = 6,
+		BorderSizePixel = 0, CanvasSize = UDim2.new(), AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		ScrollBarImageColor3 = UI.Colors.Gold,
 	}, content)
-	UI.make("UIListLayout", { Padding = UDim.new(0, 10), SortOrder = Enum.SortOrder.LayoutOrder }, scroll)
-	UI.make("UIPadding", { PaddingLeft = UDim.new(0, 4), PaddingTop = UDim.new(0, 10), PaddingBottom = UDim.new(0, 10) }, scroll)
+	UI.make("UIGridLayout", {
+		CellSize = UDim2.fromOffset(196, 228), CellPadding = UDim2.fromOffset(10, 12), SortOrder = Enum.SortOrder.LayoutOrder,
+	}, grid)
+	UI.make("UIPadding", { PaddingTop = UDim.new(0, 8), PaddingLeft = UDim.new(0, 6) }, grid)
+
 	StateController.Changed:Connect(refresh)
 	for _, attr in { "VIP", "CoinsX2" } do
 		player:GetAttributeChangedSignal(attr):Connect(refresh)

@@ -92,7 +92,7 @@ function CurrencyController.Start()
 
 	local function refreshLevel()
 		local xp, needed = player:GetAttribute("XP") or 0, player:GetAttribute("XPNeeded") or 100
-		levelLabel.Text = `Nivel {player:GetAttribute("Level") or 1}   ·   {xp}/{needed} XP`
+		levelLabel.Text = `Level {player:GetAttribute("Level") or 1}   ·   {xp}/{needed} XP`
 		TweenService:Create(barFill, TweenInfo.new(0.3), { Size = UDim2.fromScale(math.clamp(xp / needed, 0, 1), 1) }):Play()
 	end
 	for _, attr in { "XP", "XPNeeded", "Level" } do
@@ -148,9 +148,9 @@ function CurrencyController.Start()
 			end
 		elseif kind == "LevelUp" then
 			-- a = nivel, b = monedas, c = gemas
-			CurrencyController.Toast(`¡NIVEL {a}! +{b} {coinInfo.Icon}` .. (if c > 0 then ` +{c} {gemInfo.Icon}` else ""), UI.Colors.Gold)
+			CurrencyController.Toast(`LEVEL {a}! +{b} {coinInfo.Icon}` .. (if c > 0 then ` +{c} {gemInfo.Icon}` else ""), UI.Colors.Gold)
 		elseif kind == "BPTier" then
-			CurrencyController.Toast(`¡Nivel {a} del Pase! Reclama tu recompensa`, Color3.fromRGB(255, 150, 60))
+			CurrencyController.Toast(`Pass tier {a}! Claim your reward`, Color3.fromRGB(255, 150, 60))
 		end
 	end)
 end

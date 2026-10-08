@@ -105,26 +105,26 @@ function GoalController.Start()
 			local priceCoins, priceGems, level = CatalogConfig.GetPrices(goalId)
 			local coins = player:GetAttribute("Coins") or 0
 			local progress = math.clamp(coins / priceCoins, 0, 1)
-			title.Text = `Próximo objetivo: {CharacterRegistry.Get(goalId).DisplayName}`
+			title.Text = `Next goal: {CharacterRegistry.Get(goalId).DisplayName}`
 			TweenService:Create(barFill, TweenInfo.new(0.3), { Size = UDim2.fromScale(progress, 1) }):Play()
 			local myLevel = player:GetAttribute("Level") or 1
 			if coins >= priceCoins and (not level or myLevel >= level) then
-				sub.Text = "¡Ya puedes desbloquearlo! Abre Personajes"
+				sub.Text = "You can unlock it now! Open Characters"
 				sub.TextColor3 = UI.Colors.Green
 			else
 				local hours = math.max(1, math.ceil(math.max(0, priceCoins - coins) / EconomyConfig.EstimatedCoinsPerHour))
-				local levelText = if level and myLevel < level then `  ·  Nv {level}` else ""
-				sub.Text = `{UI.formatNumber(coins)} / {UI.formatNumber(priceCoins)} {COIN}   ·   ~{hours} h de juego{levelText}`
+				local levelText = if level and myLevel < level then `  ·  Lv {level}` else ""
+				sub.Text = `{UI.formatNumber(coins)} / {UI.formatNumber(priceCoins)} {COIN}   ·   ~{hours} h of play{levelText}`
 				sub.TextColor3 = UI.Colors.Muted
 			end
-			shortcut.Text = if priceGems then `Ya: {priceGems} {GEM}` else "Ver"
+			shortcut.Text = if priceGems then `Now: {priceGems} {GEM}` else "View"
 		end
 
 		local endsAt
 		eaId, endsAt = findEarlyAccess()
 		eaBanner.Visible = eaId ~= nil and inHub
 		if eaId and endsAt then
-			eaBanner.Text = `{CharacterRegistry.Get(eaId).DisplayName} en Acceso Anticipado · gratis con {COIN} en {UI.formatDuration(endsAt - StateController.Now())}`
+			eaBanner.Text = `{CharacterRegistry.Get(eaId).DisplayName} in Early Access · free with {COIN} in {UI.formatDuration(endsAt - StateController.Now())}`
 		end
 	end
 

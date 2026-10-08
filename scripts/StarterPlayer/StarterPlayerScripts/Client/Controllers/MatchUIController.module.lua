@@ -51,10 +51,11 @@ local function showResults(data)
 	}, results)
 	UI.autoScale(stage, 560)
 
-	local won = data.WinnerUserId == player.UserId
+	-- En equipos gana todo el equipo (data.Winners = UserIds de los ganadores)
+	local won = data.WinnerUserId == player.UserId or (data.Winners ~= nil and table.find(data.Winners, player.UserId) ~= nil)
 	UI.label(stage, {
 		AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 30), Size = UDim2.new(1, 0, 0, 70),
-		Text = if won then "¡VICTORIA!" else "FIN DE LA PARTIDA", TextSize = 60, Font = Enum.Font.GothamBlack,
+		Text = if won then "VICTORY!" else "MATCH OVER", TextSize = 60, Font = Enum.Font.GothamBlack,
 		TextXAlignment = Enum.TextXAlignment.Center, TextColor3 = if won then UI.Colors.Gold else UI.Colors.Text,
 		TextStrokeTransparency = 0.3,
 	})
@@ -130,10 +131,10 @@ local function showResults(data)
 		line(`Skin: {skin.Name}`, 14, if skin.Premium then UI.Colors.Gold else UI.Colors.Muted)
 	end
 	if (data.Streak or 0) > 1 then
-		line(`Racha de {data.Streak} victorias`, 14, Color3.fromRGB(255, 140, 60))
+		line(`{data.Streak}-win streak`, 14, Color3.fromRGB(255, 140, 60))
 	end
 	line(" ", 6)
-	line("CLASIFICACIÓN", 13, UI.Colors.Muted)
+	line("RANKING", 13, UI.Colors.Muted)
 	for _, entry in data.Ranking or {} do
 		local c = CharacterRegistry.Get(entry.CharacterId)
 		line(`{entry.Place}. {entry.Name}  ·  {if c then c.DisplayName else ""}  ·  {entry.KOs} KO`, 13,
@@ -141,7 +142,7 @@ local function showResults(data)
 	end
 
 	-- Llamada a la acción: el momento de máxima emoción es cuando más apetece mejorar
-	local cta = UI.button(stage, "Ver personajes y skins", UI.Colors.Accent, {
+	local cta = UI.button(stage, "View characters and skins", UI.Colors.Accent, {
 		AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 446), Size = UDim2.fromOffset(280, 40),
 	})
 	cta.Activated:Connect(function()
@@ -223,14 +224,14 @@ function MatchUIController.Start()
 				end
 			end)
 		elseif kind == "Start" then
-			flash("¡PELEA!", UI.Colors.Gold, 1)
+			flash("FIGHT!", UI.Colors.Gold, 1)
 		elseif kind == "Eliminated" and typeof(payload) == "Instance" then
 			local name = payload:GetAttribute("DisplayName") or payload.Name
 			local info = ArenaInfo.Get(player.Character and player.Character:GetAttribute("ArenaId"))
 			if info and info:GetAttribute("MatchState") ~= "Fighting" then
 				return -- última eliminación: ya sale el ¡GAME!
 			end
-			flash(if payload == player.Character then "¡ELIMINADO!" else `¡{name} eliminado!`, UI.Colors.Red, 1.5)
+			flash(if payload == player.Character then "ELIMINATED!" else `{name} eliminated!`, UI.Colors.Red, 1.5)
 		elseif kind == "Finish" then
 			bigText.TextTransparency = 1 -- el ¡GAME! de la cinemática manda
 			bigText.TextStrokeTransparency = 1

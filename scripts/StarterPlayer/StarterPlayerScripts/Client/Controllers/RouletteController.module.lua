@@ -34,6 +34,8 @@ local infoLabel: TextLabel
 local spinning = false
 
 -- Tarjeta de premio (también se usa en la tabla de probabilidades)
+local cardSkinOverride: string? = nil -- skin real que ha tocado (para la tarjeta ganadora)
+
 local function prizeCard(parent: Instance, prize, props)
 	local rarity = RouletteConfig.Rarities[prize.Rarity]
 	local card = UI.make("Frame", { BackgroundColor3 = Color3.new(1, 1, 1), Size = UDim2.fromOffset(CARD_W, 140) }, parent)
@@ -48,7 +50,8 @@ local function prizeCard(parent: Instance, prize, props)
 		local holder = UI.make("Frame", { Size = UDim2.fromScale(1, 1), BackgroundColor3 = rarity.Color, BackgroundTransparency = 0.4 }, iconBox)
 		UI.corner(holder, 999)
 		UI.stroke(holder, Color3.new(1, 1, 1), 2)
-		local skin = CatalogConfig.Skins[RouletteConfig.RareSkins[1]]
+		-- La tarjeta ganadora enseña el personaje de la skin que ha tocado de verdad
+		local skin = CatalogConfig.Skins[cardSkinOverride or RouletteConfig.RareSkins[1]] or CatalogConfig.Skins[RouletteConfig.RareSkins[1]]
 		local vp = Portrait.Create(holder, skin.Character, "Bust", { Size = UDim2.fromScale(1, 1) })
 		UI.corner(vp, 999)
 	else
@@ -82,13 +85,14 @@ local function randomPrize()
 	return RouletteConfig.Prizes[1]
 end
 
-local function buildStrip(winIndex: number?)
+local function buildStrip(winIndex: number?, winSkin: string?)
 	for _, c in track:GetChildren() do
 		if c:IsA("GuiObject") then
 			c:Destroy()
 		end
 	end
 	for i = 1, STRIP_CARDS do
+		cardSkinOverride = if i == WIN_SLOT then winSkin else nil
 		local prize = if i == WIN_SLOT and winIndex then RouletteConfig.Prizes[winIndex] else randomPrize()
 		-- que se vea pasar la skin de vez en cuando (y casi tocar justo al lado del premio)
 		if not winIndex and i % 17 == 0 then
@@ -108,7 +112,7 @@ local function refreshButtons()
 	local paid = if r and r.Day == todayDay then r.Paid else 0
 	freeButton.Visible = freeLeft
 	paidButton.Visible = not freeLeft
-	infoLabel.Text = if freeLeft then "¡Tienes 1 tirada GRATIS hoy!" else `Tiradas extra hoy: {paid}/{RouletteConfig.MaxPaidPerDay}  ·  la gratis vuelve mañana`
+	infoLabel.Text = if freeLeft then "You have 1 FREE spin today!" else `Extra spins today: {paid}/{RouletteConfig.MaxPaidPerDay}  ·  free spin returns tomorrow`
 	freeButton.Active = not spinning
 	paidButton.Active = not spinning
 end
@@ -129,7 +133,8 @@ local function spin(mode: string)
 		end
 		return
 	end
-	buildStrip(response.Index)
+	buildStrip(response.Index, response.Skin)
+	cardSkinOverride = nil
 	-- Animación: desde el principio hasta el premio (con un pequeño desvío aleatorio dentro de la tarjeta)
 	local center = strip.AbsoluteSize.X / 2
 	local jitter = math.random(-CARD_W // 2 + 12, CARD_W // 2 - 12)
@@ -157,7 +162,7 @@ local function spin(mode: string)
 		TweenService:Create(s, TweenInfo.new(0.3, Enum.EasingStyle.Back), { Scale = 1.12 }):Play()
 		UI.animatedStroke(winner, rarity.Color, 4)
 	end
-	resultLabel.Text = `¡{response.msg}!`
+	resultLabel.Text = `{response.msg}!`
 	resultLabel.TextColor3 = rarity.Color
 	if prize.Kind == "Skin" or prize.Rarity == "Legendary" then
 		Sfx.Play("LevelUp", nil, 1)
@@ -168,7 +173,7 @@ local function spin(mode: string)
 			flash:Destroy()
 		end)
 		if prize.Kind == "Skin" then
-			CurrencyController.Toast("¡¡SKIN EXCLUSIVA!! Equípala en Personajes", rarity.Color)
+			CurrencyController.Toast(`{response.msg}!! It's already equipped`, rarity.Color)
 		end
 	else
 		Sfx.Play("Buy", nil, 0.8)
@@ -197,7 +202,7 @@ end
 function RouletteController.Start()
 	local gui = UI.screenGui("Roulette", 10)
 	local content
-	frame, content = UI.modal(gui, "🎰 Ruleta Maldita", UDim2.fromOffset(780, 560), Color3.fromRGB(255, 50, 90))
+	frame, content = UI.modal(gui, "🎰 Cursed Roulette", UDim2.fromOffset(780, 560), Color3.fromRGB(255, 50, 90))
 
 	-- Tira de premios con flecha dorada en el centro
 	strip = UI.make("Frame", {
@@ -233,7 +238,7 @@ function RouletteController.Start()
 	})
 
 	-- Botones
-	freeButton = UI.button(content, "TIRADA GRATIS", UI.Colors.Green, {
+	freeButton = UI.button(content, "FREE SPIN", UI.Colors.Green, {
 		AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 206), Size = UDim2.fromOffset(260, 48), TextSize = 20,
 	})
 	UI.shine(freeButton, 1.2)
@@ -253,7 +258,7 @@ function RouletteController.Start()
 	})
 
 	-- Probabilidades (siempre visibles)
-	UI.sectionHeader(content, "Rewards", "Premios y probabilidades", Color3.fromRGB(255, 50, 90)).Position = UDim2.fromOffset(0, 282)
+	UI.sectionHeader(content, "Rewards", "Prizes and odds", Color3.fromRGB(255, 50, 90)).Position = UDim2.fromOffset(0, 282)
 	local odds = UI.make("Frame", { Position = UDim2.fromOffset(0, 328), Size = UDim2.new(1, 0, 1, -328), BackgroundTransparency = 1 }, content)
 	UI.make("UIGridLayout", { CellSize = UDim2.new(0.2, -8, 0.5, -6), CellPadding = UDim2.fromOffset(8, 8), SortOrder = Enum.SortOrder.LayoutOrder }, odds)
 	for i, prize in RouletteConfig.Prizes do

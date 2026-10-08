@@ -32,23 +32,23 @@ end
 
 UnlockService.Handlers.BuyCharacter = function(player: Player, id: any, currency: any)
 	if type(id) ~= "string" or (currency ~= "Coins" and currency ~= "Gems") then
-		return result(false, "Petición inválida")
+		return result(false, "Invalid request")
 	end
 	local entry = CatalogConfig.Characters[id]
 	if not entry or not CharacterRegistry.Get(id) then
-		return result(false, "Personaje desconocido")
+		return result(false, "Unknown character")
 	end
 	local data = DataService.Get(player)
 	if not data then
-		return result(false, "Tus datos aún se están cargando")
+		return result(false, "Your data is still loading")
 	end
 	if data.OwnedCharacters[id] then
-		return result(false, "Ya tienes este personaje")
+		return result(false, "You already own this character")
 	end
 
 	local status = CatalogConfig.GetCharacterStatus(id, os.time())
 	if status == "Upcoming" then
-		return result(false, "Este personaje aún no ha salido")
+		return result(false, "This character isn't out yet")
 	end
 
 	local priceCoins, priceGems, levelRequired = CatalogConfig.GetPrices(id)
@@ -58,19 +58,19 @@ UnlockService.Handlers.BuyCharacter = function(player: Player, id: any, currency
 	elseif currency == "Gems" then
 		price = priceGems -- las Gemas se saltan el requisito de nivel
 	elseif status == "EarlyAccess" then
-		return result(false, "En Acceso Anticipado solo se puede conseguir con Gemas")
+		return result(false, "During Early Access it can only be unlocked with Gems")
 	else
 		price = priceCoins
 		if price and levelRequired and data.Level < levelRequired then
-			return result(false, `Necesitas Nivel {levelRequired} para comprarlo con Monedas (o consíguelo ya con Gemas)`)
+			return result(false, `You need Level {levelRequired} to buy it with Coins (or get it now with Gems)`)
 		end
 	end
 	if not price then
-		return result(false, if currency == "Coins" then "Exclusivo: solo se consigue con Gemas" else "No se puede comprar con esa moneda")
+		return result(false, if currency == "Coins" then "Exclusive: only available with Gems" else "Can't be bought with that currency")
 	end
 
 	if price > 0 and not EconomyService.SpendCurrency(player, currency, price, `Personaje:{id}`) then
-		return result(false, `No tienes suficientes {currencyName(currency)}`)
+		return result(false, `You don't have enough {currencyName(currency)}`)
 	end
 	DataService.Update(player, function(d)
 		d.OwnedCharacters[id] = true
@@ -79,61 +79,61 @@ UnlockService.Handlers.BuyCharacter = function(player: Player, id: any, currency
 		afterGemSpend(player)
 	end
 	DataService.PushState(player)
-	return result(true, `¡{CharacterRegistry.Get(id).DisplayName} desbloqueado!`)
+	return result(true, `{CharacterRegistry.Get(id).DisplayName} unlocked!`)
 end
 
 UnlockService.Handlers.SelectCharacter = function(player: Player, id: any)
 	if type(id) ~= "string" then
-		return result(false, "Petición inválida")
+		return result(false, "Invalid request")
 	end
 	local data = DataService.Get(player)
 	if not data or not data.OwnedCharacters[id] then
-		return result(false, "No tienes este personaje")
+		return result(false, "You don't own this character")
 	end
 	if not MatchService.CanChangeLoadout(player) then
-		return result(false, "Solo puedes cambiar de personaje en el Hub")
+		return result(false, "You can only switch characters in the Hub")
 	end
 	if data.SelectedCharacter ~= id then
 		FighterService.SelectCharacter(player, id)
 	end
-	return result(true, `Has elegido a {CharacterRegistry.Get(id).DisplayName}`)
+	return result(true, `You chose {CharacterRegistry.Get(id).DisplayName}`)
 end
 
 -- Modo prueba: juega con cualquier personaje en el Dojo para probarlo antes de comprarlo
 UnlockService.Handlers.TryCharacter = function(player: Player, id: any)
 	if type(id) ~= "string" or not CharacterRegistry.Get(id) or not CatalogConfig.Characters[id] then
-		return result(false, "Personaje desconocido")
+		return result(false, "Unknown character")
 	end
 	if not MatchService.CanChangeLoadout(player) then
-		return result(false, "Termina la partida antes de probar personajes")
+		return result(false, "Finish the match before trying characters")
 	end
 	FighterService.TryCharacter(player, id)
-	return result(true, `Probando a {CharacterRegistry.Get(id).DisplayName} en el Dojo`)
+	return result(true, `Trying {CharacterRegistry.Get(id).DisplayName} in the Dojo`)
 end
 
 UnlockService.Handlers.BuySkin = function(player: Player, skinId: any)
 	local skin = type(skinId) == "string" and CatalogConfig.Skins[skinId]
 	if not skin then
-		return result(false, "Skin desconocida")
+		return result(false, "Unknown skin")
 	end
 	local data = DataService.Get(player)
 	if not data then
-		return result(false, "Tus datos aún se están cargando")
+		return result(false, "Your data is still loading")
 	end
 	if data.OwnedSkins[skinId] then
-		return result(false, "Ya tienes esta skin")
+		return result(false, "You already own this skin")
 	end
 	if skin.BattlePassOnly then
-		return result(false, "Esta skin solo se consigue en el Pase de Batalla")
+		return result(false, "This skin is only available in the Battle Pass")
 	elseif skin.StoryOnly then
-		return result(false, "Esta skin se consigue completando el Modo Historia")
+		return result(false, "This skin is earned by completing Story Mode")
 	elseif skin.RouletteOnly then
-		return result(false, "Esta skin solo sale en la Ruleta Maldita")
+		return result(false, "This skin only drops from the Cursed Roulette")
 	end
 	local currency = if skin.PriceGems then "Gems" else "Coins"
 	local price = skin.PriceGems or skin.PriceCoins
 	if not price or not EconomyService.SpendCurrency(player, currency, price, `Skin:{skinId}`) then
-		return result(false, `No tienes suficientes {currencyName(currency)}`)
+		return result(false, `You don't have enough {currencyName(currency)}`)
 	end
 	DataService.Update(player, function(d)
 		d.OwnedSkins[skinId] = true
@@ -142,26 +142,26 @@ UnlockService.Handlers.BuySkin = function(player: Player, skinId: any)
 		afterGemSpend(player)
 	end
 	DataService.PushState(player)
-	return result(true, `¡Skin {skin.Name} conseguida!`)
+	return result(true, `{skin.Name} skin unlocked!`)
 end
 
 -- skinId = false/nil para quitar la skin
 UnlockService.Handlers.EquipSkin = function(player: Player, characterId: any, skinId: any)
 	if type(characterId) ~= "string" or not CharacterRegistry.Get(characterId) then
-		return result(false, "Petición inválida")
+		return result(false, "Invalid request")
 	end
 	local data = DataService.Get(player)
 	if not data then
-		return result(false, "Tus datos aún se están cargando")
+		return result(false, "Your data is still loading")
 	end
 	if skinId then
 		local skin = type(skinId) == "string" and CatalogConfig.Skins[skinId]
 		if not skin or skin.Character ~= characterId or not data.OwnedSkins[skinId] then
-			return result(false, "No tienes esta skin")
+			return result(false, "You don't own this skin")
 		end
 	end
 	if not MatchService.CanChangeLoadout(player) then
-		return result(false, "No puedes cambiar de skin durante una partida")
+		return result(false, "You can't change skins during a match")
 	end
 	DataService.Update(player, function(d)
 		d.EquippedSkins[characterId] = skinId or nil
@@ -170,7 +170,7 @@ UnlockService.Handlers.EquipSkin = function(player: Player, characterId: any, sk
 		FighterService.SpawnCharacter(player, true)
 	end
 	DataService.PushState(player)
-	return result(true, if skinId then "Skin equipada" else "Skin quitada")
+	return result(true, if skinId then "Skin equipped" else "Skin removed")
 end
 
 function UnlockService.Start(services)

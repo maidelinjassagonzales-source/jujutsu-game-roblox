@@ -10,11 +10,11 @@ RouletteConfig.RareSkins = { "CursedKing_TrueForm", "Sorcerer_Honored" }
 RouletteConfig.DuplicateSkinGems = 300 -- si ya tienes todas las skins de la ruleta
 
 RouletteConfig.Rarities = {
-	Common = { Name = "Común", Color = Color3.fromRGB(170, 170, 185) },
-	Rare = { Name = "Raro", Color = Color3.fromRGB(80, 160, 255) },
-	Epic = { Name = "Épico", Color = Color3.fromRGB(190, 90, 255) },
-	Legendary = { Name = "Legendario", Color = Color3.fromRGB(255, 190, 40) },
-	Mythic = { Name = "Mítico", Color = Color3.fromRGB(255, 50, 90) },
+	Common = { Name = "Common", Color = Color3.fromRGB(170, 170, 185) },
+	Rare = { Name = "Rare", Color = Color3.fromRGB(80, 160, 255) },
+	Epic = { Name = "Epic", Color = Color3.fromRGB(190, 90, 255) },
+	Legendary = { Name = "Legendary", Color = Color3.fromRGB(255, 190, 40) },
+	Mythic = { Name = "Mythic", Color = Color3.fromRGB(255, 50, 90) },
 }
 
 -- Weight = peso relativo (la probabilidad se calcula sola y se enseña en la ventana)
@@ -45,15 +45,15 @@ end
 
 function RouletteConfig.Describe(prize): string
 	if prize.Kind == "Coins" then
-		return `{prize.Amount} Monedas`
+		return `{prize.Amount} Coins`
 	elseif prize.Kind == "Gems" then
-		return `{prize.Amount} Gemas`
+		return `{prize.Amount} Gems`
 	elseif prize.Kind == "XP" then
 		return `{prize.Amount} XP`
 	elseif prize.Kind == "Boost" then
-		return "x2 Monedas 30 min"
+		return "x2 Coins 30 min"
 	end
-	return "SKIN EXCLUSIVA"
+	return "EXCLUSIVE SKIN"
 end
 
 return RouletteConfig

@@ -8,7 +8,7 @@ local BattlePassConfig = {}
 
 BattlePassConfig.Season = {
 	Id = "S1",
-	Name = "Temporada 1 · Despertar Maldito",
+	Name = "Season 1 · Cursed Awakening",
 	Start = utc(2026, 10, 1),
 	End = utc(2026, 12, 15),
 }
@@ -17,7 +17,7 @@ BattlePassConfig.XPPerTier = 1500 -- ~3 partidas por nivel del pase
 BattlePassConfig.MaxTier = 30
 -- Pase Premium = Developer Product de Robux (uno por temporada, porque se reinicia cada temporada).
 -- Créalo en Creator Hub > Monetization > Developer Products y pega aquí su ID (0 = botón avisa que falta).
-BattlePassConfig.PremiumProductId = 0
+BattlePassConfig.PremiumProductId = 3717315969
 BattlePassConfig.PremiumRobuxHint = 499
 
 local tiers = {}

@@ -18,7 +18,7 @@ local player = Players.LocalPlayer
 
 local StageSelectController = {}
 
-local RANDOM_CARD = { Kanji = "?", Description = "Que decida el destino", Colors = { Color3.fromRGB(200, 200, 210), Color3.fromRGB(30, 28, 40) } }
+local RANDOM_CARD = { Kanji = "?", Description = "Let fate decide", Colors = { Color3.fromRGB(200, 200, 210), Color3.fromRGB(30, 28, 40) } }
 
 local dojoFrame: Frame
 local dojoGrid: Frame
@@ -33,7 +33,7 @@ local myVote: string? = nil
 -- Tarjeta de escenario: degradado con los colores del escenario, kanji gigante, nombre y descripción
 local function stageCard(parent: Instance, id: string, order: number, onPick: () -> ())
 	local info = if id == "Random" then RANDOM_CARD else StageConfig.Cards[id] or RANDOM_CARD
-	local stageName = if id == "Random" then "Aleatorio" else (StageConfig.Stages[id] and StageConfig.Stages[id].Name or id)
+	local stageName = if id == "Random" then "Random" else (StageConfig.Stages[id] and StageConfig.Stages[id].Name or id)
 	local card = UI.make("TextButton", {
 		Text = "", AutoButtonColor = false, BackgroundColor3 = Color3.new(1, 1, 1), LayoutOrder = order, ClipsDescendants = true,
 	}, parent)
@@ -111,7 +111,7 @@ local function refreshDojo()
 		if id == current then
 			stroke.Color = UI.Colors.Gold
 			stroke.Thickness = 3
-			UI.ribbon(card, "Actual", Color3.fromRGB(230, 160, 20))
+			UI.ribbon(card, "Current", Color3.fromRGB(230, 160, 20))
 		end
 	end
 end
@@ -147,21 +147,21 @@ local function showVote(options: { string }, seconds: number)
 		end)
 		local count = UI.make("TextLabel", {
 			Position = UDim2.fromOffset(10, 10), Size = UDim2.fromOffset(0, 26), AutomaticSize = Enum.AutomaticSize.X,
-			BackgroundColor3 = Color3.fromRGB(20, 18, 30), BackgroundTransparency = 0.2, Text = "0 votos", TextSize = 13,
+			BackgroundColor3 = Color3.fromRGB(20, 18, 30), BackgroundTransparency = 0.2, Text = "0 votes", TextSize = 13,
 			Font = Enum.Font.GothamBlack, TextColor3 = Color3.new(1, 1, 1), Visible = false, ZIndex = 4,
 		}, card)
 		UI.make("UIPadding", { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8) }, count)
 		UI.corner(count, 8)
 		local check = UI.make("TextLabel", {
 			AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.4), Size = UDim2.fromOffset(150, 34),
-			BackgroundColor3 = UI.Colors.Green, Text = "TU VOTO", TextSize = 16, Font = Enum.Font.GothamBlack,
+			BackgroundColor3 = UI.Colors.Green, Text = "YOUR VOTE", TextSize = 16, Font = Enum.Font.GothamBlack,
 			TextColor3 = Color3.new(1, 1, 1), Visible = false, Rotation = -6, ZIndex = 4,
 		}, card)
 		UI.corner(check, 8)
 		UI.stroke(check, Color3.new(1, 1, 1), 2)
 		voteCards[id] = { Card = card, Count = count, Check = check, Stroke = stroke }
 	end
-	voteTitle.Text = "ELIGE EL ESCENARIO"
+	voteTitle.Text = "CHOOSE THE STAGE"
 	voteGui.Enabled = true
 	voteFrame.Visible = true
 	local scale = voteFrame:FindFirstChildOfClass("UIScale") :: UIScale
@@ -177,13 +177,13 @@ local function updateVotes(counts)
 	for id, entry in voteCards do
 		local n = counts[id] or 0
 		entry.Count.Visible = n > 0
-		entry.Count.Text = if n == 1 then "1 voto" else `{n} votos`
+		entry.Count.Text = if n == 1 then "1 vote" else `{n} votes`
 	end
 end
 
 local function revealStage(stageId: string, wasRandom: boolean)
 	local name = StageConfig.Stages[stageId] and StageConfig.Stages[stageId].Name or stageId
-	voteTitle.Text = if wasRandom then `AL AZAR: {string.upper(name)}` else `¡{string.upper(name)}!`
+	voteTitle.Text = if wasRandom then `RANDOM: {string.upper(name)}` else `{string.upper(name)}!`
 	Sfx.Play("LevelUp", nil, 0.8)
 	for id, entry in voteCards do
 		if id == stageId then
@@ -207,7 +207,7 @@ function StageSelectController.Start()
 	-- Ventana del Dojo
 	local gui = UI.screenGui("StageSelect", 10)
 	local content
-	dojoFrame, content = UI.modal(gui, "🏯 Escenario del Dojo", UDim2.fromOffset(700, 440), Color3.fromRGB(60, 160, 220))
+	dojoFrame, content = UI.modal(gui, "🏯 Dojo Stage", UDim2.fromOffset(700, 440), Color3.fromRGB(60, 160, 220))
 	dojoGrid = UI.make("Frame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1 }, content)
 	UI.make("UIGridLayout", { CellSize = UDim2.new(1 / 3, -10, 0.5, -8), CellPadding = UDim2.fromOffset(12, 14), SortOrder = Enum.SortOrder.LayoutOrder }, dojoGrid)
 	UI.make("UIPadding", { PaddingTop = UDim.new(0, 6), PaddingLeft = UDim.new(0, 4), PaddingRight = UDim.new(0, 4) }, dojoGrid)
@@ -226,7 +226,7 @@ function StageSelectController.Start()
 	UI.glow(voteFrame, UI.Colors.Gold, 18)
 	UI.autoScale(voteFrame)
 	voteTitle = UI.label(voteFrame, {
-		Position = UDim2.fromOffset(0, 12), Size = UDim2.new(1, 0, 0, 40), Text = "ELIGE EL ESCENARIO", TextSize = 32, Font = UI.TitleFont,
+		Position = UDim2.fromOffset(0, 12), Size = UDim2.new(1, 0, 0, 40), Text = "CHOOSE THE STAGE", TextSize = 32, Font = UI.TitleFont,
 		TextXAlignment = Enum.TextXAlignment.Center, TextStrokeTransparency = 0.4,
 	})
 	UI.gradient(voteTitle, Color3.new(1, 1, 1), UI.Colors.Gold)

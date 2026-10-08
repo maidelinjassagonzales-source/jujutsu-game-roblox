@@ -123,15 +123,15 @@ function ObbyBuilder.Build(origin: Vector3): Model
 	local spawn = part({ Name = "ObbyStart", Size = Vector3.new(6, 0.3, 6), Position = Vector3.new(-6, 1.2, 0), Color = C(200, 160, 255), Material = M.Neon, Transparency = 0.5, CanCollide = false })
 	tag(spawn, "ObbyStart")
 	torii(Vector3.new(10, 1, 0), 12, 14, C(200, 40, 50))
-	sign(Vector3.new(0, 22, 0), "OBBY · ASCENSO MALDITO", C(255, 210, 120), 34)
-	sign(Vector3.new(0, 17, 0), "Si te caes, vuelves al último checkpoint", C(230, 220, 255), 18)
+	sign(Vector3.new(0, 22, 0), "OBBY · CURSED ASCENT", C(255, 210, 120), 34)
+	sign(Vector3.new(0, 17, 0), "If you fall, you go back to the last checkpoint", C(230, 220, 255), 18)
 	for _, z in { -12, 12 } do
 		lanternAt(Vector3.new(-12, 1, z))
 	end
 	-- Portal de vuelta al Lobby
 	local back = part({ Name = "ObbyExit", Size = Vector3.new(0.6, 10, 8), Position = Vector3.new(-14.5, 6, 0), Color = C(255, 190, 40), Material = M.Neon, Transparency = 0.35, CanCollide = false })
 	local pp = Instance.new("ProximityPrompt")
-	pp.ActionText = "Volver"
+	pp.ActionText = "Back"
 	pp.ObjectText = "Lobby"
 	pp.MaxActivationDistance = 10
 	pp.HoldDuration = 0
@@ -150,7 +150,7 @@ function ObbyBuilder.Build(origin: Vector3): Model
 		part({ Size = Vector3.new(1.2, 0.1, 2.4), CFrame = CFrame.new(p.Position - origin + Vector3.new(0, 0.66, 0)) * CFrame.Angles(0, math.rad(i * 20), 0), Color = C(250, 238, 215), CanCollide = false })
 	end
 	x += 12
-	checkpoint(Vector3.new(x, y, 0), 1, "CHECKPOINT 1 · PUENTE DE TALISMANES", C(255, 210, 120))
+	checkpoint(Vector3.new(x, y, 0), 1, "CHECKPOINT 1 · TALISMAN BRIDGE", C(255, 210, 120))
 
 	-- ===== 2. Mar de Lava Maldita
 	local lavaY = y - 8
@@ -185,7 +185,7 @@ function ObbyBuilder.Build(origin: Vector3): Model
 		end
 	end
 	x += 12
-	checkpoint(Vector3.new(x, y, 0), 2, "CHECKPOINT 2 · MAR DE LAVA", C(255, 120, 40))
+	checkpoint(Vector3.new(x, y, 0), 2, "CHECKPOINT 2 · LAVA SEA", C(255, 120, 40))
 
 	-- ===== 3. Molinos Malditos: pasarela con barras que giran (te tiran al vacío)
 	x += 14
@@ -206,7 +206,7 @@ function ObbyBuilder.Build(origin: Vector3): Model
 	end
 	y += 6
 	x += 12
-	checkpoint(Vector3.new(x, y, 0), 3, "CHECKPOINT 3 · MOLINOS MALDITOS", C(170, 90, 255))
+	checkpoint(Vector3.new(x, y, 0), 3, "CHECKPOINT 3 · CURSED WINDMILLS", C(170, 90, 255))
 
 	-- ===== 4. Escalera al Cielo: espiral alrededor de una torre + trampolines
 	local towerX = x + 22
@@ -226,7 +226,7 @@ function ObbyBuilder.Build(origin: Vector3): Model
 	end
 	y = stepY + 2
 	x = towerX + 22
-	checkpoint(Vector3.new(x, y, 0), 4, "CHECKPOINT 4 · ESCALERA AL CIELO", C(120, 200, 255))
+	checkpoint(Vector3.new(x, y, 0), 4, "CHECKPOINT 4 · STAIRWAY TO HEAVEN", C(120, 200, 255))
 
 	-- ===== 5. Velo Final: plataformas que aparecen y desaparecen
 	for i = 1, 10 do
@@ -250,7 +250,7 @@ function ObbyBuilder.Build(origin: Vector3): Model
 	light.Range = 30
 	light.Brightness = 3
 	light.Parent = chest
-	sign(Vector3.new(x, y + 22, 0), "¡META! · 完", C(255, 215, 80), 30)
+	sign(Vector3.new(x, y + 22, 0), "FINISH! · 完", C(255, 215, 80), 30)
 	for _, zz in { -10, 10 } do
 		lanternAt(Vector3.new(x + 9, y + 1, zz))
 	end

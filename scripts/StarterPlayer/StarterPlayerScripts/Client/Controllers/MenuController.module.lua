@@ -42,10 +42,10 @@ function MenuController.Start()
 		end
 	end)
 
-	menuButton(column, 1, "Play", "Jugar", Color3.fromRGB(220, 60, 70)).Activated:Connect(PlayMenuController.Toggle)
-	menuButton(column, 2, "Characters", "Personajes", UI.Colors.Accent).Activated:Connect(CharacterShopController.Toggle)
+	menuButton(column, 1, "Play", "Play", Color3.fromRGB(220, 60, 70)).Activated:Connect(PlayMenuController.Toggle)
+	menuButton(column, 2, "Characters", "Characters", UI.Colors.Accent).Activated:Connect(CharacterShopController.Toggle)
 
-	local passButton = menuButton(column, 3, "Pass", "Pase", Color3.fromRGB(255, 190, 40))
+	local passButton = menuButton(column, 3, "Pass", "Pass", Color3.fromRGB(255, 190, 40))
 	passButton.Activated:Connect(BattlePassController.Toggle)
 	-- Punto rojo con el nº de recompensas sin reclamar (efecto "pendiente")
 	local badge = UI.label(passButton, {
@@ -59,15 +59,15 @@ function MenuController.Start()
 		badge.Text = if count > 9 then "9+" else tostring(count)
 	end)
 
-	menuButton(column, 4, "Store", "Tienda", Color3.fromRGB(90, 220, 255)).Activated:Connect(StoreController.Toggle)
+	menuButton(column, 4, "Store", "Shop", Color3.fromRGB(90, 220, 255)).Activated:Connect(StoreController.Toggle)
 	-- Ruleta Maldita (con aviso cuando tienes la tirada gratis del día)
-	local rouletteButton = menuButton(column, 5, "Chest", "Ruleta", Color3.fromRGB(255, 50, 90))
+	local rouletteButton = menuButton(column, 5, "Chest", "Roulette", Color3.fromRGB(255, 50, 90))
 	rouletteButton.Activated:Connect(function()
 		require(script.Parent:WaitForChild("RouletteController")).Toggle()
 	end)
 	local freeBadge = UI.label(rouletteButton, {
 		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(1, -10, 0, 4), Size = UDim2.fromOffset(58, 22),
-		BackgroundTransparency = 0, BackgroundColor3 = UI.Colors.Green, Text = "¡GRATIS!", TextSize = 11, Font = Enum.Font.GothamBlack,
+		BackgroundTransparency = 0, BackgroundColor3 = UI.Colors.Green, Text = "FREE!", TextSize = 11, Font = Enum.Font.GothamBlack,
 		TextXAlignment = Enum.TextXAlignment.Center, Visible = false, ZIndex = 3,
 	})
 	UI.corner(freeBadge, 11)
@@ -87,7 +87,7 @@ function MenuController.Start()
 	end)
 
 	-- Misiones diarias (con el nº de misiones para cobrar)
-	local questButton = menuButton(column, 6, "Codes", "Misiones", Color3.fromRGB(80, 230, 130))
+	local questButton = menuButton(column, 6, "Codes", "Quests", Color3.fromRGB(80, 230, 130))
 	local QuestController = require(script.Parent:WaitForChild("QuestController"))
 	questButton.Activated:Connect(QuestController.Toggle)
 	local questBadge = UI.label(questButton, {

@@ -33,7 +33,7 @@ local CURSED = Color3.fromRGB(170, 80, 255)
 -- Personajes que hablan
 -- ===================================================================
 local SPEAKERS = {
-	Shiro = { Name = "Shiro Tenma · Profesor", Character = "Sorcerer", Color = Color3.fromRGB(120, 190, 255) },
+	Shiro = { Name = "Shiro Tenma · Teacher", Character = "Sorcerer", Color = Color3.fromRGB(120, 190, 255) },
 	Kaito = { Name = "Kaito Hayami", Character = "Brawler", Color = Color3.fromRGB(255, 110, 140) },
 	Mika = { Name = "Mika Zenra", Character = "WeaponMaster", Color = Color3.fromRGB(90, 220, 130) },
 }
@@ -88,11 +88,11 @@ local cancelled = false
 local STEPS = {
 	{
 		Talk = {
-			{ "Shiro", "¡Bienvenido a la Escuela de Hechicería! Soy Shiro, tu profesor. Desde hoy eres uno de los nuestros." },
-			{ "Kaito", "¡Eh, novato! Yo soy Kaito. Tranquilo, el profe parece serio pero es un buenazo... casi siempre." },
-			{ "Shiro", "Lo primero: cada día que vengas te espera un premio. Ve a por él." },
+			{ "Shiro", "Welcome to the Sorcery School! I'm Shiro, your teacher. From today on, you're one of us." },
+			{ "Kaito", "Hey, rookie! I'm Kaito. Relax, the teacher looks serious but he's a softie... most of the time." },
+			{ "Shiro", "First things first: every day you come back, a reward is waiting. Go get it." },
 		},
-		Text = "Reclama tu [premio diario]", Button = "PREMIOS",
+		Text = "Claim your [daily reward]", Button = "REWARDS",
 		Done = function()
 			local st = StateController.Get()
 			local login = st and st.Login
@@ -101,10 +101,10 @@ local STEPS = {
 	},
 	{
 		Talk = {
-			{ "Kaito", "¡Bien! Con eso ya tienes tus primeras Monedas Malditas." },
-			{ "Shiro", "Delante de la entrada están los puestos del patio. El de la izquierda es el del Pase de Batalla." },
+			{ "Kaito", "Nice! Now you have your first Cursed Coins." },
+			{ "Shiro", "In front of the entrance are the courtyard stalls. The one on the left is the Battle Pass." },
 		},
-		Text = "Ve al puesto del [Pase de Batalla] y ábrelo (E)",
+		Text = "Go to the [Battle Pass] stall and open it (E)",
 		Target = function()
 			return lobbyPos(-40, 0, 52)
 		end,
@@ -114,10 +114,10 @@ local STEPS = {
 	},
 	{
 		Talk = {
-			{ "Mika", "Cada partida te da XP del pase. Sube niveles y te llevas monedas, gemas y skins." },
-			{ "Mika", "Al otro lado está la tienda. Échale un ojo, que hay efectos de KO preciosos." },
+			{ "Mika", "Every match gives you pass XP. Level up and earn coins, gems and skins." },
+			{ "Mika", "On the other side is the shop. Take a look, there are gorgeous KO effects." },
 		},
-		Text = "Visita la [Tienda] (E en el puesto)",
+		Text = "Visit the [Shop] (E at the stall)",
 		Target = function()
 			return lobbyPos(40, 0, 52)
 		end,
@@ -127,10 +127,10 @@ local STEPS = {
 	},
 	{
 		Talk = {
-			{ "Kaito", "¿Ves la estatua del centro? Ahí sale el mejor jugador del servidor." },
-			{ "Kaito", "Algún día serás tú... después de mí, claro." },
+			{ "Kaito", "See the statue in the middle? The server's best player shows up there." },
+			{ "Kaito", "Someday it'll be you... after me, of course." },
 		},
-		Text = "Acércate a la [Estatua del Campeón]",
+		Text = "Go to the [Champion Statue]",
 		Target = function()
 			return lobbyPos(0, 0, 8)
 		end,
@@ -140,9 +140,9 @@ local STEPS = {
 	},
 	{
 		Talk = {
-			{ "Shiro", "Dentro de la Escuela está la Sala de Personajes: todos los hechiceros que puedes ser." },
+			{ "Shiro", "Inside the School is the Character Hall: every sorcerer you can become." },
 		},
-		Text = "Entra en la [Sala de Personajes]",
+		Text = "Enter the [Character Hall]",
 		Target = function()
 			return lobbyPos(0, 0, -112)
 		end,
@@ -152,20 +152,20 @@ local STEPS = {
 	},
 	{
 		Talk = {
-			{ "Shiro", "Cada personaje tiene sus técnicas y su ulti: Expansiones de Dominio, transformaciones..." },
-			{ "Mika", "¡Y puedes PROBARLOS gratis en el Dojo antes de comprarlos! Abre la ventana de personajes." },
+			{ "Shiro", "Each character has their own techniques and ult: Domain Expansions, transformations..." },
+			{ "Mika", "And you can TRY them for free in the Dojo before buying! Open the character window." },
 		},
-		Text = "Abre la ventana de [Personajes]", Button = "PERSONAJES",
+		Text = "Open the [Characters] window", Button = "CHARACTERS",
 		Done = function()
 			return modalOpen("CharacterShop")
 		end,
 	},
 	{
 		Talk = {
-			{ "Kaito", "A la izquierda del patio está el Santuario. Ahí empieza el Modo Historia." },
-			{ "Shiro", "Crónicas del Sello Maldito... Cuando estés listo, ve. De momento, solo echa un vistazo." },
+			{ "Kaito", "On the left of the courtyard is the Shrine. That's where Story Mode begins." },
+			{ "Shiro", "Chronicles of the Cursed Seal... When you're ready, go. For now, just take a look." },
 		},
-		Text = "Visita el [Santuario del Modo Historia]",
+		Text = "Visit the [Story Mode Shrine]",
 		Target = function()
 			return lobbyPos(-80, 0, -10)
 		end,
@@ -175,10 +175,10 @@ local STEPS = {
 	},
 	{
 		Talk = {
-			{ "Shiro", "Bien. Ahora a entrenar. A la derecha está la Sala de Combate." },
-			{ "Kaito", "¡El portal azul es el Dojo! Ahí hay un muñeco que no se queja por mucho que le pegues." },
+			{ "Shiro", "Good. Now let's train. The Battle Hall is on the right." },
+			{ "Kaito", "The blue portal is the Dojo! There's a dummy in there that never complains no matter how hard you hit it." },
 		},
-		Text = "Entra al [Dojo de práctica]: pulsa E en el portal azul",
+		Text = "Enter the [Practice Dojo]: press E at the blue portal",
 		Target = function()
 			return lobbyPos(114, 0, 20)
 		end,
@@ -188,28 +188,28 @@ local STEPS = {
 	},
 	{
 		Talk = {
-			{ "Shiro", "En combate todo es velocidad. Mantén Shift, toca dos veces la dirección o empuja el joystick a tope." },
+			{ "Shiro", "In combat, speed is everything. Hold Shift, double-tap a direction or push the joystick all the way." },
 		},
-		Text = "[Corre] un poco  (Shift · doble toque · joystick a tope)",
+		Text = "[Run] a bit  (Shift · double tap · full joystick)",
 		Done = function()
 			return runTime > 0.8
 		end,
 	},
 	{
 		Talk = {
-			{ "Kaito", "Y en el aire puedes saltar otra vez. ¡Es lo que te salva cuando te mandan a volar!" },
+			{ "Kaito", "And in the air you can jump again. That's what saves you when you get launched!" },
 		},
-		Text = "Haz un [doble salto]  (salta y vuelve a saltar en el aire)",
+		Text = "Do a [double jump]  (jump and jump again in the air)",
 		Done = function()
 			return MovementController.AirJumpsUsed() >= 1
 		end,
 	},
 	{
 		Talk = {
-			{ "Mika", "El muñeco te espera. Golpe rápido con clic o J, golpe fuerte con clic derecho o K." },
-			{ "Shiro", "Aquí no hay barra de vida: cuanto más porcentaje tiene, más lejos sale volando." },
+			{ "Mika", "The dummy is waiting. Quick attack with click or J, heavy attack with right click or K." },
+			{ "Shiro", "There's no health bar here: the higher the percentage, the farther they fly." },
 		},
-		Text = "Golpea al muñeco hasta el [30%]  (Clic / J · Clic derecho / K)",
+		Text = "Hit the dummy up to [30%]  (Click / J · Right click / K)",
 		Target = dummyGround,
 		Done = function()
 			local d = dummy()
@@ -218,28 +218,28 @@ local STEPS = {
 	},
 	{
 		Talk = {
-			{ "Kaito", "Truco: mantén arriba (W) mientras atacas y el golpe sale hacia arriba. Igual con los lados y abajo." },
+			{ "Kaito", "Tip: hold up (W) while attacking and the attack goes upward. Same with sides and down." },
 		},
-		Text = "Haz un [ataque hacia arriba]  (W + ataque)",
+		Text = "Do an [upward attack]  (W + attack)",
 		Done = function()
 			return lastMoveKey ~= nil and lastMoveKey:find("_Up") ~= nil
 		end,
 	},
 	{
 		Talk = {
-			{ "Shiro", "Ahora lo importante: tus TÉCNICAS. Cada hechicero tiene las suyas, con E o L." },
-			{ "Shiro", "Arriba + técnica te sirve para volver al escenario si te caes. No lo olvides." },
+			{ "Shiro", "Now the important part: your TECHNIQUES. Every sorcerer has their own, with E or L." },
+			{ "Shiro", "Up + technique helps you get back to the stage if you fall. Don't forget it." },
 		},
-		Text = "Usa una [técnica especial]  (E / L)",
+		Text = "Use a [special technique]  (E / L)",
 		Done = function()
 			return lastMoveKey ~= nil and lastMoveKey:find("Special") ~= nil
 		end,
 	},
 	{
 		Talk = {
-			{ "Mika", "Para defenderte, mantén el escudo. Si te mueves con él puesto, esquivas." },
+			{ "Mika", "To defend yourself, hold your shield. If you move while holding it, you dodge." },
 		},
-		Text = "Mantén el [escudo]  (Q · L1 · botón Escudo)",
+		Text = "Hold your [shield]  (Q · L1 · Shield button)",
 		Done = function()
 			local c = player.Character
 			return c ~= nil and c:GetAttribute("Shielding") == true
@@ -247,9 +247,9 @@ local STEPS = {
 	},
 	{
 		Talk = {
-			{ "Kaito", "Contra los que solo se cubren con escudo: ¡agárralos! Acércate y pulsa G. Luego lánzalos con una dirección." },
+			{ "Kaito", "Against players who only shield: grab them! Get close and press G. Then throw them in a direction." },
 		},
-		Text = "[Agarra] al muñeco  (G · R1 · botón Agarre)",
+		Text = "[Grab] the dummy  (G · R1 · Grab button)",
 		Target = dummyGround,
 		Done = function()
 			return lastMoveKey ~= nil and (lastMoveKey == "Grab" or lastMoveKey:find("Throw") ~= nil)
@@ -257,10 +257,10 @@ local STEPS = {
 	},
 	{
 		Talk = {
-			{ "Kaito", "¡Ahora dale con todo! Si lo subes mucho, sale volando como un cohete." },
-			{ "Shiro", "Peleando se carga tu barra de ULTI. Cuando esté llena, pulsa R... y verás algo especial." },
+			{ "Kaito", "Now go all out! If you push it high enough, it flies off like a rocket." },
+			{ "Shiro", "Fighting charges your ULT bar. When it's full, press R... and you'll see something special." },
 		},
-		Text = "Sube al muñeco hasta el [80%]",
+		Text = "Get the dummy to [80%]",
 		Target = dummyGround,
 		Done = function()
 			local d = dummy()
@@ -269,19 +269,19 @@ local STEPS = {
 	},
 	{
 		Talk = {
-			{ "Shiro", "Excelente. Ya estás listo para pelear de verdad. Vuelve al patio." },
+			{ "Shiro", "Excellent. You're ready to fight for real. Head back to the courtyard." },
 		},
-		Text = "¡Bien! Vuelve al [Lobby]", Button = "VOLVER AL LOBBY",
+		Text = "Nice! Go back to the [Lobby]", Button = "BACK TO LOBBY",
 		Done = function()
 			return player:GetAttribute("ArenaId") == "Lobby"
 		end,
 	},
 	{
 		Talk = {
-			{ "Kaito", "¿Te atreves con rivales de verdad? Pisa el círculo de Partida Rápida en la Sala de Combate." },
-			{ "Shiro", "Antes de cada partida podréis votar el escenario. Suerte, hechicero." },
+			{ "Kaito", "Dare to face real opponents? Step on the Quick Match circle in the Battle Hall." },
+			{ "Shiro", "Before each match you'll vote on the stage. Good luck, sorcerer." },
 		},
-		Text = "Busca rivales: pisa el círculo de [Partida Rápida]",
+		Text = "Find opponents: step on the [Quick Match] circle",
 		Target = function()
 			return lobbyPos(100, 0, -40)
 		end,
@@ -293,8 +293,8 @@ local STEPS = {
 }
 
 local OUTRO = {
-	{ "Shiro", "Has terminado el tutorial. Toma, un pequeño regalo de bienvenida." },
-	{ "Kaito", "¡Nos vemos en la arena! Y no llores cuando te gane." },
+	{ "Shiro", "You finished the tutorial. Here, a little welcome gift." },
+	{ "Kaito", "See you in the arena! And don't cry when I beat you." },
 }
 
 -- ===================================================================
@@ -436,7 +436,7 @@ local function buildGuides()
 	local tag = Instance.new("TextLabel")
 	tag.Size = UDim2.new(1, 0, 0.55, 0)
 	tag.BackgroundTransparency = 1
-	tag.Text = "¡AQUÍ!"
+	tag.Text = "HERE!"
 	tag.Font = Enum.Font.PermanentMarker
 	tag.TextScaled = true
 	tag.TextColor3 = GOLD
@@ -615,7 +615,7 @@ local function build()
 	UI.corner(barBack, 999)
 	bannerBar = UI.make("Frame", { Size = UDim2.fromScale(0, 1), BackgroundColor3 = GOLD, BorderSizePixel = 0 }, barBack)
 	UI.corner(bannerBar, 999)
-	local skip = UI.button(banner, "Saltar", Color3.fromRGB(70, 60, 95), {
+	local skip = UI.button(banner, "Skip", Color3.fromRGB(70, 60, 95), {
 		AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -10, 0.5, 0), Size = UDim2.fromOffset(70, 28), TextSize = 12,
 	})
 	skip.Activated:Connect(function()
@@ -630,7 +630,7 @@ local function build()
 	UI.animatedStroke(buttonFrame, GOLD, 4)
 	local here = UI.make("TextLabel", {
 		AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(1, 10, 0.5, 0), Size = UDim2.fromOffset(0, 30), AutomaticSize = Enum.AutomaticSize.X,
-		BackgroundColor3 = Color3.fromRGB(190, 30, 45), Text = "◀ ¡AQUÍ!", TextSize = 16, Font = Enum.Font.GothamBlack,
+		BackgroundColor3 = Color3.fromRGB(190, 30, 45), Text = "◀ HERE!", TextSize = 16, Font = Enum.Font.GothamBlack,
 		TextColor3 = Color3.new(1, 1, 1), ZIndex = 51,
 	}, buttonFrame)
 	UI.make("UIPadding", { PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10) }, here)
@@ -689,9 +689,9 @@ local function build()
 	})
 	dlgHint = UI.label(dialogue, {
 		AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, -16, 1, -8), Size = UDim2.fromOffset(260, 18),
-		Text = "Clic / toca para continuar ▸", TextSize = 12, TextColor3 = UI.Colors.Muted, TextXAlignment = Enum.TextXAlignment.Right, ZIndex = 62,
+		Text = "Click / tap to continue ▸", TextSize = 12, TextColor3 = UI.Colors.Muted, TextXAlignment = Enum.TextXAlignment.Right, ZIndex = 62,
 	})
-	local skipTalk = UI.button(dialogue, "Saltar tutorial", Color3.fromRGB(70, 60, 95), {
+	local skipTalk = UI.button(dialogue, "Skip tutorial", Color3.fromRGB(70, 60, 95), {
 		AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -12, 0, 10), Size = UDim2.fromOffset(120, 26), TextSize = 12, ZIndex = 64,
 	})
 	skipTalk.Activated:Connect(function()
@@ -778,7 +778,7 @@ local function celebrate()
 	Sfx.Play("LevelUp", nil, 1)
 	local title = UI.label(gui, {
 		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.35), Size = UDim2.fromOffset(700, 90),
-		Text = "¡TUTORIAL COMPLETADO!", TextSize = 56, Font = UI.TitleFont, TextXAlignment = Enum.TextXAlignment.Center,
+		Text = "TUTORIAL COMPLETE!", TextSize = 56, Font = UI.TitleFont, TextXAlignment = Enum.TextXAlignment.Center,
 		TextStrokeTransparency = 0, ZIndex = 70,
 	})
 	UI.gradient(title, Color3.new(1, 1, 1), GOLD)
@@ -827,7 +827,7 @@ local function run(fromStep: number)
 			break
 		end
 		Sfx.Play("LevelUp", nil, 0.6)
-		bannerText.Text = rich("¡Hecho!  [" .. step.Text:gsub("[%[%]]", "") .. "]")
+		bannerText.Text = rich("Done!  [" .. step.Text:gsub("[%[%]]", "") .. "]")
 		TweenService:Create(bannerBar, TweenInfo.new(0.4), { Size = UDim2.fromScale(i / #STEPS, 1) }):Play()
 		task.wait(1)
 		banner.Visible = false
@@ -839,7 +839,7 @@ local function run(fromStep: number)
 		clickCatcher.Visible = false
 		active = false
 		cancelled = false
-		CurrencyController.Toast("Tutorial saltado · puedes repetirlo con el botón Tutorial", UI.Colors.Muted)
+		CurrencyController.Toast("Tutorial skipped · you can replay it with the Tutorial button", UI.Colors.Muted)
 		return
 	end
 	talk(OUTRO)
@@ -872,20 +872,20 @@ local function offer(onAccept: () -> ())
 	local vp = Portrait.Create(bust, SPEAKERS.Shiro.Character, "Bust", { Size = UDim2.fromScale(1, 1) })
 	UI.corner(vp, 999)
 	local title = UI.label(card, {
-		Position = UDim2.fromOffset(0, 52), Size = UDim2.new(1, 0, 0, 34), Text = "¿Quieres hacer el tutorial?", TextSize = 26,
+		Position = UDim2.fromOffset(0, 52), Size = UDim2.new(1, 0, 0, 34), Text = "Do you want to play the tutorial?", TextSize = 26,
 		Font = UI.TitleFont, TextXAlignment = Enum.TextXAlignment.Center, TextStrokeTransparency = 0.5,
 	})
 	UI.gradient(title, Color3.new(1, 1, 1), GOLD)
 	UI.label(card, {
 		Position = UDim2.fromOffset(24, 90), Size = UDim2.new(1, -48, 0, 60), TextWrapped = true, TextSize = 14,
 		TextColor3 = UI.Colors.Muted, TextXAlignment = Enum.TextXAlignment.Center,
-		Text = "El profesor Shiro y Kaito te enseñarán la Escuela, el combate y tu primera partida. Al terminar te llevas una recompensa.",
+		Text = "Professor Shiro and Kaito will show you the School, combat and your first match. You'll get a reward at the end.",
 	})
-	local yes = UI.button(card, "¡VAMOS!", UI.Colors.Green, {
+	local yes = UI.button(card, "LET'S GO!", UI.Colors.Green, {
 		AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(0.5, -8, 1, -20), Size = UDim2.fromOffset(170, 44), TextSize = 17,
 	})
 	UI.shine(yes, 1.5)
-	local no = UI.button(card, "Ahora no", Color3.fromRGB(70, 60, 95), {
+	local no = UI.button(card, "Not now", Color3.fromRGB(70, 60, 95), {
 		AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0.5, 8, 1, -20), Size = UDim2.fromOffset(170, 44), TextSize = 15,
 	})
 	local scale = card:FindFirstChildOfClass("UIScale") :: UIScale
@@ -898,7 +898,7 @@ local function offer(onAccept: () -> ())
 	end)
 	no.Activated:Connect(function()
 		offerGui:Destroy()
-		CurrencyController.Toast("Puedes empezar el tutorial cuando quieras con el botón Tutorial", UI.Colors.Muted)
+		CurrencyController.Toast("You can start the tutorial anytime with the Tutorial button", UI.Colors.Muted)
 	end)
 end
 

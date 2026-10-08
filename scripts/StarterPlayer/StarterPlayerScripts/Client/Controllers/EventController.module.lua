@@ -51,10 +51,20 @@ local function showAnnouncement(id: string)
 	end)
 end
 
+-- En plena batalla (partida o historia) no se enseñan los avisos de eventos: tapan el combate
+local function inBattle(): boolean
+	local player = game:GetService("Players").LocalPlayer
+	local activity = player:GetAttribute("Activity")
+	return activity == "Match" or activity == "Story"
+end
+
 local function refresh(announceIt: boolean)
 	local id = info:GetAttribute("Id")
 	local active = id ~= nil and (info:GetAttribute("EndsAt") or 0) > os.time() - 2
-	banner.Visible = active
+	banner.Visible = active and not inBattle()
+	if announceIt and inBattle() then
+		announceIt = false
+	end
 	if active then
 		local color = info:GetAttribute("Color") or Color3.new(1, 1, 1)
 		bannerName.Text = info:GetAttribute("Name") or ""
@@ -100,7 +110,7 @@ function EventController.Start()
 		TextXAlignment = Enum.TextXAlignment.Center, TextStrokeTransparency = 0.3,
 	})
 	local evTag = UI.label(banner, {
-		Position = UDim2.fromOffset(76, 4), Size = UDim2.fromOffset(60, 14), Text = "EVENTO", TextSize = 10, Font = Enum.Font.GothamBlack,
+		Position = UDim2.fromOffset(76, 4), Size = UDim2.fromOffset(60, 14), Text = "EVENT", TextSize = 10, Font = Enum.Font.GothamBlack,
 		TextColor3 = UI.Colors.Gold,
 	})
 	evTag.TextXAlignment = Enum.TextXAlignment.Left
@@ -136,6 +146,13 @@ function EventController.Start()
 
 	-- Cuenta atrás + objetos del evento flotando y girando (solo visual, en tu cliente)
 	RunService.RenderStepped:Connect(function()
+		if banner.Visible and inBattle() then
+			banner.Visible = false
+			announce.Visible = false
+		elseif not banner.Visible and not inBattle() and info:GetAttribute("Id") ~= nil
+			and (info:GetAttribute("EndsAt") or 0) > os.time() then
+			banner.Visible = true -- al volver de la batalla, vuelve el marcador (sin el anuncio grande)
+		end
 		if banner.Visible then
 			local left = math.max(0, (info:GetAttribute("EndsAt") or 0) - os.time())
 			bannerTime.Text = string.format("%d:%02d", left // 60, left % 60)

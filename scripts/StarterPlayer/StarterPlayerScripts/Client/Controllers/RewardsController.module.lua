@@ -61,12 +61,12 @@ local function refresh()
 		card.Glow.Visible = current
 	end
 	progressFill.Size = UDim2.fromScale(done / #RewardsConfig.Daily, 1)
-	progressLabel.Text = `RACHA {done}/{#RewardsConfig.Daily}`
-	claimButton.Text = if claimed then "RECLAMADO · VUELVE MAÑANA" else `¡RECLAMAR DÍA {day}!`
+	progressLabel.Text = `STREAK {done}/{#RewardsConfig.Daily}`
+	claimButton.Text = if claimed then "CLAIMED · COME BACK TOMORROW" else `CLAIM DAY {day}!`
 	claimButton.BackgroundColor3 = if claimed then UI.Colors.Disabled else Color3.fromRGB(60, 200, 90)
 	streakLabel.Text = if player:GetAttribute("VIP")
-		then "VIP: +50% Monedas en cada recompensa diaria"
-		else "Consigue VIP para +50% Monedas en la diaria · Si faltas un día, la racha vuelve al día 1"
+		then "VIP: +50% Coins on every daily reward"
+		else "Get VIP for +50% Coins on the daily reward · Miss a day and the streak resets to day 1"
 	if menuBadge then
 		menuBadge.Visible = not claimed
 	end
@@ -88,7 +88,7 @@ end
 function RewardsController.Start()
 	local gui = UI.screenGui("Rewards", 10)
 	local content
-	frame, content = UI.modal(gui, "🎁 Premios diarios", UDim2.fromOffset(680, 500), UI.Colors.Gold)
+	frame, content = UI.modal(gui, "🎁 Daily Rewards", UDim2.fromOffset(680, 500), UI.Colors.Gold)
 
 	-- Progreso de la racha
 	local bar = UI.make("Frame", { Position = UDim2.fromOffset(150, 4), Size = UDim2.new(1, -150, 0, 18), BackgroundColor3 = Color3.fromRGB(25, 22, 36) }, content)
@@ -110,7 +110,7 @@ function RewardsController.Start()
 			Image = "rbxasset://textures/ui/LuaApp/graphic/shimmer.png", ImageColor3 = Color3.fromRGB(150, 255, 160), ImageTransparency = 0.6, ZIndex = 0, Visible = false,
 		}, card)
 		local title = UI.label(card, {
-			Position = UDim2.fromOffset(0, 4), Size = UDim2.new(1, 0, 0, if big then 34 else 22), Text = `DÍA {i}`,
+			Position = UDim2.fromOffset(0, 4), Size = UDim2.new(1, 0, 0, if big then 34 else 22), Text = `DAY {i}`,
 			TextSize = if big then 30 else 18, Font = Enum.Font.LuckiestGuy, TextXAlignment = Enum.TextXAlignment.Center, TextStrokeTransparency = 0.2,
 		})
 		local iconSide = if big then 110 else 46
@@ -164,14 +164,14 @@ function RewardsController.Start()
 
 	-- Códigos
 	UI.icon(content, "Codes", { Position = UDim2.fromOffset(0, 336), Size = UDim2.fromOffset(34, 34) })
-	UI.label(content, { Position = UDim2.fromOffset(38, 342), Size = UDim2.new(1, -38, 0, 24), Text = "Canjear código", TextSize = 18, Font = Enum.Font.GothamBlack })
+	UI.label(content, { Position = UDim2.fromOffset(38, 342), Size = UDim2.new(1, -38, 0, 24), Text = "Redeem code", TextSize = 18, Font = Enum.Font.GothamBlack })
 	local box = UI.make("TextBox", {
 		Position = UDim2.fromOffset(0, 374), Size = UDim2.new(1, -150, 0, 40), BackgroundColor3 = UI.Colors.Card,
-		Text = "", PlaceholderText = "Escribe un código (Discord, YouTube, TikTok...)", Font = Enum.Font.GothamBold, TextSize = 16,
+		Text = "", PlaceholderText = "Enter a code (Discord, YouTube, TikTok...)", Font = Enum.Font.GothamBold, TextSize = 16,
 		TextColor3 = UI.Colors.Text, PlaceholderColor3 = UI.Colors.Muted, ClearTextOnFocus = false,
 	}, content)
 	UI.corner(box, 8)
-	local redeem = UI.button(content, "Canjear", UI.Colors.Accent, { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, 0, 0, 374), Size = UDim2.fromOffset(140, 40) })
+	local redeem = UI.button(content, "Redeem", UI.Colors.Accent, { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, 0, 0, 374), Size = UDim2.fromOffset(140, 40) })
 	redeem.Activated:Connect(function()
 		if box.Text == "" then
 			return
@@ -191,7 +191,7 @@ function RewardsController.Start()
 		if not column then
 			return
 		end
-		local b = UI.metalButton(column, "Premios", UI.Colors.Gold, "Rewards", { Size = UDim2.fromOffset(196, 48), LayoutOrder = 0 })
+		local b = UI.metalButton(column, "Rewards", UI.Colors.Gold, "Rewards", { Size = UDim2.fromOffset(196, 48), LayoutOrder = 0 })
 		menuBadge = UI.label(b, {
 			AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(1, -4, 0, 4), Size = UDim2.fromOffset(24, 24),
 			BackgroundTransparency = 0, BackgroundColor3 = UI.Colors.Red, Text = "!", TextSize = 14, Font = Enum.Font.GothamBlack,

@@ -17,6 +17,7 @@ local ModelConfig = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChil
 local CharacterRegistry = require(Shared:WaitForChild("CharacterRegistry"))
 local Accessories = require(Shared:WaitForChild("Accessories"))
 local DataService = require(script.Parent:WaitForChild("DataService"))
+local StoreLook = require(script.Parent.Parent:WaitForChild("Builders"):WaitForChild("StoreLook"))
 local ArenaService = require(script.Parent:WaitForChild("ArenaService"))
 
 local FighterService = {}
@@ -35,10 +36,10 @@ function FighterService.ApplyMovement(model: Model)
 	humanoid.UseJumpPower = true
 	if model:GetAttribute("MoveMode") == "Free" then
 		humanoid.WalkSpeed = FREE_WALKSPEED
-		humanoid.JumpPower = FREE_JUMPPOWER
+		humanoid.JumpPower = FREE_JUMPPOWER * (Config.VerticalScale or 1) -- misma altura que antes con menos gravedad
 	else
-		-- SpeedMult / JumpMult: transformaciones de la ulti
-		humanoid.JumpPower = (data.JumpPower or Config.JumpPower) * (model:GetAttribute("JumpMult") or 1)
+		-- SpeedMult / JumpMult: transformaciones de la ulti. JumpScale: saltos más bajos en combate.
+		humanoid.JumpPower = (data.JumpPower or Config.JumpPower) * (Config.JumpScale or 1) * (model:GetAttribute("JumpMult") or 1)
 		humanoid.WalkSpeed = (data.WalkSpeed or Config.WalkSpeed) * (model:GetAttribute("SpeedMult") or 1)
 	end
 end
@@ -125,90 +126,29 @@ local function attachedBodyPart(part: BasePart): string?
 	return nil
 end
 
-local function applyImportedLook(model: Model, template: Model)
-	local source = template:Clone()
-	stripScripts(source)
-	local humanoid = model:FindFirstChildOfClass("Humanoid")
-
-	-- Ropa clásica, colores del cuerpo y cara
-	for _, className in { "Shirt", "Pants", "ShirtGraphic", "BodyColors" } do
-		local item = source:FindFirstChildOfClass(className)
-		if item then
-			local old = model:FindFirstChildOfClass(className)
-			if old then
-				old:Destroy()
-			end
-			item.Parent = model
-		end
+-- Viste el rig con el modelo importado (Creator Store): ver Builders/StoreLook
+local function applyImportedLook(model: Model, template: Model, data)
+	StoreLook.ApplyTemplate(model, template, data.Id)
+	-- Si el modelo ya trae sus propias armas (atributo NoExtraWeapons), no se le añaden otras encima
+	if template:GetAttribute("NoExtraWeapons") then
+		return
 	end
-	local srcHead = source:FindFirstChild("Head")
-	local head = model:FindFirstChild("Head")
-	if srcHead and head then
-		local face = srcHead:FindFirstChildWhichIsA("Decal")
-		if face then
-			local old = head:FindFirstChild("face")
-			if old then
-				old:Destroy()
-			end
-			face.Name = "face"
-			face.Parent = head
-		end
-		local headMesh = srcHead:FindFirstChildWhichIsA("SpecialMesh")
-		if headMesh then
-			local old = head:FindFirstChildWhichIsA("SpecialMesh")
-			if old then
-				old:Destroy()
-			end
-			headMesh.Parent = head
-		end
-	end
-	-- Mallas de cuerpo R6 (CharacterMesh)
-	for _, d in source:GetChildren() do
-		if d:IsA("CharacterMesh") then
-			d.Parent = model
-		end
-	end
-	-- Accesorios (pelo, sombreros, armas a la espalda...): Roblox los coloca por sus attachments
-	for _, d in source:GetDescendants() do
-		if d:IsA("Accessory") and humanoid then
-			local handle = d:FindFirstChild("Handle")
-			if handle and handle:IsA("BasePart") then
-				for _, w in handle:GetChildren() do
-					if w:IsA("JointInstance") or w:IsA("WeldConstraint") then
-						w:Destroy()
-					end
+	-- Las armas (katanas, martillo, bastón...) se mantienen encima del modelo importado
+	local meshes = ModelConfig.Characters[data.Id]
+	if meshes then
+		local weapons = {}
+		for _, piece in meshes.Base do
+			for _, word in { "Blade", "Hilt", "Hammer", "Staff", "SpearHead", "Dagger" } do
+				if piece.Mesh:find(word) then
+					table.insert(weapons, piece)
+					break
 				end
-				handle.Anchored = false
-				handle.CanCollide = false
-				handle.Massless = true
-			end
-			pcall(humanoid.AddAccessory, humanoid, d)
-		end
-	end
-	-- Piezas sueltas pegadas al cuerpo (pelo hecho con partes, armaduras...): se sueldan a la misma parte
-	for _, part in source:GetDescendants() do
-		if part:IsA("BasePart") and not R15_TO_R6[part.Name] and not part:FindFirstAncestorOfClass("Accessory") then
-			local bodyName = attachedBodyPart(part)
-			local srcBody = bodyName and source:FindFirstChild(bodyName, true)
-			local body = bodyName and model:FindFirstChild(bodyName)
-			if body and srcBody and srcBody:IsA("BasePart") then
-				local offset = srcBody.CFrame:ToObjectSpace(part.CFrame)
-				for _, j in part:GetJoints() do
-					j:Destroy()
-				end
-				part.Anchored = false
-				part.CanCollide = false
-				part.Massless = true
-				part.CFrame = body.CFrame * offset
-				part.Parent = model
-				local weld = Instance.new("WeldConstraint")
-				weld.Part0 = body
-				weld.Part1 = part
-				weld.Parent = part
 			end
 		end
+		if #weapons > 0 then
+			Accessories.BuildMeshes(model, weapons, ServerStorage:FindFirstChild("MeshLibrary"))
+		end
 	end
-	source:Destroy()
 end
 
 local function buildModel(characterId: string, skinId: string?, plain: boolean?): Model
@@ -259,7 +199,7 @@ local function buildModel(characterId: string, skinId: string?, plain: boolean?)
 	end
 	local faceId = (ClothingConfig.Characters[data.Id] or {}).Face
 	local head = model:FindFirstChild("Head")
-	if faceId and faceId ~= 0 and head and not plain then
+	if faceId and faceId ~= 0 and head and not plain and not imported then
 		local decal = head:FindFirstChild("face") or Instance.new("Decal")
 		decal.Name = "face"
 		decal.Face = Enum.NormalId.Front
@@ -269,7 +209,17 @@ local function buildModel(characterId: string, skinId: string?, plain: boolean?)
 	-- Pelo, armas, sombreros, cuerpos de maldición: modelos de Blender (si están importados);
 	-- si no, las piezas simples de antes
 	if imported then
-		applyImportedLook(model, imported)
+		applyImportedLook(model, imported, data)
+		-- Las skins tiñen la ropa del modelo
+		if skin and skin.Colors then
+			for _, c in model:GetChildren() do
+				if c:IsA("Shirt") then
+					c.Color3 = skin.Colors.Torso:Lerp(Color3.new(1, 1, 1), 0.35)
+				elseif c:IsA("Pants") then
+					c.Color3 = skin.Colors.Legs:Lerp(Color3.new(1, 1, 1), 0.35)
+				end
+			end
+		end
 	elseif not plain then
 		local library = game:GetService("ServerStorage"):FindFirstChild("MeshLibrary")
 		local meshes = ModelConfig.Characters[data.Id]
@@ -424,9 +374,31 @@ function FighterService.RefreshCosmetics(player: Player)
 end
 
 -- Tecla T (atajo): rota entre los personajes que el jugador POSEE.
+-- En el Dojo (modo práctica) rota entre TODOS: los que no tienes se prueban (como "Probar" en la tienda).
+-- Antes, con un solo personaje comprado la T no hacía nada.
 function FighterService.CycleCharacter(player: Player)
 	local data = DataService.Get(player)
 	if not data then
+		return
+	end
+	if player:GetAttribute("ArenaId") == "Hub" then
+		local all = {}
+		for _, id in CharacterRegistry.GetOrder() do
+			if CatalogConfig.Characters[id] then
+				table.insert(all, id)
+			end
+		end
+		if #all <= 1 then
+			return
+		end
+		local index = table.find(all, FighterService.CurrentCharacter(player)) or 0
+		local nextId = all[index % #all + 1]
+		if data.OwnedCharacters[nextId] then
+			player:SetAttribute("TrialCharacter", nil)
+			FighterService.SelectCharacter(player, nextId)
+		else
+			FighterService.TryCharacter(player, nextId)
+		end
 		return
 	end
 	local owned = {}
@@ -587,7 +559,7 @@ local function createDummy(): Model?
 	model:SetAttribute("IsDummy", true)
 	model:SetAttribute("ArenaId", "Hub")
 	FighterService.SetupFighter(model, "Brawler", nil)
-	model:SetAttribute("DisplayName", "Muñeco de práctica")
+	model:SetAttribute("DisplayName", "Training dummy")
 	local humanoid = model:FindFirstChildOfClass("Humanoid") :: Humanoid
 	humanoid.WalkSpeed = 0
 	humanoid.JumpPower = 0

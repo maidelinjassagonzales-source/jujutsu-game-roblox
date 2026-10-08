@@ -1,13 +1,13 @@
 -- CombatController: lee los inputs de combate y los envía al servidor.
 -- Controles:
 --   Clic izq / J / X(mando)   -> Golpe (ligero)
---   Clic der / K / Y(mando)   -> Fuerte (smash)
+--   Clic der / K / Y(mando)   -> Fuerte (smash). En el suelo, MANTENER para cargarlo (hasta +40% de daño)
 --   E / L / B(mando)          -> Especial
 --   Q / L2 (mantener)         -> ESCUDO. Con escudo: ←/→ = rodar, ↓ = esquiva en el sitio.
 --                                En el aire: esquiva aérea.
 --   G / R2                    -> AGARRE (atraviesa escudos). Lanza hacia la dirección que mantengas.
 --   Mantener A/D (lado), W (arriba), S (abajo) cambia la variante de cada ataque
---   T                         -> cambiar personaje (en el Hub)
+--   T                         -> cambiar personaje (en el Hub; en el Dojo puedes probar cualquiera)
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -16,6 +16,7 @@ local ContextActionService = game:GetService("ContextActionService")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local KnockbackSimulator = require(Shared:WaitForChild("KnockbackSimulator"))
 local CharacterRegistry = require(Shared:WaitForChild("CharacterRegistry"))
+local Config = require(Shared:WaitForChild("CombatConfig"))
 
 local MovementController = require(script.Parent:WaitForChild("MovementController"))
 local CameraController = require(script.Parent:WaitForChild("CameraController"))
@@ -27,17 +28,31 @@ local CombatController = {}
 local request: RemoteEvent
 local animCache = setmetatable({}, { __mode = "k" }) -- [Animator] = { [animId] = AnimationTrack }
 local shieldHeld = false
+local shieldKeyDown = false -- la tecla de escudo sigue pulsada (para volver a levantarlo tras rodar)
+local lastShieldTry = 0
 local lastDodgeX, lastDodgeDown = false, false
+
+-- Carga del ataque fuerte (smash)
+local charge: { Start: number, Dir: string, Facing: number }? = nil
+
+-- Agarre: la dirección del lanzamiento se puede elegir mientras tienes al rival agarrado
+local grabUntil = 0
+local grabFacing = 1
+local lastThrowDir = "Side"
 
 local function inFreeMode(): boolean
 	local character = player.Character
 	return character ~= nil and character:GetAttribute("MoveMode") == "Free"
 end
 
+local function isGrounded(): boolean
+	local _, humanoid = MovementController.GetCharacter()
+	return humanoid ~= nil and humanoid.FloorMaterial ~= Enum.Material.Air
+end
+
 local function getDirectionAndFacing(): (string, number)
 	local mv = MovementController.GetMoveVector()
-	local _, _, hrp = MovementController.GetCharacter()
-	local facing = if hrp and hrp.CFrame.LookVector.X < 0 then -1 else 1
+	local facing = MovementController.GetFacing()
 
 	local horizontal = math.abs(mv.X)
 	local vertical = -mv.Z -- positivo = arriba
@@ -58,6 +73,33 @@ function CombatController.Attack(kind: string)
 	request:FireServer("Attack", kind, dir, facing)
 end
 
+-- Smash cargable: al pulsar empieza la carga (quieto, brillando); al soltar o al llegar al máximo, golpea.
+-- La dirección y el lado se fijan al pulsar, como en Smash. El servidor mide la carga él mismo.
+local function startCharge()
+	local dir, facing = getDirectionAndFacing()
+	charge = { Start = os.clock(), Dir = dir, Facing = facing }
+	MovementController.LockFor(Config.SmashChargeTime + 0.5)
+	request:FireServer("Charge", true)
+end
+
+local function releaseCharge()
+	local c = charge
+	if not c then
+		return
+	end
+	charge = nil
+	MovementController.LockFor(0)
+	request:FireServer("Attack", "Heavy", c.Dir, c.Facing)
+end
+
+local function cancelCharge()
+	if charge then
+		charge = nil
+		MovementController.LockFor(0)
+		request:FireServer("Charge", false)
+	end
+end
+
 function CombatController.Shield(on: boolean)
 	if inFreeMode() then
 		return
@@ -67,6 +109,9 @@ function CombatController.Shield(on: boolean)
 		request:FireServer("Dodge", "Air") -- escudo en el aire = esquiva aérea
 		return
 	end
+	if on then
+		lastShieldTry = os.clock()
+	end
 	shieldHeld = on
 	-- Si ya mantenías una dirección al levantar el escudo, hay que soltarla y volver a pulsarla para esquivar
 	local mv = MovementController.GetMoveVector()
@@ -74,32 +119,63 @@ function CombatController.Shield(on: boolean)
 	request:FireServer("Shield", on)
 end
 
+-- Dirección del lanzamiento respecto al lado hacia el que se agarró
+local function throwDirection(facing: number): string
+	local mv = MovementController.GetMoveVector()
+	if -mv.Z > 0.5 then
+		return "Up"
+	elseif mv.Z > 0.5 then
+		return "Down"
+	elseif math.abs(mv.X) > 0.3 and math.sign(mv.X) ~= facing then
+		return "Back" -- lanzar hacia atrás
+	end
+	return "Side"
+end
+
 function CombatController.Grab()
 	if inFreeMode() then
 		return
 	end
-	local mv = MovementController.GetMoveVector()
-	local _, _, hrp = MovementController.GetCharacter()
-	local facing = if hrp and hrp.CFrame.LookVector.X < 0 then -1 else 1
-	local dir = "Side"
-	if -mv.Z > 0.5 then
-		dir = "Up"
-	elseif mv.Z > 0.5 then
-		dir = "Down"
-	elseif math.abs(mv.X) > 0.3 and math.sign(mv.X) ~= facing then
-		dir = "Back" -- lanzar hacia atrás
+	grabFacing = MovementController.GetFacing()
+	lastThrowDir = throwDirection(grabFacing)
+	if isGrounded() then
+		-- Quieto y sin girarse mientras agarra: así A/D eligen lanzar delante/detrás
+		grabUntil = os.clock() + Config.Defense.GrabStartup + Config.Defense.GrabActive + 0.1
+		MovementController.LockFor(grabUntil - os.clock())
 	end
-	request:FireServer("Grab", dir, facing)
+	request:FireServer("Grab", lastThrowDir, grabFacing)
 end
 
 local function onAction(actionName: string, inputState: Enum.UserInputState)
 	if actionName == "Shield" then
 		if inputState == Enum.UserInputState.Begin then
-			CombatController.Shield(true)
+			shieldKeyDown = true
+			if not charge then
+				CombatController.Shield(true)
+			end
 		elseif inputState == Enum.UserInputState.End or inputState == Enum.UserInputState.Cancel then
-			if shieldHeld then
+			shieldKeyDown = false
+			local character = player.Character
+			if shieldHeld or (character and character:GetAttribute("Shielding")) then
 				CombatController.Shield(false)
 			end
+		end
+		return Enum.ContextActionResult.Sink
+	end
+	if actionName == "Heavy" then
+		if inputState == Enum.UserInputState.Begin then
+			if inFreeMode() then
+				return Enum.ContextActionResult.Pass -- en el Lobby el clic derecho es para la cámara
+			end
+			if not charge then
+				if isGrounded() and not shieldHeld and not KnockbackSimulator.IsActive(player.Character) then
+					startCharge()
+				else
+					CombatController.Attack("Heavy") -- en el aire no se carga
+				end
+			end
+		elseif inputState == Enum.UserInputState.End or inputState == Enum.UserInputState.Cancel then
+			releaseCharge()
 		end
 		return Enum.ContextActionResult.Sink
 	end
@@ -108,6 +184,9 @@ local function onAction(actionName: string, inputState: Enum.UserInputState)
 	end
 	if inFreeMode() and actionName ~= "SwapCharacter" then
 		return Enum.ContextActionResult.Pass -- en el Lobby el clic derecho es para la cámara y E abre los puestos
+	end
+	if charge and actionName ~= "SwapCharacter" then
+		return Enum.ContextActionResult.Sink -- cargando un smash no se hace otra cosa
 	end
 	if actionName == "Ultimate" then
 		CombatController.Ultimate()
@@ -156,6 +235,9 @@ local function onFeedback(kind: string, a, b, c)
 	if kind == "Knockback" then
 		-- a = velocidad, b = hitstun
 		shieldHeld = false
+		charge = nil -- un golpe corta la carga (el servidor también la cancela)
+		grabUntil = 0
+		MovementController.LockFor(0)
 		KnockbackSimulator.Apply(character, a, b)
 		if a.Magnitude > 1 then
 			CameraController.Shake(math.clamp(a.Magnitude / 60, 0.3, 2), 0.2)
@@ -169,8 +251,15 @@ local function onFeedback(kind: string, a, b, c)
 			hrp.AssemblyLinearVelocity = c
 		end
 		playMoveAnimation(character, b)
+	elseif kind == "Grabbed" and a == character then
+		-- Tienes a alguien agarrado: hasta el lanzamiento puedes elegir dirección (sin girarte)
+		grabUntil = os.clock() + Config.Defense.GrabHold
+		MovementController.LockFor(Config.Defense.GrabHold + 0.1)
 	elseif kind == "Respawned" then
 		shieldHeld = false
+		charge = nil
+		grabUntil = 0
+		MovementController.LockFor(0)
 		KnockbackSimulator.Cancel(character)
 		MovementController.ResetAirJumps()
 		if hrp then
@@ -201,8 +290,33 @@ function CombatController.Start()
 	ContextActionService:BindAction("SwapCharacter", onAction, false, Enum.KeyCode.T, Enum.KeyCode.ButtonR3)
 	ContextActionService:BindAction("Ultimate", onAction, false, Enum.KeyCode.R, Enum.KeyCode.DPadUp)
 
-	-- Con el escudo puesto, un toque de dirección = esquiva (rodar o en el sitio)
 	RunService.Heartbeat:Connect(function()
+		local now = os.clock()
+		local character = player.Character
+
+		-- Smash cargado al máximo: se suelta solo
+		if charge and now - charge.Start >= Config.SmashChargeTime then
+			releaseCharge()
+		end
+
+		-- Agarrando: actualizar la dirección del lanzamiento si cambia
+		if now < grabUntil then
+			local dir = throwDirection(grabFacing)
+			if dir ~= lastThrowDir then
+				lastThrowDir = dir
+				request:FireServer("ThrowDir", dir)
+			end
+		end
+
+		-- Escudo mantenido: si se cayó (tras rodar, esquivar o recibir un golpe) se vuelve a levantar
+		-- en cuanto se pueda, sin tener que soltar y volver a pulsar la tecla
+		if shieldKeyDown and not charge and character and not character:GetAttribute("Shielding")
+			and not inFreeMode() and isGrounded() and not KnockbackSimulator.IsActive(character)
+			and now - lastShieldTry > 0.2 then
+			CombatController.Shield(true)
+		end
+
+		-- Con el escudo puesto, un toque de dirección = esquiva (rodar o en el sitio)
 		if not shieldHeld then
 			return
 		end

@@ -747,14 +747,14 @@ end
 
 -- Qué estilo usa cada técnica (por su nombre)
 local PROJECTILE_STYLE = {
-	["Azul: Atracción"] = "Blue", ["Rojo: Repulsión"] = "Red", ["Púrpura Hueco"] = "Purple", ["Técnica Inversa: Púrpura Hueco"] = "Purple",
-	["Desmantelar"] = "Dismantle", ["Flecha de Fuego"] = "FireArrow", ["Perros Divinos"] = "Dogs",
-	["Perforación de Sangre"] = "BloodBeam", ["Sangre Perforante"] = "BloodBeam", ["Bala de Sangre"] = "BloodBullet",
-	["Escupitajo Maldito"] = "Spit", ["Maldición Invocada"] = "CurseSpirit", ["Enjambre Maldito"] = "Swarm", ["Vórtice Maldito"] = "Vortex",
-	["Uzumaki Máximo"] = "Vortex", ["Esfera Espiral"] = "Rasengan", ["Kunai"] = "Kunai", ["Puertas Corredizas"] = "Doors",
-	["Onda Celestial"] = "Kamehameha", ["Clavos"] = "Nails", ["Horquilla"] = "Hairpin", ["Alma Disparada"] = "Soul",
-	["Tajo Maldito"] = "CrescentWhite", ["¡Ven, Reina Maldita!"] = "Rika", ["Corte Volador"] = "CrescentGreen", ["Asura: Ichibugin"] = "CrescentGreen",
-	["Daga Arrojadiza"] = "Dagger", ["Bola de Magma"] = "Magma", ["Insectos de Fuego"] = "FireBugs",
+	["Blue: Attraction"] = "Blue", ["Red: Repulsion"] = "Red", ["Hollow Purple"] = "Purple", ["Reverse Technique: Hollow Purple"] = "Purple",
+	["Dismantle"] = "Dismantle", ["Fire Arrow"] = "FireArrow", ["Divine Dogs"] = "Dogs",
+	["Piercing Blood"] = "BloodBeam", ["Piercing Blood"] = "BloodBeam", ["Blood Bullet"] = "BloodBullet",
+	["Cursed Spit"] = "Spit", ["Summoned Curse"] = "CurseSpirit", ["Cursed Swarm"] = "Swarm", ["Cursed Vortex"] = "Vortex",
+	["Maximum Uzumaki"] = "Vortex", ["Spiral Sphere"] = "Rasengan", ["Kunai"] = "Kunai", ["Sliding Doors"] = "Doors",
+	["Celestial Wave"] = "Kamehameha", ["Nails"] = "Nails", ["Hairpin"] = "Hairpin", ["Soul Shot"] = "Soul",
+	["Cursed Slash"] = "CrescentWhite", ["Come, Cursed Queen!"] = "Rika", ["Flying Slash"] = "CrescentGreen", ["Asura: Ichibugin"] = "CrescentGreen",
+	["Throwing Dagger"] = "Dagger", ["Magma Ball"] = "Magma", ["Fire Insects"] = "FireBugs",
 }
 
 -- Explosión final de cada estilo
@@ -782,7 +782,7 @@ local IMPACT = {
 	Hairpin = function(pos, d)
 		fireBurst(pos, C(255, 230, 150), C(255, 120, 40), 35, d * 1.2)
 		ring(pos, C(255, 150, 60), d * 6, 0.45)
-		floatText(pos + Vector3.new(0, 2, 0), "¡BOOM!", C(255, 180, 80), 34)
+		floatText(pos + Vector3.new(0, 2, 0), "BOOM!", C(255, 180, 80), 34)
 	end,
 	FireArrow = function(pos, d)
 		fireBurst(pos, C(255, 230, 150), C(255, 80, 10), 45, d * 1.4)
@@ -935,12 +935,12 @@ local POSE_FX = {
 	end,
 	Clap = function(m, color, f, at)
 		ring(at + Vector3.new(0, 1, 0), WHITE, 14, 0.35)
-		floatText(at + Vector3.new(0, 4, 0), "¡CLAP!", C(255, 220, 160), 28)
+		floatText(at + Vector3.new(0, 4, 0), "CLAP!", C(255, 220, 160), 28)
 	end,
 }
 
 -- Técnicas con efecto propio (por nombre)
-Moves["Puño Divergente"] = function(m, color, f, at)
+Moves["Divergent Fist"] = function(m, color, f, at)
 	POSE_FX.Haymaker(m, color, f, at)
 	-- segundo impacto retardado (la energía maldita llega un instante después)
 	task.delay(0.25, function()
@@ -949,15 +949,15 @@ Moves["Puño Divergente"] = function(m, color, f, at)
 		sparks(h, C(60, 180, 255), 18, 35)
 	end)
 end
-Moves["Embestida Maldita"] = function(m, color, f, at)
+Moves["Cursed Rush"] = function(m, color, f, at)
 	afterimages(m, color, 0.35)
 end
-Moves["Impacto Sísmico"] = function(m, color, f, at)
+Moves["Seismic Impact"] = function(m, color, f, at)
 	task.delay(0.15, function()
 		groundShock(rootPos(m) or at, color, 22)
 	end)
 end
-Moves["Puño Destello Negro"] = function(m, color, f, at)
+Moves["Black Flash Fist"] = function(m, color, f, at)
 	local h = (handPos(m) or at) + Vector3.new(f * 2, 0, 0)
 	for _ = 1, 6 do
 		local a = math.random() * math.pi * 2
@@ -965,22 +965,22 @@ Moves["Puño Destello Negro"] = function(m, color, f, at)
 	end
 	floatText(h + Vector3.new(0, 2, 0), "黒閃", C(255, 50, 60), 30)
 end
-Moves["Partir"] = function(m, color, f, at)
+Moves["Cleave"] = function(m, color, f, at)
 	-- Cleave: corte enorme en cruz
 	slashArc(at + Vector3.new(f * 3, 1, 0), f, WHITE, 7, 110, -70, 0.9, C(255, 40, 40))
 	task.delay(0.08, slashArc, at + Vector3.new(f * 3, 1, 0), -f, WHITE, 7, 110, -70, 0.9, C(255, 40, 40))
 end
-Moves["Ascenso del Rey"] = function(m, color, f, at)
+Moves["King's Ascent"] = function(m, color, f, at)
 	column(at, C(200, 20, 20), 14, 4)
 	fireBurst(at, C(255, 160, 120), C(150, 0, 0), 20, 2)
 end
-Moves["Nue: Picado"] = function(m, color, f, at)
+Moves["Nue: Dive"] = function(m, color, f, at)
 	afterimages(m, C(255, 240, 150), 0.3)
 	for _ = 1, 4 do
 		bolt(at, at + Vector3.new(math.random(-4, 4), math.random(-4, 4), 0), C(255, 250, 180), 0.2)
 	end
 end
-Moves["Nue: Ascenso"] = function(m, color, f, at)
+Moves["Nue: Ascent"] = function(m, color, f, at)
 	-- alas de Nue + electricidad
 	for _, side in { -1, 1 } do
 		local wing = part({ Size = Vector3.new(4, 0.2, 1.5), CFrame = CFrame.new(at + Vector3.new(side * 2.5, 1, 0)) * CFrame.Angles(0, 0, math.rad(side * 20)), Color = C(240, 240, 255), Transparency = 0.2 })
@@ -988,7 +988,7 @@ Moves["Nue: Ascenso"] = function(m, color, f, at)
 	end
 	POSE_FX.Rise(m, C(255, 250, 180), f, at)
 end
-Moves["Mar de Sombras"] = function(m, color, f, at)
+Moves["Sea of Shadows"] = function(m, color, f, at)
 	local ground = at - Vector3.new(0, 2.9, 0)
 	local pool = part({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.2, 2, 2), CFrame = CFrame.new(ground) * CFrame.Angles(0, 0, math.rad(90)), Color = C(5, 5, 12), Material = Enum.Material.Glass })
 	TweenService:Create(pool, TweenInfo.new(0.2), { Size = Vector3.new(0.2, 18, 18) }):Play()
@@ -1002,7 +1002,7 @@ Moves["Mar de Sombras"] = function(m, color, f, at)
 		end)
 	end
 end
-Moves["Paso Infinito"] = function(m, color, f, at)
+Moves["Infinite Step"] = function(m, color, f, at)
 	local r = ball(3, C(120, 190, 255), { Position = at, Material = Enum.Material.ForceField })
 	fade(r, 0.35, { Size = Vector3.one * 9 })
 	afterimages(m, C(150, 210, 255), 0.25)
@@ -1016,28 +1016,28 @@ Moves["Ratio 7:3"] = function(m, color, f, at)
 	floatText(center + Vector3.new(0, 3, 0), "7:3", C(255, 220, 120), 26)
 	task.delay(0.15, POSE_FX.Slash, m, color, f, at)
 end
-Moves["Horas Extra"] = function(m, color, f, at)
+Moves["Overtime"] = function(m, color, f, at)
 	afterimages(m, C(240, 210, 130), 0.3)
 end
-Moves["Colapso"] = function(m, color, f, at)
+Moves["Collapse"] = function(m, color, f, at)
 	task.delay(0.15, groundShock, at, C(220, 200, 140), 20)
 end
-Moves["Lluvia de Clones"] = function(m, color, f, at)
+Moves["Clone Rain"] = function(m, color, f, at)
 	for i = -2, 2 do
 		smokePuff(at + Vector3.new(i * 2.5, 3, 0), WHITE, 6, 1.2)
 	end
 	task.delay(0.2, groundShock, at, color, 14)
 end
-Moves["Doble o Nada"] = function(m, color, f, at)
+Moves["Double or Nothing"] = function(m, color, f, at)
 	floatText(at + Vector3.new(0, 4, 0), "x2", C(120, 255, 140), 30)
 	POSE_FX.Jab(m, C(120, 255, 140), f, at)
 end
-Moves["¡JACKPOT!"] = function(m, color, f, at)
+Moves["JACKPOT!"] = function(m, color, f, at)
 	floatText(at + Vector3.new(0, 4, 0), "7 7 7", C(255, 225, 60), 34)
 	sparks(at, C(255, 225, 60), 30, 40)
 	task.delay(0.15, groundShock, at, C(120, 255, 140), 16)
 end
-Moves["Pistola Elástica"] = function(m, color, f, at)
+Moves["Rubber Pistol"] = function(m, color, f, at)
 	-- el brazo se estira como goma
 	local shoulder = at + Vector3.new(f * 0.8, 0.6, 0)
 	local arm = part({ Size = Vector3.new(0.9, 0.9, 1), CFrame = CFrame.lookAt(shoulder, shoulder + Vector3.new(f, 0, 0)), Color = C(235, 200, 165), Material = Enum.Material.SmoothPlastic })
@@ -1053,15 +1053,15 @@ Moves["Pistola Elástica"] = function(m, color, f, at)
 		Debris:AddItem(fist, 0.15)
 	end)
 end
-Moves["Bazuca Elástica"] = function(m, color, f, at)
-	Moves["Pistola Elástica"](m, color, f, at + Vector3.new(0, 0.8, 0))
-	Moves["Pistola Elástica"](m, color, f, at - Vector3.new(0, 0.6, 0))
+Moves["Rubber Bazooka"] = function(m, color, f, at)
+	Moves["Rubber Pistol"](m, color, f, at + Vector3.new(0, 0.8, 0))
+	Moves["Rubber Pistol"](m, color, f, at - Vector3.new(0, 0.6, 0))
 	task.delay(0.12, ring, at + Vector3.new(f * 9, 0, 0), C(255, 240, 200), 12, 0.35)
 end
-Moves["Martillo Elástico"] = function(m, color, f, at)
+Moves["Rubber Hammer"] = function(m, color, f, at)
 	task.delay(0.2, groundShock, at + Vector3.new(f * 3, 0, 0), C(255, 220, 200), 16)
 end
-Moves["Cohete Elástico"] = function(m, color, f, at)
+Moves["Rubber Rocket"] = function(m, color, f, at)
 	POSE_FX.Rise(m, WHITE, f, at)
 end
 local function water(m, f, at, radius: number)
@@ -1070,30 +1070,30 @@ local function water(m, f, at, radius: number)
 	burstAt(at, 25, { Texture = TEX_SPARK, Color = ColorSequence.new(C(200, 235, 255), blue), Size = NumberSequence.new(0.7, 0),
 		Lifetime = NumberRange.new(0.3, 0.6), Speed = NumberRange.new(8, 18), SpreadAngle = Vector2.new(180, 180), Acceleration = Vector3.new(0, -30, 0) })
 end
-Moves["Rueda de Agua"] = function(m, color, f, at)
+Moves["Water Wheel"] = function(m, color, f, at)
 	water(m, f, at + Vector3.new(f * 2, 0, 0), 4)
 end
-Moves["Flujo Torrencial"] = function(m, color, f, at)
+Moves["Torrential Flow"] = function(m, color, f, at)
 	afterimages(m, C(120, 190, 255), 0.3)
 	slashArc(at + Vector3.new(f * 2, 0, 0), f, C(60, 160, 255), 5, 60, -60, 0.6, C(200, 235, 255))
 end
-Moves["Cascada Ascendente"] = function(m, color, f, at)
+Moves["Rising Waterfall"] = function(m, color, f, at)
 	column(at, C(80, 170, 255), 12, 3, Enum.Material.Glass)
 end
-Moves["Danza del Dios del Fuego"] = function(m, color, f, at)
+Moves["Fire God Dance"] = function(m, color, f, at)
 	slashArc(at + Vector3.new(f * 1.5, 0, 0), f, C(255, 120, 30), 5, 120, -120, 0.8, C(255, 230, 150))
 	fireBurst(at + Vector3.new(f * 3, 0, 0), C(255, 230, 150), C(255, 70, 0), 25, 2)
 end
-Moves["Lanza Maldita"] = function(m, color, f, at)
+Moves["Cursed Spear"] = function(m, color, f, at)
 	POSE_FX.Thrust(m, C(150, 255, 170), f, at)
 end
-Moves["Carga Imparable"] = function(m, color, f, at)
+Moves["Unstoppable Charge"] = function(m, color, f, at)
 	afterimages(m, C(90, 230, 140), 0.35)
 end
-Moves["Barrido Giratorio"] = function(m, color, f, at)
+Moves["Spinning Sweep"] = function(m, color, f, at)
 	slashArc(at - Vector3.new(0, 1.5, 0), 1, C(150, 255, 170), 5, 0, 360, 0.4)
 end
-Moves["Cadena Infinita"] = function(m, color, f, at)
+Moves["Infinite Chain"] = function(m, color, f, at)
 	-- cadena que se estira hacia delante
 	local from = at + Vector3.new(f, 0.4, 0)
 	for i = 1, 10 do
@@ -1105,38 +1105,38 @@ Moves["Cadena Infinita"] = function(m, color, f, at)
 		end)
 	end
 end
-Moves["Asalto Invisible"] = function(m, color, f, at)
+Moves["Invisible Assault"] = function(m, color, f, at)
 	afterimages(m, C(120, 120, 130), 0.3, 0.04)
 end
-Moves["Caída del Cazador"] = function(m, color, f, at)
+Moves["Hunter's Drop"] = function(m, color, f, at)
 	task.delay(0.15, groundShock, at, C(120, 120, 130), 16)
 end
-Moves["Erupción"] = function(m, color, f, at)
+Moves["Eruption"] = function(m, color, f, at)
 	for i = -1, 1 do
 		task.delay(0.1 + (i + 1) * 0.05, column, at + Vector3.new(i * 4, 0, 0), C(255, 110, 20), 10, 3)
 	end
 	fireBurst(at, C(255, 220, 120), C(255, 60, 0), 30, 2.5)
 end
-Moves["Géiser"] = function(m, color, f, at)
+Moves["Geyser"] = function(m, color, f, at)
 	column(at, C(255, 140, 40), 14, 3.5)
 	smokePuff(at - Vector3.new(0, 2.5, 0), C(80, 60, 50), 10, 1.5)
 end
-Moves["Meteoro de Sangre"] = function(m, color, f, at)
+Moves["Blood Meteor"] = function(m, color, f, at)
 	task.delay(0.15, function()
 		groundShock(at, C(200, 0, 30), 16)
 		IMPACT.BloodBeam(at, 4)
 	end)
 end
-Moves["Impulso Carmesí"] = function(m, color, f, at)
+Moves["Crimson Rush"] = function(m, color, f, at)
 	POSE_FX.Rise(m, C(220, 20, 40), f, at)
 end
-Moves["Transfiguración: Brazo Largo"] = function(m, color, f, at)
+Moves["Transfiguration: Long Arm"] = function(m, color, f, at)
 	local shoulder = at + Vector3.new(f * 0.8, 0.6, 0)
 	local arm = part({ Size = Vector3.new(1.4, 1.4, 1), CFrame = CFrame.lookAt(shoulder, shoulder + Vector3.new(f, 0, 0)), Color = C(160, 180, 200), Material = Enum.Material.SmoothPlastic })
 	TweenService:Create(arm, TweenInfo.new(0.12), { Size = Vector3.new(1.6, 1.6, 10), CFrame = CFrame.lookAt(shoulder + Vector3.new(f * 5, 0, 0), shoulder + Vector3.new(f * 10, 0, 0)) }):Play()
 	task.delay(0.25, fade, arm, 0.25)
 end
-Moves["Púas del Alma"] = function(m, color, f, at)
+Moves["Soul Spikes"] = function(m, color, f, at)
 	local ground = at - Vector3.new(0, 2.9, 0)
 	for i = -3, 3 do
 		local base = ground + Vector3.new(i * 1.8, 0, 0)
@@ -1147,38 +1147,38 @@ Moves["Púas del Alma"] = function(m, color, f, at)
 		end)
 	end
 end
-Moves["Alas Remodeladas"] = function(m, color, f, at)
-	Moves["Nue: Ascenso"](m, C(170, 190, 215), f, at)
+Moves["Remodeled Wings"] = function(m, color, f, at)
+	Moves["Nue: Ascent"](m, C(170, 190, 215), f, at)
 end
-Moves["Estocada Relámpago"] = function(m, color, f, at)
+Moves["Lightning Thrust"] = function(m, color, f, at)
 	afterimages(m, C(200, 160, 255), 0.25)
 	POSE_FX.Thrust(m, C(200, 160, 255), f, at)
 end
-Moves["Ogro Cortador"] = function(m, color, f, at)
+Moves["Ogre Cutter"] = function(m, color, f, at)
 	afterimages(m, C(120, 230, 150), 0.25)
 	slashArc(at + Vector3.new(f * 2, 0.5, 0), f, C(150, 255, 170), 5, 40, -40, 0.7, WHITE)
 end
-Moves["Tornado de Tres Espadas"] = function(m, color, f, at)
+Moves["Three-Sword Tornado"] = function(m, color, f, at)
 	for i = 0, 3 do
 		task.delay(i * 0.06, slashArc, at + Vector3.new(0, -1 + i * 1.2, 0), 1, C(150, 255, 170), 4 + i * 0.5, i * 90, i * 90 + 360, 0.35)
 	end
 end
-Moves["Corte del Dragón"] = function(m, color, f, at)
+Moves["Dragon Cut"] = function(m, color, f, at)
 	slashArc(at, f, C(150, 255, 170), 4, -90, 270, 0.4, WHITE)
 	POSE_FX.Rise(m, C(150, 255, 170), f, at)
 end
-Moves["Torbellino de Dagas"] = function(m, color, f, at)
+Moves["Dagger Whirlwind"] = function(m, color, f, at)
 	for i = 0, 2 do
 		task.delay(i * 0.07, slashArc, at, 1, C(230, 210, 150), 4 + i, i * 120, i * 120 + 360, 0.3)
 	end
 end
-Moves["Estocada Vikinga"] = function(m, color, f, at)
+Moves["Viking Thrust"] = function(m, color, f, at)
 	POSE_FX.Thrust(m, C(230, 210, 150), f, at)
 end
-Moves["Embestida Dorada"] = function(m, color, f, at)
+Moves["Golden Rush"] = function(m, color, f, at)
 	afterimages(m, C(255, 215, 60), 0.35)
 end
-Moves["Puño del Dragón"] = function(m, color, f, at)
+Moves["Dragon Fist"] = function(m, color, f, at)
 	-- dragón dorado que sube enroscándose
 	for i = 0, 10 do
 		task.delay(i * 0.02, function()
@@ -1188,14 +1188,14 @@ Moves["Puño del Dragón"] = function(m, color, f, at)
 		end)
 	end
 end
-Moves["Teletransporte"] = function(m, color, f, at)
+Moves["Teleport"] = function(m, color, f, at)
 	fade(ball(1, WHITE, { Position = at }), 0.2, { Size = Vector3.one * 6 })
-	floatText(at + Vector3.new(0, 3, 0), "¡ZAS!", WHITE, 24)
+	floatText(at + Vector3.new(0, 3, 0), "WHAM!", WHITE, 24)
 end
-Moves["Tren de Mercancías"] = function(m, color, f, at)
+Moves["Freight Train"] = function(m, color, f, at)
 	afterimages(m, C(220, 170, 110), 0.35)
 end
-Moves["Resonancia"] = function(m, color, f, at)
+Moves["Resonance"] = function(m, color, f, at)
 	-- muñeco de paja + clavo + onda de resonancia
 	local doll = part({ Size = Vector3.new(1.2, 2, 0.6), Position = at + Vector3.new(f * 2.5, 0.5, 0), Color = C(200, 170, 100), Material = Enum.Material.Fabric })
 	task.delay(0.4, fade, doll, 0.2)
@@ -1204,13 +1204,13 @@ Moves["Resonancia"] = function(m, color, f, at)
 		floatText(at + Vector3.new(f * 3, 3, 0), "共鳴り", C(255, 160, 80), 28)
 	end)
 end
-Moves["Martillazo Ascendente"] = function(m, color, f, at)
+Moves["Rising Hammer"] = function(m, color, f, at)
 	slashArc(at, f, C(255, 150, 60), 4, -60, 120, 0.5)
 end
-Moves["Embestida"] = function(m, color, f, at)
+Moves["Rush"] = function(m, color, f, at)
 	afterimages(m, color, 0.3)
 end
-Moves["Mordisco"] = function(m, color, f, at)
+Moves["Bite"] = function(m, color, f, at)
 	local center = at + Vector3.new(f * 2.5, 0.5, 0)
 	for _, s in { 1, -1 } do
 		local jaw = part({ Size = Vector3.new(2, 0.4, 1), Position = center + Vector3.new(0, s * 1.2, 0), Color = C(230, 220, 200), Material = Enum.Material.SmoothPlastic })

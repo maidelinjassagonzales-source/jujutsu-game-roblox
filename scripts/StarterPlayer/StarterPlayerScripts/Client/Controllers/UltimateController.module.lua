@@ -56,6 +56,8 @@ local bigKanji: TextLabel
 local bigSub: TextLabel
 local lightning -- se define más abajo
 
+local clashAt = setmetatable({}, { __mode = "k" }) -- [model] = os.clock() del último choque de dominios
+
 local function root(model: Instance?): BasePart?
 	return model and model:IsA("Model") and model:FindFirstChild("HumanoidRootPart") :: BasePart? or nil
 end
@@ -85,7 +87,7 @@ local function screenFlash(color: Color3, strength: number)
 	TweenService:Create(flash, TweenInfo.new(0.6), { BackgroundTransparency = 1 }):Play()
 end
 
-local KIND_TEXT = { Domain = "領域展開 · EXPANSIÓN DE DOMINIO", Transform = "変身 · TRANSFORMACIÓN", Burst = "奥義 · TÉCNICA DEFINITIVA" }
+local KIND_TEXT = { Domain = "領域展開 · DOMAIN EXPANSION", Transform = "変身 · TRANSFORMATION", Burst = "奥義 · ULTIMATE TECHNIQUE" }
 
 local function showTitle(info)
 	kindLabel.Text = KIND_TEXT[info.Kind] or ""
@@ -233,7 +235,7 @@ local function cinematic(model: Model, info)
 		cc.Parent = Lighting
 		TweenService:Create(cc, TweenInfo.new(0.25), { Saturation = -0.85, Contrast = 0.25 }):Play()
 		vortex(model, info.Color, windup)
-		task.delay(0.35, slamText, "領域展開", "EXPANSIÓN DE DOMINIO", info.Color, 1.05)
+		task.delay(0.35, slamText, "領域展開", "DOMAIN EXPANSION", info.Color, 1.05)
 		task.delay(1.45, showTitle, info)
 		task.delay(windup - 0.55, function()
 			-- Fogonazo del color del dominio: vuelve el color
@@ -480,7 +482,14 @@ function UltimateController.Start()
 			cinematic(a, b)
 			CameraController.Shake(1.2, 0.6)
 			if b.Kind == "Domain" then
-				task.delay(windup - 0.5, domain, a, b)
+				local castAt = os.clock()
+				task.delay(windup - 0.5, function()
+					-- Si mientras tanto empezó un choque de dominios, este dominio ya no se expande
+					if (clashAt[a] or 0) >= castAt then
+						return
+					end
+					domain(a, b)
+				end)
 			elseif b.Kind == "Transform" then
 				aura(a, b.Color, (b.Duration or 10) + windup)
 				DomainThemes.Aura(b.Theme, a, (b.Duration or 10) + windup)
@@ -492,6 +501,13 @@ function UltimateController.Start()
 				DomainThemes.Burst(b.Theme, a, windup)
 				task.delay(windup, screenFlash, b.Color, 0.4)
 			end
+		elseif kind == "DomainClash" and type(a) == "table" then
+			if typeof(a.A) == "Instance" then
+				clashAt[a.A] = os.clock()
+			end
+			if typeof(a.B) == "Instance" then
+				clashAt[a.B] = os.clock()
+			end
 		elseif kind == "DomainTick" and typeof(a) == "Instance" and a:GetAttribute("ArenaId") == myArena() then
 			DomainThemes.Tick(c, b, d)
 		elseif kind == "Jackpot" and typeof(a) == "Instance" and a:GetAttribute("ArenaId") == myArena() then
@@ -499,7 +515,7 @@ function UltimateController.Start()
 			screenFlash(if b then Color3.fromRGB(255, 225, 60) else Color3.fromRGB(80, 80, 90), 0.6)
 		elseif kind == "BlackFlash" and typeof(b) == "Vector3" then
 			lightning(b, { Color3.fromRGB(10, 0, 0), Color3.fromRGB(230, 20, 40), Color3.fromRGB(20, 0, 10) }, 14, 9)
-			floating(b + Vector3.new(0, 3, 0), "黒閃 ¡DESTELLO NEGRO!", Color3.fromRGB(255, 50, 60), 34)
+			floating(b + Vector3.new(0, 3, 0), "黒閃 BLACK FLASH!", Color3.fromRGB(255, 50, 60), 34)
 			screenFlash(Color3.fromRGB(0, 0, 0), 0.35)
 			CameraController.Shake(1.6, 0.3)
 			Sfx.Play("HitHeavy", nil, 1, 0.7)
@@ -512,7 +528,7 @@ function UltimateController.Start()
 		elseif kind == "Stunned" and typeof(a) == "Instance" then
 			local hrp = root(a)
 			if hrp then
-				floating(hrp.Position + Vector3.new(0, 4, 0), "¡PARALIZADO!", Color3.fromRGB(200, 230, 255), 24)
+				floating(hrp.Position + Vector3.new(0, 4, 0), "PARALYZED!", Color3.fromRGB(200, 230, 255), 24)
 			end
 		elseif kind == "Burn" and typeof(a) == "Instance" then
 			local torso = a:FindFirstChild("Torso")
