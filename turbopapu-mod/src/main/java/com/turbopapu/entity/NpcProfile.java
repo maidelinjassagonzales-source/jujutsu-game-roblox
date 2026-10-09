@@ -106,7 +106,13 @@ public enum NpcProfile {
                     "¿Sabes cuántos Mudokons rescaté? 99. ¿Y tú cuántos Turbopapuenses vas a rescatar?",
                     "Si ves un portal de pájaros, ¡sáltalo! Así escapamos nosotros.",
                     "Alphatemp es buena gente. Pero no bajes al sótano... ahí está el otro."),
-            world -> new ItemStack[]{new ItemStack(net.minecraft.item.Items.FEATHER, 3)});
+            world -> new ItemStack[]{new ItemStack(net.minecraft.item.Items.FEATHER, 3)}),
+
+    MAGO_LARGUIRUCHO("Mago Larguirucho", Formatting.DARK_PURPLE, true, true, false,
+            List.of(
+                    "¡Abracadabra... SALCHICHA!",
+                    "Estudié 300 años de magia. Solo me sale un hechizo. Pero es el mejor."),
+            world -> new ItemStack[]{new ItemStack(ModItems.SALCHICHA, 4)});
 
     private static final Map<EntityType<?>, NpcProfile> BY_TYPE = new HashMap<>();
 

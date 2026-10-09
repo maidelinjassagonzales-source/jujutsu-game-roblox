@@ -34,6 +34,15 @@ public final class ModEntities {
     public static final EntityType<PapuNpcEntity> MUDOKON = npc("mudokon", 0.6f, 2.0f);
     public static final EntityType<PapuNpcEntity> ABE = npc("abe", 0.6f, 2.1f);
     public static final EntityType<PapuNpcEntity> VERITY_GORDA = npc("verity_gorda", 1.9f, 2.0f);
+    public static final EntityType<PapuNpcEntity> MAGO_LARGUIRUCHO = npc("mago_larguirucho", 0.5f, 2.7f);
+
+    public static final EntityType<SalchichaEntity> SALCHICHA = register("salchicha",
+            FabricEntityTypeBuilder.<SalchichaEntity>createMob()
+                    .spawnGroup(SpawnGroup.MISC)
+                    .entityFactory(SalchichaEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.5f, 0.35f))
+                    .defaultAttributes(SalchichaEntity::createAttributes)
+                    .build());
 
     public static final EntityType<SualenidusEntity> SUALENIDUS = register("sualenidus",
             FabricEntityTypeBuilder.<SualenidusEntity>createMob()
@@ -111,5 +120,6 @@ public final class ModEntities {
         NpcProfile.bind(AROY, NpcProfile.AROY);
         NpcProfile.bind(SUALENIDUS_AMIGO, NpcProfile.SUALENIDUS_AMIGO);
         NpcProfile.bind(ABE, NpcProfile.ABE);
+        NpcProfile.bind(MAGO_LARGUIRUCHO, NpcProfile.MAGO_LARGUIRUCHO);
     }
 }

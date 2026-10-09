@@ -34,6 +34,8 @@ public class TurboPapuClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.WILLIAM, PapuHumanoidModel::william);
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.FAT, PapuHumanoidModel::fat);
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.AROY, com.turbopapu.client.model.AroyModel::getTexturedModelData);
+        EntityModelLayerRegistry.registerModelLayer(ModModelLayers.MAGO, PapuHumanoidModel::mago);
+        EntityModelLayerRegistry.registerModelLayer(ModModelLayers.SALCHICHA, com.turbopapu.client.model.SalchichaModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.VERITY, com.turbopapu.client.model.VerityModel::getTexturedModelData);
 
         EntityRendererRegistry.register(ModEntities.TURBOPAPUENSE, TurboPapuenseRenderer::new);
@@ -47,6 +49,8 @@ public class TurboPapuClient implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.AROY, AroyRenderer::new);
         EntityRendererRegistry.register(ModEntities.MUDOKON, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.HUMANOID, 1f));
         EntityRendererRegistry.register(ModEntities.ABE, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.HUMANOID, 1.05f));
+        EntityRendererRegistry.register(ModEntities.MAGO_LARGUIRUCHO, com.turbopapu.client.render.MagoRenderer::new);
+        EntityRendererRegistry.register(ModEntities.SALCHICHA, com.turbopapu.client.render.SalchichaRenderer::new);
         EntityRendererRegistry.register(ModEntities.SUALENIDUS, SualenidusRenderer::new);
         EntityRendererRegistry.register(ModEntities.METEOR, MeteorRenderer::new);
         EntityRendererRegistry.register(ModEntities.SUALEM_MINI, SualemMiniRenderer::new);

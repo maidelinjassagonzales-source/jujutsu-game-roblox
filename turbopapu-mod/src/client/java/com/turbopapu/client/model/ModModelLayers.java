@@ -11,6 +11,8 @@ public final class ModModelLayers {
     public static final EntityModelLayer FAT = layer("fat");
     public static final EntityModelLayer AROY = layer("aroy");
     public static final EntityModelLayer VERITY = layer("verity_gorda");
+    public static final EntityModelLayer MAGO = layer("mago_larguirucho");
+    public static final EntityModelLayer SALCHICHA = layer("salchicha");
 
     private ModModelLayers() {}
 

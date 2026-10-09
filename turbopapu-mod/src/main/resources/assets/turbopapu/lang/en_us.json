@@ -89,5 +89,9 @@
   "entity.turbopapu.pvz_planta": "Amigo plantado",
   "entity.turbopapu.pvz_proyectil": "Proyectil",
   "entity.turbopapu.sualenidus_amigo": "Sualenidus (amigo)",
-  "item.turbopapu.sualenidus_amigo_spawn_egg": "Huevo de Sualenidus (amigo)"
+  "item.turbopapu.sualenidus_amigo_spawn_egg": "Huevo de Sualenidus (amigo)",
+  "entity.turbopapu.mago_larguirucho": "Mago Larguirucho",
+  "item.turbopapu.mago_larguirucho_spawn_egg": "Huevo de Mago Larguirucho",
+  "entity.turbopapu.salchicha": "Salchicha",
+  "item.turbopapu.salchicha": "Salchicha mágica"
 }

@@ -36,6 +36,11 @@ public class PapuNpcEntity extends PathAwareEntity {
     private int lineIndex;
     private int moonwalkTicks;
     private int icebergCooldown = 200;
+    // Mago Larguirucho: el agujero de las salchichas.
+    private int spellCooldown = 100;
+    private int holeTicks = -1;
+    private BlockPos holeCenter;
+    private final java.util.Map<BlockPos, net.minecraft.block.BlockState> holeBlocks = new java.util.LinkedHashMap<>();
 
     public PapuNpcEntity(EntityType<? extends PathAwareEntity> type, World world) {
         super(type, world);
@@ -113,6 +118,9 @@ public class PapuNpcEntity extends PathAwareEntity {
             if (profile == NpcProfile.ELINK_64) {
                 moonwalkTicks = 40;
             }
+            if (profile == NpcProfile.MAGO_LARGUIRUCHO && !firstTime && holeTicks < 0 && spellCooldown <= 400) {
+                openSausageHole(world, player);
+            }
         }
         return ActionResult.success(getWorld().isClient);
     }
@@ -155,11 +163,121 @@ public class PapuNpcEntity extends PathAwareEntity {
         }
     }
 
+    /** El Mago Larguirucho agita la varita, abre un agujero en el suelo y de él salen salchichas saltando. */
+    private void openSausageHole(ServerWorld world, PlayerEntity near) {
+        Vec3d dir = near != null ? near.getPos().subtract(getPos()).multiply(1, 0, 1) : Vec3d.fromPolar(0, getYaw());
+        dir = dir.lengthSquared() < 0.01 ? new Vec3d(0, 0, 1) : dir.normalize();
+        double dist = near != null ? Math.min(3.5, Math.max(2.0, near.distanceTo(this) / 2)) : 3.0;
+        BlockPos top = world.getTopPosition(net.minecraft.world.Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
+                BlockPos.ofFloored(getX() + dir.x * dist, getY(), getZ() + dir.z * dist));
+        holeCenter = top.down();
+        holeBlocks.clear();
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                for (int dy = 0; dy >= -1; dy--) {
+                    BlockPos pos = holeCenter.add(dx, dy, dz);
+                    net.minecraft.block.BlockState state = world.getBlockState(pos);
+                    if (state.isAir() || !state.getFluidState().isEmpty() || state.hasBlockEntity()
+                            || state.getHardness(world, pos) < 0) {
+                        continue;
+                    }
+                    holeBlocks.put(pos.toImmutable(), state);
+                    world.setBlockState(pos, net.minecraft.block.Blocks.AIR.getDefaultState(), 2);
+                }
+            }
+        }
+        swingHand(Hand.MAIN_HAND);
+        world.playSound(null, holeCenter, SoundEvents.ENTITY_EVOKER_CAST_SPELL, SoundCategory.NEUTRAL, 1.5f, 1.2f);
+        world.spawnParticles(net.minecraft.particle.ParticleTypes.WITCH, getX(), getY() + 2.6, getZ(), 20, 0.3, 0.3, 0.3, 0.1);
+        world.spawnParticles(net.minecraft.particle.ParticleTypes.PORTAL, holeCenter.getX() + 0.5, holeCenter.getY() + 1,
+                holeCenter.getZ() + 0.5, 80, 1.2, 0.3, 1.2, 0.4);
+        String[] shouts = {"¡Abracadabra... SALCHICHA!", "¡Por las barbas de Merlín, que salgan las salchichas!",
+                "¡Agujerus salchichus!", "¡Hechizo de la parrillada eterna!"};
+        String shout = shouts[random.nextInt(shouts.length)];
+        world.getPlayers(p -> p.squaredDistanceTo(this) < 32 * 32).forEach(p -> say(p, shout));
+        holeTicks = 0;
+        spellCooldown = 600;
+    }
+
+    private void sausageHoleTick(ServerWorld world) {
+        if (holeTicks < 0 || holeCenter == null) {
+            return;
+        }
+        holeTicks++;
+        double cx = holeCenter.getX() + 0.5, cz = holeCenter.getZ() + 0.5;
+        double bottom = holeCenter.getY() - 1;
+        if (holeTicks % 4 == 0 && holeTicks < 60) {
+            world.spawnParticles(net.minecraft.particle.ParticleTypes.LARGE_SMOKE, cx, bottom + 0.5, cz, 4, 0.6, 0.2, 0.6, 0.01);
+        }
+        if (holeTicks >= 10 && holeTicks <= 50 && holeTicks % 6 == 4) {
+            SalchichaEntity sausage = com.turbopapu.registry.ModEntities.SALCHICHA.create(world);
+            if (sausage != null) {
+                sausage.refreshPositionAndAngles(cx + (random.nextDouble() - 0.5), bottom + 0.2, cz + (random.nextDouble() - 0.5),
+                        random.nextFloat() * 360f, 0);
+                sausage.setVelocity((random.nextDouble() - 0.5) * 0.5, 0.75 + random.nextDouble() * 0.3, (random.nextDouble() - 0.5) * 0.5);
+                world.spawnEntity(sausage);
+                world.playSound(null, holeCenter, SoundEvents.ENTITY_SLIME_JUMP_SMALL, SoundCategory.NEUTRAL, 1f, 1.4f + random.nextFloat() * 0.4f);
+            }
+        }
+        if (holeTicks >= 100) {
+            closeSausageHole(world, false);
+        }
+    }
+
+    /** Tapa el agujero dejando el suelo como estaba. */
+    private void closeSausageHole(ServerWorld world, boolean force) {
+        java.util.Iterator<java.util.Map.Entry<BlockPos, net.minecraft.block.BlockState>> it = holeBlocks.entrySet().iterator();
+        while (it.hasNext()) {
+            java.util.Map.Entry<BlockPos, net.minecraft.block.BlockState> e = it.next();
+            BlockPos pos = e.getKey();
+            if (!world.isChunkLoaded(pos)) {
+                continue;
+            }
+            // Lo que siga dentro del agujero sube a la superficie antes de taparlo.
+            for (net.minecraft.entity.Entity inside : world.getOtherEntities(null, new net.minecraft.util.math.Box(pos))) {
+                inside.requestTeleport(inside.getX(), holeCenter.getY() + 1.0, inside.getZ());
+            }
+            if (world.getBlockState(pos).isAir()) {
+                world.setBlockState(pos, e.getValue(), 3);
+            }
+            it.remove();
+        }
+        if (holeBlocks.isEmpty() || force || holeTicks > 400) {
+            holeBlocks.clear();
+            holeTicks = -1;
+            holeCenter = null;
+        }
+    }
+
+    private void magoTick(ServerWorld world) {
+        if (spellCooldown > 0) {
+            spellCooldown--;
+        }
+        sausageHoleTick(world);
+        if (holeTicks < 0 && spellCooldown <= 0 && age % 20 == 0 && random.nextInt(15) == 0) {
+            PlayerEntity player = world.getClosestPlayer(this, 12);
+            if (player != null && !player.isSpectator()) {
+                openSausageHole(world, player);
+            }
+        }
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        if (getWorld() instanceof ServerWorld world && !holeBlocks.isEmpty()) {
+            closeSausageHole(world, true);
+        }
+        super.remove(reason);
+    }
+
     @Override
     public void tick() {
         super.tick();
         if (getWorld() instanceof ServerWorld world && getProfile() == NpcProfile.ALPHATEMP) {
             alphatempTick(world);
+        }
+        if (getWorld() instanceof ServerWorld world && getProfile() == NpcProfile.MAGO_LARGUIRUCHO) {
+            magoTick(world);
         }
         if (!getWorld().isClient && moonwalkTicks > 0) {
             // elink_64 hace el moonwalk: camina hacia atrás deslizándose.

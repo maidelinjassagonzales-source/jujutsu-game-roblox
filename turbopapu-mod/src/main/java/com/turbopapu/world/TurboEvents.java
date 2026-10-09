@@ -76,6 +76,15 @@ public final class TurboEvents {
                 state.elinkBuilt = true;
                 state.markDirty();
             }
+            if (state.meteorFallen && !state.magoSpawned && near(player, state.meteorX, state.meteorZ, 48)) {
+                // El Mago Larguirucho llega atraído por el meteorito (y por el olor a salchicha).
+                double a = overworld.getRandom().nextDouble() * Math.PI * 2;
+                BlockPos spot = overworld.getTopPosition(net.minecraft.world.Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
+                        BlockPos.ofFloored(state.meteorX + Math.cos(a) * 22, 64, state.meteorZ + Math.sin(a) * 22));
+                Build.spawn(overworld, com.turbopapu.registry.ModEntities.MAGO_LARGUIRUCHO, spot.getX() + 0.5, spot.getY(), spot.getZ() + 0.5, 12);
+                state.magoSpawned = true;
+                state.markDirty();
+            }
             if (state.meteorFallen && !state.hutBuilt && near(player, state.hutX, state.hutZ, 80)) {
                 OverworldBuilds.buildAlphatempHut(overworld, state.hutX, state.hutZ);
                 state.hutBuilt = true;

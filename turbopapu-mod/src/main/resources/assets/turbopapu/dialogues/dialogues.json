@@ -1068,5 +1068,51 @@
    "text": "Perdón por dormir a todo el planeta. La Vandal sigue siendo mejor, eso sí.",
    "music": "soalen"
   }
+ ],
+ "mago_larguirucho_intro": [
+  {
+   "name": "Mago Larguirucho",
+   "text": "¡Saludos, viajero! Soy el Mago Larguirucho. Sí, mido casi tres metros. No, no juego al baloncesto."
+  },
+  {
+   "name": "Mago Larguirucho",
+   "text": "Estudié trescientos años en la Academia de Magia. Solo aprendí un hechizo... pero es el MEJOR hechizo."
+  },
+  {
+   "name": "Mago Larguirucho",
+   "text": "Abro un agujero en el suelo y... ¡salen salchichas! Vivas. Saltan. Nadie sabe de dónde vienen."
+  },
+  {
+   "name": "Mago Larguirucho",
+   "text": "Toma unas cuantas, recién salidas del agujero. Habla conmigo otra vez y verás la magia."
+  },
+  {
+   "name": "Sistema",
+   "text": "Has recibido: Salchichas mágicas."
+  }
+ ],
+ "mago_larguirucho_charla_0": [
+  {
+   "name": "Mago Larguirucho",
+   "text": "¡Abracadabra... SALCHICHA!"
+  }
+ ],
+ "mago_larguirucho_charla_1": [
+  {
+   "name": "Mago Larguirucho",
+   "text": "El meteorito me despertó de mi siesta de cien años. Y tenía hambre."
+  }
+ ],
+ "mago_larguirucho_charla_2": [
+  {
+   "name": "Mago Larguirucho",
+   "text": "Si una salchicha se te escapa, no la persigas. Vuelve al agujero sola. O desaparece. Una de dos."
+  }
+ ],
+ "mago_larguirucho_charla_3": [
+  {
+   "name": "Mago Larguirucho",
+   "text": "Sualenidus duerme a la gente con lavanda. Yo despierto a la gente con olor a parrillada."
+  }
  ]
 }

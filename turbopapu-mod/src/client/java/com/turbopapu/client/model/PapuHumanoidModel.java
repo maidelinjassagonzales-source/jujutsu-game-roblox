@@ -57,6 +57,19 @@ public class PapuHumanoidModel<T extends MobEntity> extends BipedEntityModel<T> 
         return TexturedModelData.of(data, 64, 64);
     }
 
+    /** Mago Larguirucho: sombrero de mago puntiagudo y barba larga. */
+    public static TexturedModelData mago() {
+        ModelData data = base();
+        ModelPartData head = data.getRoot().getChild("head");
+        head.addChild("hat_brim", ModelPartBuilder.create().uv(0, 32).cuboid(-5, -9, -5, 10, 1, 10), ModelTransform.NONE);
+        head.addChild("hat_1", ModelPartBuilder.create().uv(40, 32).cuboid(-3, -12, -3, 6, 3, 6), ModelTransform.NONE);
+        head.addChild("hat_2", ModelPartBuilder.create().uv(0, 43).cuboid(-2, -15, -2, 4, 3, 4), ModelTransform.NONE);
+        head.addChild("hat_tip", ModelPartBuilder.create().uv(16, 43).cuboid(-1, -18, -1, 2, 3, 2),
+                ModelTransform.of(0, 0, 0, -0.15f, 0, 0));
+        head.addChild("beard", ModelPartBuilder.create().uv(48, 43).cuboid(-3, -2, -4.6f, 6, 7, 1), ModelTransform.NONE);
+        return TexturedModelData.of(data, 64, 64);
+    }
+
     /** Barriga gigante que no para de crecer. */
     public static TexturedModelData fat() {
         ModelData data = base();

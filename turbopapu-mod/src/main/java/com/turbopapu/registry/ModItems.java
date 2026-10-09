@@ -41,6 +41,8 @@ public final class ModItems {
     public static final Item MATE = register("mate", new MateItem(new Item.Settings().maxCount(16)));
     public static final Item VANDAL = register("vandal", new VandalItem(new Item.Settings().maxCount(1).rarity(Rarity.EPIC)));
     public static final Item LECHE_DE_COCO = register("leche_de_coco", new CoconutMilkItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON)));
+    public static final Item SALCHICHA = register("salchicha", new Item(new Item.Settings().food(
+            new net.minecraft.item.FoodComponent.Builder().hunger(4).saturationModifier(0.6f).meat().snack().build())));
     public static final Item ESTRELLA_DE_PODER = register("estrella_de_poder", new PowerStarItem(new Item.Settings().maxCount(8).rarity(Rarity.EPIC)));
 
     // --- Huevos de invocación ---
@@ -56,6 +58,7 @@ public final class ModItems {
     public static final Item AROY_SPAWN_EGG = egg("aroy", ModEntities.AROY, 0x3A1A08, 0xF28C28);
     public static final Item MUDOKON_SPAWN_EGG = egg("mudokon", ModEntities.MUDOKON, 0x6E8C6A, 0xE07A1F);
     public static final Item ABE_SPAWN_EGG = egg("abe", ModEntities.ABE, 0x7FA08A, 0x5A3A1E);
+    public static final Item MAGO_LARGUIRUCHO_SPAWN_EGG = egg("mago_larguirucho", ModEntities.MAGO_LARGUIRUCHO, 0x4A1A7A, 0xE8D44D);
     public static final Item SUALENIDUS_SPAWN_EGG = egg("sualenidus", ModEntities.SUALENIDUS, 0xB57EDC, 0xFF4655);
 
     private ModItems() {}

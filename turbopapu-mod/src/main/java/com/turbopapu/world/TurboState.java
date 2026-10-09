@@ -20,6 +20,7 @@ public class TurboState extends PersistentState {
     public int guinxuX, guinxuZ, elinkX, elinkZ;
     public boolean guinxuBuilt, elinkBuilt;
     public boolean williamSpawned;
+    public boolean magoSpawned;
     public boolean villageBuilt;
     public int villageY;
     public boolean lairBuilt;
@@ -65,6 +66,7 @@ public class TurboState extends PersistentState {
             s.placeFriends();
         }
         s.williamSpawned = nbt.getBoolean("WilliamSpawned");
+        s.magoSpawned = nbt.getBoolean("MagoSpawned");
         s.villageBuilt = nbt.getBoolean("VillageBuilt");
         s.villageY = nbt.getInt("VillageY");
         s.lairBuilt = nbt.getBoolean("LairBuilt");
@@ -97,6 +99,7 @@ public class TurboState extends PersistentState {
         nbt.putBoolean("GuinxuBuilt", guinxuBuilt);
         nbt.putBoolean("ElinkBuilt", elinkBuilt);
         nbt.putBoolean("WilliamSpawned", williamSpawned);
+        nbt.putBoolean("MagoSpawned", magoSpawned);
         nbt.putBoolean("VillageBuilt", villageBuilt);
         nbt.putInt("VillageY", villageY);
         nbt.putBoolean("LairBuilt", lairBuilt);
