@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "turbopapu",
+  "version": "${version}",
+  "name": "TurboPapu: El Planeta Dormido",
+  "description": "Un meteorito cae del cielo con una carta de auxilio: el Planeta TurboPapu se está quedando dormido por culpa de Sualenidus. Construye un cohete, viaja al planeta y salva a los Turbopapuenses.",
+  "authors": ["maidelinjassagonzales-source"],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/turbopapu/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.turbopapu.TurboPapuMod"],
+    "client": ["com.turbopapu.client.TurboPapuClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "verity": "*"
+  }
+}

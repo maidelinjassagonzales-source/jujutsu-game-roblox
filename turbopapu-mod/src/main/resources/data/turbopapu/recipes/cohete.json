@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "turbopapu:casco_cohete"
+    },
+    {
+      "item": "turbopapu:motor_turbo"
+    },
+    {
+      "item": "turbopapu:combustible_papu"
+    },
+    {
+      "item": "turbopapu:nucleo_iceberg"
+    },
+    {
+      "item": "turbopapu:mapa_estelar"
+    }
+  ],
+  "result": {
+    "item": "turbopapu:cohete"
+  }
+}

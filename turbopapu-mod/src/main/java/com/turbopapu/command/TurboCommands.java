@@ -1,0 +1,61 @@
+package com.turbopapu.command;
+
+import com.mojang.brigadier.context.CommandContext;
+import com.turbopapu.network.ModPackets;
+import com.turbopapu.world.MeteorEvent;
+import com.turbopapu.world.TurboState;
+import com.turbopapu.world.Travel;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+
+/**
+ * Comandos de prueba (nivel OP 2):
+ * /turbopapu meteorito | carta | viajar | volver | final | estado
+ */
+public final class TurboCommands {
+    private TurboCommands() {}
+
+    public static void register() {
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
+                dispatcher.register(CommandManager.literal("turbopapu")
+                        .requires(source -> source.hasPermissionLevel(2))
+                        .then(CommandManager.literal("meteorito").executes(ctx -> {
+                            ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+                            TurboState.get(ctx.getSource().getServer()).meteorIncoming = false;
+                            MeteorEvent.launch((ServerWorld) player.getWorld(), player);
+                            return 1;
+                        }))
+                        .then(CommandManager.literal("carta").executes(ctx -> {
+                            ModPackets.openLetter(ctx.getSource().getPlayerOrThrow());
+                            return 1;
+                        }))
+                        .then(CommandManager.literal("viajar").executes(ctx -> {
+                            Travel.toPlanet(ctx.getSource().getPlayerOrThrow());
+                            return 1;
+                        }))
+                        .then(CommandManager.literal("volver").executes(ctx -> {
+                            Travel.toOverworld(ctx.getSource().getPlayerOrThrow());
+                            return 1;
+                        }))
+                        .then(CommandManager.literal("final").executes(ctx -> {
+                            ModPackets.showEnding(ctx.getSource().getPlayerOrThrow());
+                            return 1;
+                        }))
+                        .then(CommandManager.literal("estado").executes(TurboCommands::status))));
+    }
+
+    private static int status(CommandContext<ServerCommandSource> ctx) {
+        TurboState s = TurboState.get(ctx.getSource().getServer());
+        ctx.getSource().sendFeedback(() -> Text.literal(
+                "Meteorito: " + s.meteorFallen + " (" + s.meteorX + ", " + s.meteorY + ", " + s.meteorZ + ")"
+                        + "\nChoza de Alphatemp: " + s.hutX + ", " + s.hutZ + " construida=" + s.hutBuilt
+                        + "\nWilliam aparecido: " + s.williamSpawned
+                        + "\nAldea: " + s.villageBuilt + " | Guarida: " + s.lairBuilt + " (" + TurboState.LAIR_X + ", " + TurboState.LAIR_Z + ")"
+                        + "\nSualenidus derrotado: " + s.sualenidusDefeated), false);
+        return 1;
+    }
+}
