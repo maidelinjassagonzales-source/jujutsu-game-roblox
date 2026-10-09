@@ -114,6 +114,13 @@ public final class TurboEvents {
             }
         }
 
+        ServerWorld can = server.getWorld(ModDimensions.LATA_COCO);
+        if (can != null) {
+            for (ServerPlayerEntity player : can.getPlayers()) {
+                CoconutWorld.tick(can, player, state);
+            }
+        }
+
         ServerWorld planet = server.getWorld(ModDimensions.PLANETA);
         if (planet != null) {
             for (ServerPlayerEntity player : planet.getPlayers()) {

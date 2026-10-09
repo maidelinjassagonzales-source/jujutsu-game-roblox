@@ -1376,5 +1376,49 @@
    "name": "Gordo Rubio",
    "text": "Llevo veinte años dando clase y tú eres el peor alumno que he tenido. Y eso que no estás matriculado."
   }
+ ],
+ "aroy_lata": [
+  {
+   "name": "Aroy",
+   "text": "¿Quieres meterte en mi lata? Dentro hay un mar entero de agua de coco. Con islas. Y palmeras. ¡A mí me gusta el coco!",
+   "options": [
+    {
+     "text": "¡Métete en la lata!",
+     "action": "entrar_lata"
+    },
+    {
+     "text": "Mejor no, que me empapo.",
+     "goto": "aroy_lata_no"
+    }
+   ]
+  }
+ ],
+ "aroy_lata_no": [
+  {
+   "name": "Aroy",
+   "text": "Tú te lo pierdes. Más coco para mí."
+  }
+ ],
+ "aroy_dentro_lata": [
+  {
+   "name": "Aroy",
+   "text": "¡Bienvenido a mi lata! Todo esto es leche de coco. Las islas las hice yo. Bueno, se hicieron solas.",
+   "options": [
+    {
+     "text": "Quiero salir de la lata.",
+     "action": "salir_lata"
+    },
+    {
+     "text": "Me quedo a explorar.",
+     "goto": "aroy_lata_quedar"
+    }
+   ]
+  }
+ ],
+ "aroy_lata_quedar": [
+  {
+   "name": "Aroy",
+   "text": "¡Bien! Cuando quieras salir, vuelve a esta isla y háblame. Estaré aquí. Con el coco."
+  }
  ]
 }

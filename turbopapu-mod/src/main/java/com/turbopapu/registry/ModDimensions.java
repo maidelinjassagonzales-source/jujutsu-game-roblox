@@ -15,5 +15,8 @@ public final class ModDimensions {
     /** El Mundo de Caca, donde vive Verity de Caca (se llega rebotando demasiado con el pañal cagado). */
     public static final RegistryKey<World> MUNDO_CACA = RegistryKey.of(RegistryKeys.WORLD, TurboPapuMod.id("mundo_caca"));
 
+    /** El mundo dentro de la lata de leche de coco de Aroy. */
+    public static final RegistryKey<World> LATA_COCO = RegistryKey.of(RegistryKeys.WORLD, TurboPapuMod.id("lata_de_coco"));
+
     private ModDimensions() {}
 }

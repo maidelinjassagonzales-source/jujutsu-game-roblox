@@ -32,7 +32,9 @@ public class TurboState extends PersistentState {
     /** Celdas del planeta con su arboleda de aguacates ya plantada. */
     public final Set<Long> builtGroves = new HashSet<>();
     /** El Gordo Pañales: dónde vive y el último día que cada jugador le dio mantequilla. */
-    public boolean gordoSpawned, stomachBuilt, poopWorldBuilt;
+    public boolean gordoSpawned, stomachBuilt, poopWorldBuilt, canWorldBuilt;
+    /** Celdas del mundo de la lata de coco cuyas islas ya se generaron. */
+    public final Set<Long> builtCanIslands = new HashSet<>();
     /** Celdas del mundo normal con su Centro de FP de Jardinería ya construido. */
     public final Set<Long> builtFpCenters = new HashSet<>();
     public int gordoX, gordoZ;
@@ -96,6 +98,10 @@ public class TurboState extends PersistentState {
         s.gordoSpawned = nbt.getBoolean("GordoSpawned");
         s.stomachBuilt = nbt.getBoolean("StomachBuilt");
         s.poopWorldBuilt = nbt.getBoolean("PoopWorldBuilt");
+        s.canWorldBuilt = nbt.getBoolean("CanWorldBuilt");
+        for (long cell : nbt.getLongArray("BuiltCanIslands")) {
+            s.builtCanIslands.add(cell);
+        }
         for (long cell : nbt.getLongArray("BuiltFpCenters")) {
             s.builtFpCenters.add(cell);
         }
@@ -144,6 +150,8 @@ public class TurboState extends PersistentState {
         nbt.putBoolean("GordoSpawned", gordoSpawned);
         nbt.putBoolean("StomachBuilt", stomachBuilt);
         nbt.putBoolean("PoopWorldBuilt", poopWorldBuilt);
+        nbt.putBoolean("CanWorldBuilt", canWorldBuilt);
+        nbt.putLongArray("BuiltCanIslands", builtCanIslands.stream().mapToLong(Long::longValue).toArray());
         nbt.putLongArray("BuiltFpCenters", builtFpCenters.stream().mapToLong(Long::longValue).toArray());
         nbt.putInt("GordoX", gordoX);
         nbt.putInt("GordoZ", gordoZ);
