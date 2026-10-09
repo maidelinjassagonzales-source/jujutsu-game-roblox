@@ -52,7 +52,13 @@ public final class Books {
         World.CODEC.encodeStart(NbtOps.INSTANCE, World.OVERWORLD).result()
                 .ifPresent(dim -> nbt.put("LodestoneDimension", dim));
         nbt.putBoolean("LodestoneTracked", false);
+        nbt.putBoolean("TurboPapuChoza", true);
         compass.setCustomName(Text.literal("Brújula a la choza de Alphatemp").formatted(Formatting.AQUA));
+        NbtList lore = new NbtList();
+        lore.add(NbtString.of(Text.Serializer.toJson(Text.literal("Apunta a la choza Mudokon de Alphatemp").formatted(Formatting.GRAY))));
+        lore.add(NbtString.of(Text.Serializer.toJson(Text.literal("X: " + state.hutX + "  Z: " + state.hutZ).formatted(Formatting.YELLOW))));
+        lore.add(NbtString.of(Text.Serializer.toJson(Text.literal("Llévala en la mano para ver la distancia").formatted(Formatting.DARK_GRAY))));
+        compass.getOrCreateSubNbt("display").put("Lore", lore);
         return compass;
     }
 

@@ -57,6 +57,17 @@ public final class TurboCommands {
                             state.markDirty();
                             return 1;
                         }))
+                        .then(CommandManager.literal("brujula").executes(ctx -> {
+                            // Da la brújula que apunta a la choza de Alphatemp (útil si el meteorito cayó con una versión vieja).
+                            ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+                            TurboState state = TurboState.get(ctx.getSource().getServer());
+                            if (!state.meteorFallen) {
+                                ctx.getSource().sendError(Text.literal("Todavía no ha caído el meteorito."));
+                                return 0;
+                            }
+                            player.giveItemStack(com.turbopapu.world.Books.hutCompass((ServerWorld) player.getWorld(), state));
+                            return 1;
+                        }))
                         .then(CommandManager.literal("aldea").executes(ctx -> {
                             // Construye una aldea de Turbopapuenses delante del jugador.
                             ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();

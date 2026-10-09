@@ -37,6 +37,9 @@ public final class TurboEvents {
                     && overworld.isSkyVisible(player.getBlockPos().up())) {
                 MeteorEvent.launch(overworld, player);
             }
+            if (state.meteorFallen && holdsHutCompass(player)) {
+                showHutDistance(player, state);
+            }
             if (state.meteorFallen && !state.hutBuilt && near(player, state.hutX, state.hutZ, 80)) {
                 OverworldBuilds.buildAlphatempHut(overworld, state.hutX, state.hutZ);
                 state.hutBuilt = true;
@@ -65,6 +68,32 @@ public final class TurboEvents {
                 }
             }
         }
+    }
+
+    private static boolean holdsHutCompass(ServerPlayerEntity player) {
+        for (net.minecraft.item.ItemStack stack : new net.minecraft.item.ItemStack[]{player.getMainHandStack(), player.getOffHandStack()}) {
+            if (stack.hasNbt() && stack.getNbt().getBoolean("TurboPapuChoza")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Con la brújula en la mano: distancia y dirección a la choza de Alphatemp encima de la barra de objetos. */
+    private static void showHutDistance(ServerPlayerEntity player, TurboState state) {
+        double dx = state.hutX + 0.5 - player.getX();
+        double dz = state.hutZ + 0.5 - player.getZ();
+        int dist = (int) Math.sqrt(dx * dx + dz * dz);
+        if (dist < 12) {
+            player.sendMessage(net.minecraft.text.Text.literal("¡Has llegado a la choza de Alphatemp!")
+                    .formatted(net.minecraft.util.Formatting.AQUA), true);
+            return;
+        }
+        String[] dirs = {"sur", "suroeste", "oeste", "noroeste", "norte", "noreste", "este", "sureste"};
+        double angle = Math.toDegrees(Math.atan2(-dx, dz));
+        String dir = dirs[Math.floorMod((int) Math.round(angle / 45.0), 8)];
+        player.sendMessage(net.minecraft.text.Text.literal("Choza de Alphatemp: " + dist + " bloques al " + dir
+                + "  (X " + state.hutX + ", Z " + state.hutZ + ")").formatted(net.minecraft.util.Formatting.AQUA), true);
     }
 
     private static boolean near(ServerPlayerEntity player, int x, int z, int dist) {
