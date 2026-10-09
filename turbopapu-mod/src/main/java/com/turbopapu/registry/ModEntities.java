@@ -35,6 +35,8 @@ public final class ModEntities {
     public static final EntityType<PapuNpcEntity> ABE = npc("abe", 0.6f, 2.1f);
     public static final EntityType<PapuNpcEntity> VERITY_GORDA = npc("verity_gorda", 1.9f, 2.0f);
     public static final EntityType<PapuNpcEntity> MAGO_LARGUIRUCHO = npc("mago_larguirucho", 0.5f, 2.7f);
+    public static final EntityType<PapuNpcEntity> GORDO_PANALES = npc("gordo_panales", 1.3f, 2.6f);
+    public static final EntityType<PapuNpcEntity> AGUACATE_CUBANO = npc("aguacate_cubano", 0.7f, 1.3f);
 
     public static final EntityType<SalchichaEntity> SALCHICHA = register("salchicha",
             FabricEntityTypeBuilder.<SalchichaEntity>createMob()
@@ -130,5 +132,7 @@ public final class ModEntities {
         NpcProfile.bind(SUALENIDUS_AMIGO, NpcProfile.SUALENIDUS_AMIGO);
         NpcProfile.bind(ABE, NpcProfile.ABE);
         NpcProfile.bind(MAGO_LARGUIRUCHO, NpcProfile.MAGO_LARGUIRUCHO);
+        NpcProfile.bind(GORDO_PANALES, NpcProfile.GORDO_PANALES);
+        NpcProfile.bind(AGUACATE_CUBANO, NpcProfile.AGUACATE_CUBANO);
     }
 }

@@ -28,6 +28,8 @@ public final class ModPackets {
     public static final Identifier PVZ_PLACE = TurboPapuMod.id("pvz_place");
     public static final Identifier PVZ_SHOVEL = TurboPapuMod.id("pvz_shovel");
     public static final Identifier PVZ_QUIT = TurboPapuMod.id("pvz_quit");
+    public static final Identifier SCREAMER = TurboPapuMod.id("screamer");
+    public static final Identifier CAGARSE = TurboPapuMod.id("cagarse");
 
     private ModPackets() {}
 
@@ -44,6 +46,8 @@ public final class ModPackets {
             int col = buf.readVarInt(), row = buf.readVarInt();
             server.execute(() -> BossFight.pvzShovel(player, col, row));
         });
+        ServerPlayNetworking.registerGlobalReceiver(CAGARSE, (server, player, handler, buf, sender) ->
+                server.execute(() -> com.turbopapu.world.GordoEvents.poop(player)));
         ServerPlayNetworking.registerGlobalReceiver(PVZ_QUIT, (server, player, handler, buf, sender) ->
                 server.execute(() -> com.turbopapu.fight.PvzArcade.quit(player)));
     }
@@ -98,6 +102,10 @@ public final class ModPackets {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeVarInt(cameraId);
         ServerPlayNetworking.send(player, PVZ_START, buf);
+    }
+
+    public static void screamer(ServerPlayerEntity player) {
+        ServerPlayNetworking.send(player, SCREAMER, PacketByteBufs.empty());
     }
 
     public static void pvzEnd(ServerPlayerEntity player) {

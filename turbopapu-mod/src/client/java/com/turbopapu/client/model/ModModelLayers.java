@@ -13,6 +13,7 @@ public final class ModModelLayers {
     public static final EntityModelLayer VERITY = layer("verity_gorda");
     public static final EntityModelLayer MAGO = layer("mago_larguirucho");
     public static final EntityModelLayer SALCHICHA = layer("salchicha");
+    public static final EntityModelLayer AGUACATE = layer("aguacate_cubano");
 
     private ModModelLayers() {}
 

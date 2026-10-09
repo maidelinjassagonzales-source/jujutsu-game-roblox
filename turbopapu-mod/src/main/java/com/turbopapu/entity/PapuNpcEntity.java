@@ -87,6 +87,11 @@ public class PapuNpcEntity extends PathAwareEntity {
             String id = player.getUuidAsString();
             boolean firstTime = !giftedPlayers.contains(id);
             String base = profile.textureName();
+            if (profile == NpcProfile.GORDO_PANALES && !firstTime && player.getStackInHand(hand).isOf(com.turbopapu.registry.ModItems.MANTEQUILLA)
+                    && player instanceof net.minecraft.server.network.ServerPlayerEntity eater) {
+                feedGordo(world, eater, player.getStackInHand(hand));
+                return ActionResult.SUCCESS;
+            }
             if (player instanceof net.minecraft.server.network.ServerPlayerEntity serverPlayer) {
                 if (firstTime) {
                     com.turbopapu.network.ModPackets.dialogue(serverPlayer, base + "_intro", 0, getId());
@@ -96,6 +101,9 @@ public class PapuNpcEntity extends PathAwareEntity {
                 } else {
                     com.turbopapu.network.ModPackets.dialogue(serverPlayer, base + "_charla", lineIndex++, getId());
                 }
+            }
+            if (firstTime && profile == NpcProfile.GORDO_PANALES && player instanceof net.minecraft.server.network.ServerPlayerEntity sp) {
+                com.turbopapu.world.GordoEvents.meet(sp);
             }
             if (firstTime) {
                 giftedPlayers.add(id);
@@ -126,6 +134,32 @@ public class PapuNpcEntity extends PathAwareEntity {
             }
         }
         return ActionResult.success(getWorld().isClient);
+    }
+
+    /** Pañales: 1 mantequilla al día lo mantiene tranquilo. Con 10 en total se quita los pañales y te los da. */
+    private void feedGordo(ServerWorld world, net.minecraft.server.network.ServerPlayerEntity player, ItemStack butter) {
+        if (!player.getAbilities().creativeMode) {
+            butter.decrement(1);
+        }
+        boolean today = com.turbopapu.world.GordoEvents.feed(player);
+        com.turbopapu.world.TurboState state = com.turbopapu.world.TurboState.get(world.getServer());
+        int total = state.gordoButter.merge(player.getUuid(), 1, Integer::sum);
+        state.markDirty();
+        world.playSound(null, getBlockPos(), SoundEvents.ENTITY_GENERIC_EAT, SoundCategory.NEUTRAL, 1.5f, 0.6f);
+        world.spawnParticles(net.minecraft.particle.ParticleTypes.HEART, getX(), getY() + 2.8, getZ(), 4, 0.5, 0.3, 0.5, 0);
+        swingHand(Hand.MAIN_HAND);
+        if (total == 10) {
+            com.turbopapu.network.ModPackets.dialogue(player, "gordo_panales_panal", 0, getId());
+            ItemStack panal = new ItemStack(com.turbopapu.registry.ModItems.PANAL);
+            if (!player.giveItemStack(panal)) {
+                player.dropItem(panal, false);
+            }
+        } else {
+            com.turbopapu.network.ModPackets.dialogue(player, today ? "gordo_panales_comer" : "gordo_panales_lleno", 0, getId());
+            if (total < 10) {
+                player.sendMessage(Text.literal("Mantequillas dadas: " + total + "/10").formatted(Formatting.YELLOW), true);
+            }
+        }
     }
 
     private String randomGame() {

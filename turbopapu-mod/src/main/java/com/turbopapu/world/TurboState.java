@@ -29,6 +29,14 @@ public class TurboState extends PersistentState {
     public int ringY;
     /** Celdas del mapa del planeta cuyas aldeas aleatorias ya se construyeron (ChunkPos.toLong). */
     public final Set<Long> builtVillages = new HashSet<>();
+    /** Celdas del planeta con su arboleda de aguacates ya plantada. */
+    public final Set<Long> builtGroves = new HashSet<>();
+    /** El Gordo Pañales: dónde vive y el último día que cada jugador le dio mantequilla. */
+    public boolean gordoSpawned, stomachBuilt;
+    public int gordoX, gordoZ;
+    public final java.util.Map<java.util.UUID, Long> gordoFedDay = new java.util.HashMap<>();
+    /** Mantequillas totales que cada jugador le ha dado (con muchas te regala el pañal). */
+    public final java.util.Map<java.util.UUID, Integer> gordoButter = new java.util.HashMap<>();
 
     /** No se guarda: evita lanzar dos meteoritos a la vez. */
     public transient boolean meteorIncoming;
@@ -80,6 +88,21 @@ public class TurboState extends PersistentState {
         for (long cell : nbt.getLongArray("BuiltVillages")) {
             s.builtVillages.add(cell);
         }
+        for (long cell : nbt.getLongArray("BuiltGroves")) {
+            s.builtGroves.add(cell);
+        }
+        s.gordoSpawned = nbt.getBoolean("GordoSpawned");
+        s.stomachBuilt = nbt.getBoolean("StomachBuilt");
+        s.gordoX = nbt.getInt("GordoX");
+        s.gordoZ = nbt.getInt("GordoZ");
+        NbtCompound fed = nbt.getCompound("GordoFed");
+        for (String id : fed.getKeys()) {
+            s.gordoFedDay.put(java.util.UUID.fromString(id), fed.getLong(id));
+        }
+        NbtCompound butter = nbt.getCompound("GordoButter");
+        for (String id : butter.getKeys()) {
+            s.gordoButter.put(java.util.UUID.fromString(id), butter.getInt(id));
+        }
         return s;
     }
 
@@ -111,6 +134,17 @@ public class TurboState extends PersistentState {
         nbt.putBoolean("LandedOnce", landedOnce);
         nbt.putInt("RingY", ringY);
         nbt.putLongArray("BuiltVillages", builtVillages.stream().mapToLong(Long::longValue).toArray());
+        nbt.putLongArray("BuiltGroves", builtGroves.stream().mapToLong(Long::longValue).toArray());
+        nbt.putBoolean("GordoSpawned", gordoSpawned);
+        nbt.putBoolean("StomachBuilt", stomachBuilt);
+        nbt.putInt("GordoX", gordoX);
+        nbt.putInt("GordoZ", gordoZ);
+        NbtCompound fed = new NbtCompound();
+        gordoFedDay.forEach((id, day) -> fed.putLong(id.toString(), day));
+        nbt.put("GordoFed", fed);
+        NbtCompound butter = new NbtCompound();
+        gordoButter.forEach((id, n) -> butter.putInt(id.toString(), n));
+        nbt.put("GordoButter", butter);
         return nbt;
     }
 }

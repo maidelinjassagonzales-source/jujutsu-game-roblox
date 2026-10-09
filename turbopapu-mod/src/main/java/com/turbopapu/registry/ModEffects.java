@@ -20,10 +20,14 @@ public final class ModEffects {
     /** Efecto del mate de Juanma: inmune al sueño de lavanda. */
     public static final StatusEffect DESPIERTO = new TurboEffect(StatusEffectCategory.BENEFICIAL, 0x4CAF50);
 
+    /** Mantequilla en los pies: te deslizas muy rápido (el empujón lo da el cliente, ver TurboPapuClient). */
+    public static final StatusEffect UNTADO = new TurboEffect(StatusEffectCategory.BENEFICIAL, 0xFFE066);
+
     private ModEffects() {}
 
     public static void register() {
         Registry.register(Registries.STATUS_EFFECT, TurboPapuMod.id("dormido"), DORMIDO);
         Registry.register(Registries.STATUS_EFFECT, TurboPapuMod.id("despierto"), DESPIERTO);
+        Registry.register(Registries.STATUS_EFFECT, TurboPapuMod.id("untado"), UNTADO);
     }
 }

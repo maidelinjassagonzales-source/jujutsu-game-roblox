@@ -112,7 +112,15 @@ public enum NpcProfile {
             List.of(
                     "¡Abracadabra... SALCHICHA!",
                     "Estudié 300 años de magia. Solo me sale un hechizo. Pero es el mejor."),
-            world -> new ItemStack[]{new ItemStack(ModItems.SALCHICHA, 4)});
+            world -> new ItemStack[]{new ItemStack(ModItems.SALCHICHA, 4)}),
+
+    GORDO_PANALES("Gordo Pañales", Formatting.GOLD, true, false, false,
+            List.of("Mantequilla. Todos. Los. Días."),
+            world -> new ItemStack[]{new ItemStack(ModItems.MANTEQUILLA, 3)}),
+
+    AGUACATE_CUBANO("Aguacate Cubano", Formatting.GREEN, true, true, false,
+            List.of("¡Pinga asere!"),
+            world -> new ItemStack[]{new ItemStack(ModItems.AGUACATE, 1)});
 
     private static final Map<EntityType<?>, NpcProfile> BY_TYPE = new HashMap<>();
 

@@ -42,6 +42,7 @@ public final class TurboEvents {
     private static void onTick(MinecraftServer server) {
         com.turbopapu.fight.BossFight.tick(server);
         com.turbopapu.fight.PvzArcade.tick(server);
+        GordoEvents.tick(server);
         if (++ticks % 20 != 0) {
             return;
         }
@@ -86,6 +87,15 @@ public final class TurboEvents {
                 state.magoSpawned = true;
                 state.markDirty();
             }
+            if (state.meteorFallen && !state.gordoSpawned && near(player, state.meteorX, state.meteorZ, 48)) {
+                // El Gordo Pañales se sienta cerca del meteorito a esperar su mantequilla.
+                state.gordoX = state.meteorX - 26;
+                state.gordoZ = state.meteorZ - 14;
+                int gy = Build.surface(overworld, state.gordoX, state.gordoZ);
+                Build.spawn(overworld, com.turbopapu.registry.ModEntities.GORDO_PANALES, state.gordoX + 0.5, gy, state.gordoZ + 0.5, 4);
+                state.gordoSpawned = true;
+                state.markDirty();
+            }
             if (state.meteorFallen && !state.hutBuilt && near(player, state.hutX, state.hutZ, 80)) {
                 OverworldBuilds.buildAlphatempHut(overworld, state.hutX, state.hutZ);
                 state.hutBuilt = true;
@@ -108,6 +118,7 @@ public final class TurboEvents {
                     PlanetBuilds.buildLair(planet, state);
                 }
                 RandomVillages.tick(planet, player, state);
+                AvocadoGroves.tick(planet, player, state);
                 ItemStack lairCompass = heldLairCompass(player);
                 if (lairCompass != null && state.meteorFallen) {
                     aimCompass(lairCompass, ModDimensions.PLANETA, TurboState.LAIR_X, 80, TurboState.LAIR_Z);

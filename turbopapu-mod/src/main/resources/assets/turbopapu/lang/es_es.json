@@ -93,5 +93,16 @@
   "entity.turbopapu.mago_larguirucho": "Mago Larguirucho",
   "item.turbopapu.mago_larguirucho_spawn_egg": "Huevo de Mago Larguirucho",
   "entity.turbopapu.salchicha": "Salchicha",
-  "item.turbopapu.salchicha": "Salchicha mágica"
+  "item.turbopapu.salchicha": "Salchicha mágica",
+  "entity.turbopapu.gordo_panales": "Gordo Pañales",
+  "item.turbopapu.gordo_panales_spawn_egg": "Huevo de Gordo Pañales",
+  "entity.turbopapu.aguacate_cubano": "Aguacate Cubano",
+  "item.turbopapu.aguacate_cubano_spawn_egg": "Huevo de Aguacate Cubano",
+  "item.turbopapu.mantequilla": "Mantequilla",
+  "item.turbopapu.aguacate": "Aguacate cubano",
+  "entity.turbopapu.zombi_pvz": "Zombi",
+  "item.turbopapu.panal": "Pañal del Gordo",
+  "effect.turbopapu.untado": "Untado de mantequilla",
+  "key.turbopapu.cagarse": "Cagarse encima (con pañal)",
+  "category.turbopapu": "TurboPapu"
 }

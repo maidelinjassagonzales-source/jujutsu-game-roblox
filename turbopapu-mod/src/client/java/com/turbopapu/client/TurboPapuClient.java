@@ -35,6 +35,7 @@ public class TurboPapuClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.FAT, PapuHumanoidModel::fat);
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.AROY, com.turbopapu.client.model.AroyModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.MAGO, PapuHumanoidModel::mago);
+        EntityModelLayerRegistry.registerModelLayer(ModModelLayers.AGUACATE, com.turbopapu.client.model.AguacateModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.SALCHICHA, com.turbopapu.client.model.SalchichaModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.VERITY, com.turbopapu.client.model.VerityModel::getTexturedModelData);
 
@@ -51,6 +52,8 @@ public class TurboPapuClient implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.ABE, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.HUMANOID, 1.05f));
         EntityRendererRegistry.register(ModEntities.MAGO_LARGUIRUCHO, com.turbopapu.client.render.MagoRenderer::new);
         EntityRendererRegistry.register(ModEntities.SALCHICHA, com.turbopapu.client.render.SalchichaRenderer::new);
+        EntityRendererRegistry.register(ModEntities.GORDO_PANALES, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.FAT, 1.3f));
+        EntityRendererRegistry.register(ModEntities.AGUACATE_CUBANO, com.turbopapu.client.render.AguacateRenderer::new);
         EntityRendererRegistry.register(ModEntities.SUALENIDUS, SualenidusRenderer::new);
         EntityRendererRegistry.register(ModEntities.METEOR, MeteorRenderer::new);
         EntityRendererRegistry.register(ModEntities.SUALEM_MINI, SualemMiniRenderer::new);
@@ -112,6 +115,10 @@ public class TurboPapuClient implements ClientModInitializer {
             client.execute(() -> client.setScreen(new DialogueScreen(Dialogues.pick(key, variant), npcId)));
         });
 
+        GordoClient.init();
+        ClientPlayNetworking.registerGlobalReceiver(ModPackets.SCREAMER, (client, handler, buf, sender) ->
+                client.execute(GordoClient::screamer));
+        ClientTickEvents.END_CLIENT_TICK.register(GordoClient::tick);
         ClientTickEvents.END_CLIENT_TICK.register(CinematicController::tick);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             FightHud.tick();
@@ -122,6 +129,7 @@ public class TurboPapuClient implements ClientModInitializer {
             CinematicController.renderHud(ctx, tickDelta);
             FightHud.render(ctx);
             LandingCinematic.renderHud(ctx);
+            GordoClient.render(ctx);
         });
     }
 

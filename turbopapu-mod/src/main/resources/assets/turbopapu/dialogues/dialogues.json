@@ -1176,5 +1176,101 @@
    "name": "Sualenidus",
    "text": "Vale. Me echo una siestecita... sin lavanda, lo prometo."
   }
+ ],
+ "gordo_panales_intro": [
+  {
+   "name": "Gordo Pañales",
+   "text": "Hola... soy el Gordo Pañales. Tengo hambre. Siempre tengo hambre."
+  },
+  {
+   "name": "Gordo Pañales",
+   "text": "Me gusta la mantequilla. Mucho. Muchísimo."
+  },
+  {
+   "name": "Gordo Pañales",
+   "text": "Tienes que darme mantequilla TODOS los días. Un día sí, y otro también."
+  },
+  {
+   "name": "Gordo Pañales",
+   "text": "Si un día se te olvida... vendré a por ti. Y te comeré. Y te irás a vivir a mi estómago."
+  },
+  {
+   "name": "Gordo Pañales",
+   "text": "Toma, te doy algo de mantequilla para empezar. Se hace con un cubo de leche en la mesa de crafteo."
+  },
+  {
+   "name": "Sistema",
+   "text": "Has recibido: 3 Mantequillas. Dale una cada día de Minecraft (clic derecho con la mantequilla en la mano)."
+  }
+ ],
+ "gordo_panales_charla_0": [
+  {
+   "name": "Gordo Pañales",
+   "text": "¿Me traes mantequilla? Clic derecho con ella en la mano. No me hagas esperar."
+  }
+ ],
+ "gordo_panales_charla_1": [
+  {
+   "name": "Gordo Pañales",
+   "text": "El pañal es por comodidad. No preguntes."
+  }
+ ],
+ "gordo_panales_charla_2": [
+  {
+   "name": "Gordo Pañales",
+   "text": "Ayer soñé con un río de mantequilla. Me lo bebí entero."
+  }
+ ],
+ "gordo_panales_comer": [
+  {
+   "name": "Gordo Pañales",
+   "text": "¡ÑAM! Mmmmantequilla... Hoy no te como. Vuelve mañana con más."
+  }
+ ],
+ "gordo_panales_lleno": [
+  {
+   "name": "Gordo Pañales",
+   "text": "¡Más mantequilla! Hoy ya estaba servido, pero no digo que no. Mañana quiero otra, ¿eh?"
+  }
+ ],
+ "aguacate_cubano_intro": [
+  {
+   "name": "Aguacate Cubano",
+   "text": "¡Pinga asere!"
+  },
+  {
+   "name": "Sistema",
+   "text": "El Aguacate Cubano te ha dado un aguacate."
+  }
+ ],
+ "aguacate_cubano_charla_0": [
+  {
+   "name": "Aguacate Cubano",
+   "text": "¡Pinga asere!"
+  }
+ ],
+ "estomago_llegada": [
+  {
+   "name": "Gordo Pañales",
+   "text": "ÑAM."
+  },
+  {
+   "name": "Sistema",
+   "text": "Estás en el estómago del Gordo Pañales. Cuidado con el ácido. Sube por las costillas hasta la garganta para que te vomite."
+  }
+ ],
+ "gordo_panales_panal": [
+  {
+   "name": "Gordo Pañales",
+   "text": "¡DIEZ MANTEQUILLAS! Eres mi mejor amigo. Toma... mis pañales. Ya no los necesito, estoy muy lleno."
+  },
+  {
+   "name": "Gordo Pañales",
+   "text": "Póntelos y pulsa G. Ya verás lo que pasa. Je, je."
+  },
+  {
+   "name": "Sistema",
+   "text": "Has recibido: Pañal del Gordo. Póntelo como pantalones y pulsa G para cagarte encima."
+  }
  ]
 }
