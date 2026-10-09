@@ -214,15 +214,19 @@
  "guinxu_intro": [
   {
    "name": "Guinxu",
-   "text": "¡Ey! Soy Guinxu. Sí, el pelo es así de natural. No, no se despeina ni en el espacio."
+   "text": "¡Hola, muy buenas! Soy Guinxu. Bienvenido a mi estudio."
   },
   {
    "name": "Guinxu",
-   "text": "Estaba haciendo un juego en 48 horas y aparecí aquí. Típico."
+   "text": "¿Un meteorito con una carta de unos extraterrestres? Esto da para un vídeo. O para un juego hecho en 48 horas."
   },
   {
    "name": "Guinxu",
-   "text": "La guarida de Sualenidus está lejos, al noreste. Toma mi Brújula Despeinada: apunta siempre a la guarida."
+   "text": "Los Turbopapuenses me hablaron por radio de su problema. La guarida de Sualenidus está al noreste de su aldea."
+  },
+  {
+   "name": "Guinxu",
+   "text": "Toma mi Brújula Despeinada. En la Tierra da vueltas, pero en el Planeta TurboPapu apunta directa a la guarida."
   },
   {
    "name": "Sistema",
@@ -238,23 +242,23 @@
  "guinxu_charla_1": [
   {
    "name": "Guinxu",
-   "text": "La brújula a veces apunta a mi peluquero. Ignóralo."
+   "text": "No toques la máscara de Majora. En serio. La última vez fue un fin de semana muy raro."
   }
  ],
  "guinxu_charla_2": [
   {
    "name": "Guinxu",
-   "text": "Las cúpulas de las aldeas las diseñé yo. Bueno, las dibujé en una servilleta."
+   "text": "El pelo no se peina solo, ¿eh? Bueno... sí. Se peina solo."
   }
  ],
  "elink_64_intro": [
   {
    "name": "elink_64",
-   "text": "¡It's-a me, elink_64! El streamer que el internet olvidó... pero el Planeta TurboPapu no."
+   "text": "¡It's-a me, elink_64! El streamer que el internet olvidó... pero tú no. ¡Bienvenido a mi castillo!"
   },
   {
    "name": "elink_64",
-   "text": "¡Saludos desde Machala! ¿O era Perú? Ya ni me acuerdo, llevo años aquí."
+   "text": "¡Saludos desde Machala! ¿O era Perú? Ya ni me acuerdo, ¡llevo años encerrado en este castillo!"
   },
   {
    "name": "elink_64",
@@ -263,7 +267,7 @@
   },
   {
    "name": "elink_64",
-   "text": "Toma estas Estrellas de Poder. ¡Here we go! Úsalas si Sualenidus te pega muy fuerte."
+   "text": "¿Vas al Planeta TurboPapu? Toma estas Estrellas de Poder. ¡Here we go! Úsalas si Sualenidus te pega muy fuerte."
   },
   {
    "name": "Sistema",
@@ -273,14 +277,14 @@
  "elink_64_charla_0": [
   {
    "name": "elink_64",
-   "text": "*hace el moonwalk* ¡Auuu!",
+   "text": "*hace el moonwalk por la pista de Billie Jean* ¡Auuu!",
    "shake": true
   }
  ],
  "elink_64_charla_1": [
   {
    "name": "elink_64",
-   "text": "¿Sabías que en Mario 64 puedes saltar las escaleras infinitas? Aquí también hay trucos. Pero no te los digo."
+   "text": "Los cuadros del castillo llevan a otros mundos. Como en Mario 64. Bueno... no. Pero mola pensarlo."
   }
  ],
  "elink_64_charla_2": [
@@ -652,6 +656,12 @@
    "portrait": "aroy_risa_verde",
    "pw": 160,
    "ph": 256
+  }
+ ],
+ "guinxu_charla_3": [
+  {
+   "name": "Guinxu",
+   "text": "Esa Game Boy de la estantería todavía funciona. La de al lado no. La de arriba es un misterio."
   }
  ]
 }

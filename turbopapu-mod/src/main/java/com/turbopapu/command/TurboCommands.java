@@ -68,6 +68,16 @@ public final class TurboCommands {
                             player.giveItemStack(com.turbopapu.world.Books.hutCompass((ServerWorld) player.getWorld(), state));
                             return 1;
                         }))
+                        .then(CommandManager.literal("guinxu").executes(ctx -> {
+                            ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+                            com.turbopapu.world.FriendBuilds.buildGuinxuStudio((ServerWorld) player.getWorld(), (int) player.getX() + 15, (int) player.getZ());
+                            return 1;
+                        }))
+                        .then(CommandManager.literal("elink").executes(ctx -> {
+                            ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+                            com.turbopapu.world.FriendBuilds.buildElinkCastle((ServerWorld) player.getWorld(), (int) player.getX() + 20, (int) player.getZ());
+                            return 1;
+                        }))
                         .then(CommandManager.literal("aldea").executes(ctx -> {
                             // Construye una aldea de Turbopapuenses delante del jugador.
                             ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
@@ -84,6 +94,8 @@ public final class TurboCommands {
         ctx.getSource().sendFeedback(() -> Text.literal(
                 "Meteorito: " + s.meteorFallen + " (" + s.meteorX + ", " + s.meteorY + ", " + s.meteorZ + ")"
                         + "\nChoza de Alphatemp: " + s.hutX + ", " + s.hutZ + " construida=" + s.hutBuilt
+                        + "\nEstudio de Guinxu: " + s.guinxuX + ", " + s.guinxuZ + " construido=" + s.guinxuBuilt
+                        + "\nCastillo de elink_64: " + s.elinkX + ", " + s.elinkZ + " construido=" + s.elinkBuilt
                         + "\nWilliam aparecido: " + s.williamSpawned
                         + "\nAldea: " + s.villageBuilt + " | Guarida: " + s.lairBuilt + " (" + TurboState.LAIR_X + ", " + TurboState.LAIR_Z + ")"
                         + "\nSualenidus derrotado: " + s.sualenidusDefeated), false);

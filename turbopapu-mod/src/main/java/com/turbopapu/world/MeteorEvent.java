@@ -134,6 +134,7 @@ public final class MeteorEvent {
         // La choza de Alphatemp queda a ~180 bloques al este.
         state.hutX = target.getX() + 180;
         state.hutZ = target.getZ() + 40;
+        state.placeFriends();
         state.markDirty();
 
         if (world.getBlockEntity(chestPos) instanceof ChestBlockEntity chest) {
@@ -151,6 +152,10 @@ public final class MeteorEvent {
             ModPackets.openLetter(p);
             p.sendMessage(Text.translatable("message.turbopapu.meteor_landed", target.getX(), target.getY(), target.getZ())
                     .formatted(Formatting.GOLD), false);
+            TurboState state = TurboState.get(world.getServer());
+            p.sendMessage(Text.literal("Alphatemp: X " + state.hutX + ", Z " + state.hutZ
+                    + "  |  Guinxu: X " + state.guinxuX + ", Z " + state.guinxuZ
+                    + "  |  elink_64: X " + state.elinkX + ", Z " + state.elinkZ).formatted(Formatting.YELLOW), false);
         }
     }
 }

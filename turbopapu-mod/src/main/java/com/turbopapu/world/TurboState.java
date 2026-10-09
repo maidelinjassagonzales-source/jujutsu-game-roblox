@@ -17,6 +17,8 @@ public class TurboState extends PersistentState {
     public int meteorX, meteorY, meteorZ;
     public int hutX, hutZ;
     public boolean hutBuilt;
+    public int guinxuX, guinxuZ, elinkX, elinkZ;
+    public boolean guinxuBuilt, elinkBuilt;
     public boolean williamSpawned;
     public boolean villageBuilt;
     public int villageY;
@@ -27,6 +29,14 @@ public class TurboState extends PersistentState {
 
     /** No se guarda: evita lanzar dos meteoritos a la vez. */
     public transient boolean meteorIncoming;
+
+    /** Casa de Guinxu (~160 bloques al oeste del meteorito) y castillo de elink_64 (~170 al sur). */
+    public void placeFriends() {
+        guinxuX = meteorX - 160;
+        guinxuZ = meteorZ + 50;
+        elinkX = meteorX + 40;
+        elinkZ = meteorZ + 170;
+    }
 
     public static TurboState get(MinecraftServer server) {
         return server.getWorld(World.OVERWORLD).getPersistentStateManager()
@@ -42,6 +52,16 @@ public class TurboState extends PersistentState {
         s.hutX = nbt.getInt("HutX");
         s.hutZ = nbt.getInt("HutZ");
         s.hutBuilt = nbt.getBoolean("HutBuilt");
+        s.guinxuX = nbt.getInt("GuinxuX");
+        s.guinxuZ = nbt.getInt("GuinxuZ");
+        s.elinkX = nbt.getInt("ElinkX");
+        s.elinkZ = nbt.getInt("ElinkZ");
+        s.guinxuBuilt = nbt.getBoolean("GuinxuBuilt");
+        s.elinkBuilt = nbt.getBoolean("ElinkBuilt");
+        if (s.meteorFallen && s.guinxuX == 0 && s.guinxuZ == 0) {
+            // Mundos donde el meteorito cayó con una versión anterior del mod.
+            s.placeFriends();
+        }
         s.williamSpawned = nbt.getBoolean("WilliamSpawned");
         s.villageBuilt = nbt.getBoolean("VillageBuilt");
         s.villageY = nbt.getInt("VillageY");
@@ -62,6 +82,12 @@ public class TurboState extends PersistentState {
         nbt.putInt("HutX", hutX);
         nbt.putInt("HutZ", hutZ);
         nbt.putBoolean("HutBuilt", hutBuilt);
+        nbt.putInt("GuinxuX", guinxuX);
+        nbt.putInt("GuinxuZ", guinxuZ);
+        nbt.putInt("ElinkX", elinkX);
+        nbt.putInt("ElinkZ", elinkZ);
+        nbt.putBoolean("GuinxuBuilt", guinxuBuilt);
+        nbt.putBoolean("ElinkBuilt", elinkBuilt);
         nbt.putBoolean("WilliamSpawned", williamSpawned);
         nbt.putBoolean("VillageBuilt", villageBuilt);
         nbt.putInt("VillageY", villageY);

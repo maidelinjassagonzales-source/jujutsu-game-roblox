@@ -267,23 +267,43 @@ def juanma():
 
 
 def guinxu():
-    hair = hexc("6B4423")
-    img = humanoid(hexc("E6B48F"), hair, hexc("2B2B2B"), hexc("3A5A8C"), hexc("E0E0E0"))
-    chest_logo(img, [(1, 0), (2, 0), (3, 0), (0, 1), (0, 2), (2, 2), (3, 2), (0, 3), (3, 3), (1, 4), (2, 4), (3, 4)], hexc("F6C453"))
-    cube(img, 0, 32, 10, 5, 10, hair, 0.25)
-    cube(img, 40, 32, 3, 4, 3, shade(hair, 1.15), 0.25)
-    cube(img, 52, 32, 3, 4, 3, shade(hair, 0.9), 0.25)
-    # Mechones locos en la capa de sombrero
-    f = faces(*HAT)
-    for name, (x, y, w, h) in f.items():
-        for i in range(w):
-            for j in range(h):
-                if name in ("front",) and j > 1:
-                    continue
-                if name in ("right", "left", "back") and j > 4:
-                    continue
-                if rng.random() < 0.7:
-                    img.putpixel((x + i, y + j), shade(hair, 0.8 + rng.random() * 0.5))
+    """Guinxu: pelo largo castaño oscuro con raya en medio, gafas negras rectangulares, perilla y
+    camiseta negra con los kanji 空手 en blanco."""
+    hair = hexc("3B2A20")
+    skin = hexc("E2B79A")
+    img = humanoid(skin, hair, hexc("141414"), hexc("2B3340"), hexc("111111"), sleeves=hexc("141414"))
+    fx, fy = front(HEAD)
+    # Flequillo con raya en medio que enmarca la cara.
+    rect(img, fx, fy, 8, 1, hair, 0.15)
+    rect(img, fx, fy + 1, 1, 7, hair, 0.15)
+    rect(img, fx + 7, fy + 1, 1, 7, hair, 0.15)
+    img.putpixel((fx + 3, fy + 1), hair)
+    img.putpixel((fx + 4, fy + 1), hair)
+    # Gafas negras rectangulares.
+    for ex in (fx + 1, fx + 4):
+        rect(img, ex, fy + 3, 3, 1, hexc("0A0A0A"))
+        img.putpixel((ex, fy + 4), hexc("0A0A0A"))
+        img.putpixel((ex + 2, fy + 4), hexc("0A0A0A"))
+        img.putpixel((ex + 1, fy + 4), hexc("3B2416"))
+    # Bigote y perilla.
+    rect(img, fx + 3, fy + 6, 2, 1, shade(hair, 1.1))
+    rect(img, fx + 3, fy + 7, 2, 1, shade(hair, 1.2))
+    # Toda la cabeza menos la cara, de pelo.
+    for name in ("right", "left", "back", "top"):
+        x, y, w, h = faces(*HEAD)[name]
+        rect(img, x, y, w, h, hair, 0.15)
+    # Melena: arriba, espalda y mechones laterales.
+    for box in [(0, 32, 9, 2, 9), (36, 32, 9, 14, 1), (0, 43, 1, 12, 6)]:
+        for name, (x, y, w, h) in faces(*box).items():
+            for i in range(w):
+                for j in range(h):
+                    img.putpixel((x + i, y + j), shade(hair, 0.85 + 0.3 * ((i * 7 + j) % 5) / 5))
+    # Kanji 空手 en blanco en la camiseta.
+    bx, by = front(BODY)
+    kanji = [(3, 1), (4, 1), (2, 2), (5, 2), (3, 3), (4, 3), (2, 4), (3, 4), (4, 4), (5, 4),
+             (3, 6), (4, 6), (2, 7), (3, 7), (4, 7), (5, 7), (3, 8), (4, 8), (4, 9), (3, 10), (4, 10)]
+    for (px, py) in kanji:
+        img.putpixel((bx + px, by + py), hexc("F0F0F0"))
     return img
 
 

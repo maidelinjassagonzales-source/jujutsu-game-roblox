@@ -40,6 +40,16 @@ public final class TurboEvents {
             if (state.meteorFallen && holdsHutCompass(player)) {
                 showHutDistance(player, state);
             }
+            if (state.meteorFallen && !state.guinxuBuilt && near(player, state.guinxuX, state.guinxuZ, 80)) {
+                FriendBuilds.buildGuinxuStudio(overworld, state.guinxuX, state.guinxuZ);
+                state.guinxuBuilt = true;
+                state.markDirty();
+            }
+            if (state.meteorFallen && !state.elinkBuilt && near(player, state.elinkX, state.elinkZ, 80)) {
+                FriendBuilds.buildElinkCastle(overworld, state.elinkX, state.elinkZ);
+                state.elinkBuilt = true;
+                state.markDirty();
+            }
             if (state.meteorFallen && !state.hutBuilt && near(player, state.hutX, state.hutZ, 80)) {
                 OverworldBuilds.buildAlphatempHut(overworld, state.hutX, state.hutZ);
                 state.hutBuilt = true;

@@ -86,8 +86,6 @@ public final class VillageBuilder {
 
         if (main) {
             Build.spawn(world, ModEntities.JUANMA, cx + 7.5, y0, cz + 5.5, 10);
-            Build.spawn(world, ModEntities.GUINXU, cx - 6.5, y0, cz + 6.5, 10);
-            Build.spawn(world, ModEntities.ELINK_64, cx + 0.5, y0, cz - 9.5, 10);
             Build.spawn(world, ModEntities.VERITY_GORDA, cx - 8.5, y0, cz - 4.5, 8);
             Build.spawn(world, ModEntities.AROY, cx + 3.5, y0, cz + 9.5, 8);
             // Parrilla para el asado de Juanma.

@@ -34,15 +34,14 @@ public class PapuHumanoidModel<T extends MobEntity> extends BipedEntityModel<T> 
         return TexturedModelData.of(base(), 64, 64);
     }
 
-    /** Guinxu: un pelo tan loco que necesita su propio modelo. */
+    /** Guinxu: melena larga y lisa con raya en medio que le cae por la espalda y por delante de los hombros. */
     public static TexturedModelData guinxu() {
         ModelData data = base();
         ModelPartData head = data.getRoot().getChild("head");
-        head.addChild("hair", ModelPartBuilder.create().uv(0, 32).cuboid(-5, -12, -5, 10, 5, 10), ModelTransform.NONE);
-        head.addChild("spike_left", ModelPartBuilder.create().uv(40, 32).cuboid(1, -16, -2, 3, 4, 3),
-                ModelTransform.of(0, 0, 0, 0, 0, 0.35f));
-        head.addChild("spike_right", ModelPartBuilder.create().uv(52, 32).cuboid(-4, -15, -1, 3, 4, 3),
-                ModelTransform.of(0, 0, 0, 0, 0, -0.4f));
+        head.addChild("hair_top", ModelPartBuilder.create().uv(0, 32).cuboid(-4.5f, -8.6f, -4.5f, 9, 2, 9), ModelTransform.NONE);
+        head.addChild("hair_back", ModelPartBuilder.create().uv(36, 32).cuboid(-4.5f, -7.5f, 3.6f, 9, 14, 1), ModelTransform.NONE);
+        head.addChild("hair_left", ModelPartBuilder.create().uv(0, 43).cuboid(3.6f, -7.5f, -3.5f, 1, 12, 6), ModelTransform.NONE);
+        head.addChild("hair_right", ModelPartBuilder.create().uv(0, 43).mirrored().cuboid(-4.6f, -7.5f, -3.5f, 1, 12, 6), ModelTransform.NONE);
         return TexturedModelData.of(data, 64, 64);
     }
 
