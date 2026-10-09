@@ -68,6 +68,13 @@ public final class TurboCommands {
                             player.giveItemStack(com.turbopapu.world.Books.hutCompass((ServerWorld) player.getWorld(), state));
                             return 1;
                         }))
+                        .then(CommandManager.literal("pvz")
+                                .then(CommandManager.argument("nivel", com.mojang.brigadier.arguments.IntegerArgumentType.integer(1, com.turbopapu.fight.PvzGame.MAX_LEVEL))
+                                        .executes(ctx -> {
+                                            com.turbopapu.fight.PvzArcade.start(ctx.getSource().getPlayerOrThrow(),
+                                                    com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "nivel"));
+                                            return 1;
+                                        })))
                         .then(CommandManager.literal("guinxu").executes(ctx -> {
                             ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
                             com.turbopapu.world.FriendBuilds.buildGuinxuStudio((ServerWorld) player.getWorld(), (int) player.getX() + 15, (int) player.getZ());

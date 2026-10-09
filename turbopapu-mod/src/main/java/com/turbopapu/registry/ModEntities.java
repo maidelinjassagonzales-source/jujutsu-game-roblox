@@ -62,6 +62,15 @@ public final class ModEntities {
                     .defaultAttributes(SualemMiniEntity::createAttributes)
                     .build());
 
+    /** Zombies normales del Plantas vs Zombies del modo libre (misma lógica que los Sualems). */
+    public static final EntityType<SualemMiniEntity> ZOMBI_PVZ = register("zombi_pvz",
+            FabricEntityTypeBuilder.<SualemMiniEntity>createMob()
+                    .spawnGroup(SpawnGroup.MISC)
+                    .entityFactory(SualemMiniEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.95f))
+                    .defaultAttributes(SualemMiniEntity::createAttributes)
+                    .build());
+
     public static final EntityType<PvzPlantEntity> PVZ_PLANT = register("pvz_planta",
             FabricEntityTypeBuilder.<PvzPlantEntity>createMob()
                     .spawnGroup(SpawnGroup.MISC)

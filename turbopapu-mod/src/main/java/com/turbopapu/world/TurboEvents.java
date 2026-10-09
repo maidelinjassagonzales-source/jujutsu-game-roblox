@@ -41,6 +41,7 @@ public final class TurboEvents {
 
     private static void onTick(MinecraftServer server) {
         com.turbopapu.fight.BossFight.tick(server);
+        com.turbopapu.fight.PvzArcade.tick(server);
         if (++ticks % 20 != 0) {
             return;
         }

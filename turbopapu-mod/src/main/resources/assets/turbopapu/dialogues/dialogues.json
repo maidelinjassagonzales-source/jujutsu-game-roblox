@@ -1114,5 +1114,67 @@
    "name": "Mago Larguirucho",
    "text": "Sualenidus duerme a la gente con lavanda. Yo despierto a la gente con olor a parrillada."
   }
+ ],
+ "sualenidus_amigo_pvz": [
+  {
+   "name": "Sualenidus",
+   "text": "¿Otra partidita de Plantas vs Zombies? Esta vez no mando a mis Sualems... he contratado zombies de verdad.",
+   "options": [
+    {
+     "text": "Niveles 1 a 3",
+     "goto": "sualenidus_amigo_pvz_facil"
+    },
+    {
+     "text": "Niveles 4 y 5",
+     "goto": "sualenidus_amigo_pvz_dificil"
+    },
+    {
+     "text": "Ahora no, gracias.",
+     "goto": "sualenidus_amigo_pvz_no"
+    }
+   ]
+  }
+ ],
+ "sualenidus_amigo_pvz_facil": [
+  {
+   "name": "Sualenidus",
+   "text": "Elige nivel. Para jugar uno tienes que haber superado el anterior.",
+   "options": [
+    {
+     "text": "Nivel 1",
+     "action": "pvz_nivel_1"
+    },
+    {
+     "text": "Nivel 2",
+     "action": "pvz_nivel_2"
+    },
+    {
+     "text": "Nivel 3",
+     "action": "pvz_nivel_3"
+    }
+   ]
+  }
+ ],
+ "sualenidus_amigo_pvz_dificil": [
+  {
+   "name": "Sualenidus",
+   "text": "Uy, los difíciles. Más oleadas y zombies con cubo en la cabeza. Pulsa ESC dentro si te rindes.",
+   "options": [
+    {
+     "text": "Nivel 4",
+     "action": "pvz_nivel_4"
+    },
+    {
+     "text": "Nivel 5",
+     "action": "pvz_nivel_5"
+    }
+   ]
+  }
+ ],
+ "sualenidus_amigo_pvz_no": [
+  {
+   "name": "Sualenidus",
+   "text": "Vale. Me echo una siestecita... sin lavanda, lo prometo."
+  }
  ]
 }

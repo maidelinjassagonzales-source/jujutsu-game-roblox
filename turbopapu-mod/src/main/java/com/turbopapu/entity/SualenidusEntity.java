@@ -313,4 +313,9 @@ public class SualenidusEntity extends HostileEntity {
         world.getPlayers(p -> p.squaredDistanceTo(this) < 48 * 48).forEach(p -> p.sendMessage(
                 Text.literal("<Sualenidus> ¡¿UN ICEBERG?! ¡ESO NO ESTÁ EN VALORANT! ¡JAJA... ay!").formatted(Formatting.LIGHT_PURPLE), false));
     }
+
+    @Override
+    protected boolean isDisallowedInPeaceful() {
+        return false;
+    }
 }

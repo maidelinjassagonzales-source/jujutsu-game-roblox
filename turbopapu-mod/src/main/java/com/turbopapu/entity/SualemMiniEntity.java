@@ -55,6 +55,12 @@ public class SualemMiniEntity extends HostileEntity {
     }
 
     @Override
+    protected boolean isDisallowedInPeaceful() {
+        // Si no, en Pacífico desaparecen nada más salir y no hay oleadas.
+        return false;
+    }
+
+    @Override
     public boolean isPushable() {
         return false;
     }

@@ -59,7 +59,11 @@ public class BossFight {
     private static boolean pvzDamageFlag;
 
     private final ServerWorld world;
-    private final UUID bossId;
+    private UUID bossId;
+    private int missingBossTicks;
+    /** Mantiene cargadas las arenas lejanas mientras Sualenidus está en ellas (si no, se pierde al teletransportarlo). */
+    private static final net.minecraft.server.world.ChunkTicketType<net.minecraft.util.math.ChunkPos> FIGHT_TICKET =
+            net.minecraft.server.world.ChunkTicketType.create("turbopapu_pelea", java.util.Comparator.comparingLong(net.minecraft.util.math.ChunkPos::toLong), 20 * 30);
     private final Set<UUID> players = new LinkedHashSet<>();
     private Phase phase = Phase.RING;
     private int phaseTicks;
@@ -79,7 +83,6 @@ public class BossFight {
     // PvZ
     private PvzGame pvz;
     private ArmorStandEntity camera;
-    boolean pvzDamage;
 
     private int absentTicks;
 
@@ -96,11 +99,11 @@ public class BossFight {
     }
 
     public static boolean isPvzActive() {
-        return current != null && current.phase == Phase.PVZ;
+        return (current != null && current.phase == Phase.PVZ) || PvzArcade.isActive();
     }
 
     public static boolean isPvzDamage() {
-        return current != null && current.pvzDamage;
+        return PvzGame.isDamaging();
     }
 
     public static BossFight forBoss(SualenidusEntity boss) {
@@ -142,12 +145,16 @@ public class BossFight {
     public static void pvzPlace(ServerPlayerEntity player, int col, int row, int type) {
         if (current != null && current.pvz != null && current.phase == Phase.PVZ) {
             current.pvz.place(player, col, row, type);
+        } else {
+            PvzArcade.place(player, col, row, type);
         }
     }
 
     public static void pvzShovel(ServerPlayerEntity player, int col, int row) {
         if (current != null && current.pvz != null && current.phase == Phase.PVZ) {
             current.pvz.shovel(col, row);
+        } else {
+            PvzArcade.shovel(player, col, row);
         }
     }
 
@@ -171,7 +178,7 @@ public class BossFight {
                 return Math.max(0, Math.min(amount, boss.getHealth() - floor));
             }
             case PVZ -> {
-                return pvzDamage ? amount : 0;
+                return PvzGame.isDamaging() ? amount : 0;
             }
             default -> {
                 return 0;
@@ -270,6 +277,61 @@ public class BossFight {
         broadcast(Text.literal("¡Damas y caballeros! En la esquina roja... ¡el terrícola! En la esquina azul... ¡SUALENIDUS!").formatted(Formatting.GOLD));
     }
 
+    private void keepLoaded(double x, double z) {
+        net.minecraft.util.math.ChunkPos cp = new net.minecraft.util.math.ChunkPos(BlockPos.ofFloored(x, 0, z));
+        world.getChunkManager().addTicket(FIGHT_TICKET, cp, 3, cp);
+        world.getChunk(cp.x, cp.z);
+    }
+
+    /** Teletransporta a Sualenidus cargando antes el sitio de destino. */
+    void moveBoss(SualenidusEntity boss, double x, double y, double z, float yaw) {
+        keepLoaded(x, z);
+        boss.refreshPositionAndAngles(x, y, z, yaw, 0);
+        boss.setHeadYaw(yaw);
+        boss.setBodyYaw(yaw);
+        boss.getNavigation().stop();
+    }
+
+    private SualenidusEntity respawnBoss() {
+        SualenidusEntity boss = ModEntities.SUALENIDUS.create(world);
+        if (boss == null) {
+            return null;
+        }
+        double x, y, z;
+        float yaw;
+        switch (phase) {
+            case SOULS, PVZ -> {
+                x = Arenas.LAWN_X + Arenas.COLS * Arenas.CELL + 7;
+                y = Arenas.LAWN_Y;
+                z = Arenas.rowZ(2);
+                yaw = 90;
+            }
+            case VALORANT, VALORANT_PREP -> {
+                BlockPos b = Arenas.valBossSpawn();
+                x = b.getX() + 0.5;
+                y = b.getY();
+                z = b.getZ() + 0.5;
+                yaw = -90;
+            }
+            default -> {
+                x = TurboState.LAIR_X + 0.5;
+                y = ringY;
+                z = TurboState.LAIR_Z - 2.5;
+                yaw = 0;
+            }
+        }
+        keepLoaded(x, z);
+        boss.refreshPositionAndAngles(x, y, z, yaw, 0);
+        boss.setPersistent();
+        world.spawnEntity(boss);
+        if (phase != Phase.RING) {
+            boss.setHealth(boss.getMaxHealth() * 0.3f);
+            setScripted(boss, true);
+        }
+        bossId = boss.getUuid();
+        return boss;
+    }
+
     public SualenidusEntity boss() {
         return world.getEntity(bossId) instanceof SualenidusEntity b ? b : null;
     }
@@ -296,7 +358,17 @@ public class BossFight {
         }
         absentTicks = 0;
         if (boss == null) {
-            return;
+            // Si Sualenidus se perdió por el camino (chunk sin cargar), vuelve a aparecer donde toca.
+            if (phase != Phase.RING && ++missingBossTicks > 40) {
+                boss = respawnBoss();
+            }
+            if (boss == null) {
+                return;
+            }
+        }
+        missingBossTicks = 0;
+        if (phase != Phase.RING && world.getTime() % 100 == 0) {
+            keepLoaded(boss.getX(), boss.getZ());
         }
         switch (phase) {
             case RING -> {
@@ -330,7 +402,7 @@ public class BossFight {
             boss.setHealth(boss.getMaxHealth());
             setScripted(boss, false);
             boss.setAiDisabled(false);
-            boss.refreshPositionAndAngles(TurboState.LAIR_X + 0.5, ringY, TurboState.LAIR_Z - 2.5, 0, 0);
+            moveBoss(boss, TurboState.LAIR_X + 0.5, ringY, TurboState.LAIR_Z - 2.5, 0);
         }
         if (pvz != null) {
             pvz.clear();
@@ -393,7 +465,7 @@ public class BossFight {
 
     private void resetRound(SualenidusEntity boss) {
         BlockPos b = Arenas.valBossSpawn();
-        boss.refreshPositionAndAngles(b.getX() + 0.5, b.getY(), b.getZ() + 0.5, -90, 0);
+        moveBoss(boss, b.getX() + 0.5, b.getY(), b.getZ() + 0.5, -90);
         boss.getNavigation().stop();
         spikeTicks = SPIKE_TICKS;
         defuse = 0;
@@ -499,7 +571,7 @@ public class BossFight {
             p.teleport(world, cx + 0.5, Arenas.LAWN_Y, cz, -90, 0);
             ModPackets.dialogue(p, "sualenidus_fase3", 0, boss.getId());
         }
-        boss.refreshPositionAndAngles(Arenas.LAWN_X + Arenas.COLS * Arenas.CELL + 7, Arenas.LAWN_Y, cz, 90, 0);
+        moveBoss(boss, Arenas.LAWN_X + Arenas.COLS * Arenas.CELL + 7, Arenas.LAWN_Y, cz, 90);
         boss.getNavigation().stop();
     }
 
@@ -567,21 +639,7 @@ public class BossFight {
         if (camera != null) {
             camera.discard();
         }
-        camera = new ArmorStandEntity(world, Arenas.LAWN_X + Arenas.COLS, Arenas.LAWN_Y + 12, Arenas.LAWN_Z + Arenas.ROWS * Arenas.CELL + 11);
-        NbtCompound tag = new NbtCompound();
-        camera.writeCustomDataToNbt(tag);
-        tag.putBoolean("Marker", true);
-        tag.putBoolean("Invisible", true);
-        tag.putBoolean("NoGravity", true);
-        camera.readCustomDataFromNbt(tag);
-        camera.setInvisible(true);
-        camera.setNoGravity(true);
-        camera.setYaw(180);
-        camera.setPitch(46);
-        camera.setHeadYaw(180);
-        camera.setBodyYaw(180);
-        camera.addCommandTag("turbopapu_camara");
-        world.spawnEntity(camera);
+        camera = PvzGame.spawnCamera(world);
         pvz = new PvzGame(world, this);
         pvz.start();
         for (ServerPlayerEntity p : ps) {

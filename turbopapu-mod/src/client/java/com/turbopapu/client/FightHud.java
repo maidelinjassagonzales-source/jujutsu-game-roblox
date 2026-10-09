@@ -24,7 +24,8 @@ import net.minecraft.util.math.random.Random;
 public final class FightHud {
     public static int phase = -1;
     public static int round, spikeTicks, defuse;
-    public static int sun, wave, waveProgress;
+    public static int sun, wave, waveProgress, totalWaves = 3;
+    public static boolean arcade;
     public static String message = "";
     public static final int[] cooldowns = new int[PvzPlantType.values().length];
 
@@ -48,6 +49,8 @@ public final class FightHud {
         if (buf.readBoolean()) {
             sun = buf.readVarInt();
             wave = buf.readVarInt();
+            totalWaves = buf.readVarInt();
+            arcade = buf.readBoolean();
             waveProgress = buf.readVarInt();
             message = buf.readString();
             for (int i = 0; i < cooldowns.length; i++) {

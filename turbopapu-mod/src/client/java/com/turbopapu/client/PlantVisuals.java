@@ -26,6 +26,7 @@ public final class PlantVisuals {
             case JUANMA -> ModEntities.JUANMA;
             case ELINK_64 -> ModEntities.ELINK_64;
             case VERITY_GORDA -> ModEntities.VERITY_GORDA;
+            case MAGO_LARGUIRUCHO -> ModEntities.MAGO_LARGUIRUCHO;
         };
     }
 

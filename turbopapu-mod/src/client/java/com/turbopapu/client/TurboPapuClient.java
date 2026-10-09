@@ -54,6 +54,7 @@ public class TurboPapuClient implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.SUALENIDUS, SualenidusRenderer::new);
         EntityRendererRegistry.register(ModEntities.METEOR, MeteorRenderer::new);
         EntityRendererRegistry.register(ModEntities.SUALEM_MINI, SualemMiniRenderer::new);
+        EntityRendererRegistry.register(ModEntities.ZOMBI_PVZ, com.turbopapu.client.render.PvzZombieRenderer::new);
         EntityRendererRegistry.register(ModEntities.PVZ_PLANT, PvzPlantRenderer::new);
         EntityRendererRegistry.register(ModEntities.PVZ_PROJECTILE, ctx -> new net.minecraft.client.render.entity.FlyingItemEntityRenderer<>(ctx, 1.4f, true));
         EntityRendererRegistry.register(ModEntities.SUALENIDUS_AMIGO, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.FAT, 1.4f));

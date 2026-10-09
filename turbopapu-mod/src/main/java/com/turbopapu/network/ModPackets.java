@@ -27,6 +27,7 @@ public final class ModPackets {
     public static final Identifier DIALOGUE_ACTION = TurboPapuMod.id("dialogue_action");
     public static final Identifier PVZ_PLACE = TurboPapuMod.id("pvz_place");
     public static final Identifier PVZ_SHOVEL = TurboPapuMod.id("pvz_shovel");
+    public static final Identifier PVZ_QUIT = TurboPapuMod.id("pvz_quit");
 
     private ModPackets() {}
 
@@ -43,6 +44,8 @@ public final class ModPackets {
             int col = buf.readVarInt(), row = buf.readVarInt();
             server.execute(() -> BossFight.pvzShovel(player, col, row));
         });
+        ServerPlayNetworking.registerGlobalReceiver(PVZ_QUIT, (server, player, handler, buf, sender) ->
+                server.execute(() -> com.turbopapu.fight.PvzArcade.quit(player)));
     }
 
     public static void fightState(ServerPlayerEntity player, BossFight fight) {
@@ -51,18 +54,34 @@ public final class ModPackets {
         buf.writeVarInt(fight.round());
         buf.writeVarInt(fight.spikeTicks());
         buf.writeVarInt(fight.defuse());
-        PvzGame pvz = fight.pvz();
+        writePvz(buf, fight.pvz(), false);
+        ServerPlayNetworking.send(player, FIGHT_STATE, buf);
+    }
+
+    /** Estado del Plantas vs Zombies del modo libre (se dibuja igual que la fase final de la pelea). */
+    public static void arcadeState(ServerPlayerEntity player, PvzGame pvz) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeVarInt(BossFight.Phase.PVZ.ordinal());
+        buf.writeVarInt(0);
+        buf.writeVarInt(0);
+        buf.writeVarInt(0);
+        writePvz(buf, pvz, true);
+        ServerPlayNetworking.send(player, FIGHT_STATE, buf);
+    }
+
+    private static void writePvz(PacketByteBuf buf, PvzGame pvz, boolean arcade) {
         buf.writeBoolean(pvz != null);
         if (pvz != null) {
             buf.writeVarInt(pvz.sun());
             buf.writeVarInt(pvz.wave());
+            buf.writeVarInt(pvz.totalWaves());
+            buf.writeBoolean(arcade);
             buf.writeVarInt(pvz.waveProgress());
             buf.writeString(pvz.message());
             for (int i = 0; i < PvzPlantType.values().length; i++) {
                 buf.writeVarInt(pvz.cooldownPercent(i));
             }
         }
-        ServerPlayNetworking.send(player, FIGHT_STATE, buf);
     }
 
     public static void fightEnded(ServerPlayerEntity player) {

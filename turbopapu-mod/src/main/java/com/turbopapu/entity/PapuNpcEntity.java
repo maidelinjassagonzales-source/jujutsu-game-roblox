@@ -90,6 +90,9 @@ public class PapuNpcEntity extends PathAwareEntity {
             if (player instanceof net.minecraft.server.network.ServerPlayerEntity serverPlayer) {
                 if (firstTime) {
                     com.turbopapu.network.ModPackets.dialogue(serverPlayer, base + "_intro", 0, getId());
+                } else if (profile == NpcProfile.SUALENIDUS_AMIGO) {
+                    // Sualenidus reformado organiza partidas de Plantas vs Zombies (ahora con zombies de verdad).
+                    com.turbopapu.network.ModPackets.dialogue(serverPlayer, "sualenidus_amigo_pvz", 0, getId());
                 } else {
                     com.turbopapu.network.ModPackets.dialogue(serverPlayer, base + "_charla", lineIndex++, getId());
                 }

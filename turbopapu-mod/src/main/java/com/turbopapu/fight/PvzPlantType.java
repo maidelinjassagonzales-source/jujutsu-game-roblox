@@ -12,7 +12,8 @@ public enum PvzPlantType {
     AROY("Aroy", 150, 300, 30, "Cañón de coco: mucho daño"),
     JUANMA("Juanma", 125, 200, 30, "Lanza mate con salpicadura"),
     ELINK_64("elink_64", 150, 900, 30, "¡Explota! (petazeta)"),
-    VERITY_GORDA("Verity Gorda", 100, 400, 30, "Rueda por la fila (nuez bolera)");
+    VERITY_GORDA("Verity Gorda", 100, 400, 30, "Rueda por la fila (nuez bolera)"),
+    MAGO_LARGUIRUCHO("Mago Larguirucho", 125, 200, 30, "Abre un agujero y lanza salchichas");
 
     public final String displayName;
     public final int cost;

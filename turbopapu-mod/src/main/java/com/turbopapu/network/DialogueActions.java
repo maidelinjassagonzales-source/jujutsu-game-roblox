@@ -40,7 +40,16 @@ public final class DialogueActions {
                     player.giveItemStack(new ItemStack(ModItems.LECHE_DE_COCO, 2));
                 }
             }
-            default -> BossFight.onDialogueAction(player, action);
+            default -> {
+                if (action.startsWith("pvz_nivel_")) {
+                    try {
+                        com.turbopapu.fight.PvzArcade.start(player, Integer.parseInt(action.substring("pvz_nivel_".length())));
+                    } catch (NumberFormatException ignored) {
+                    }
+                } else {
+                    BossFight.onDialogueAction(player, action);
+                }
+            }
         }
     }
 }

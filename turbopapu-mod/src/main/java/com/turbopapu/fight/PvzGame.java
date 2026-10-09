@@ -31,7 +31,15 @@ import java.util.Map;
  */
 public class PvzGame {
     public static final int START_SUN = 150;
-    private static final int TOTAL_WAVES = 3;
+    public static final int MAX_LEVEL = 5;
+    /** true mientras el minijuego hace daño (los Sualems/zombies solo reciben daño de las plantas). */
+    static boolean damaging;
+
+    /** 0 = la batalla contra Sualenidus; 1..MAX_LEVEL = niveles del modo libre. */
+    final int level;
+    /** Modo libre después de vencer a Sualenidus: zombies normales en vez de Sualems. */
+    final boolean zombiesMode;
+    final int totalWaves;
 
     private final ServerWorld world;
     private final BossFight fight;
@@ -53,15 +61,59 @@ public class PvzGame {
     int messageTicks;
 
     public PvzGame(ServerWorld world, BossFight fight) {
+        this(world, fight, 0, false);
+    }
+
+    public PvzGame(ServerWorld world, BossFight fight, int level, boolean zombiesMode) {
         this.world = world;
         this.fight = fight;
         this.random = world.getRandom();
+        this.level = level;
+        this.zombiesMode = zombiesMode;
+        this.totalWaves = level <= 0 ? 3 : new int[]{2, 3, 3, 4, 5}[Math.min(level, MAX_LEVEL) - 1];
+    }
+
+    public static boolean isDamaging() {
+        return damaging;
+    }
+
+    private SualenidusEntity boss() {
+        return fight == null ? null : boss();
+    }
+
+    private String enemies() {
+        return zombiesMode ? "zombies" : "Sualems";
+    }
+
+    private int waveSize(int w) {
+        if (level <= 0) {
+            return w == 1 ? 7 : w == 2 ? 12 : 18;
+        }
+        int size = 4 + level * 2 + (w - 1) * (3 + level);
+        return w == totalWaves ? size * 3 / 2 : size;
+    }
+
+    private int spawnInterval(int w) {
+        if (level <= 0) {
+            return w == 1 ? 150 : w == 2 ? 90 : 45;
+        }
+        return Math.max(25, 170 - level * 20 - w * 15);
+    }
+
+    /** 0 = enemigo normal, 1 = "caracono", 2 = "caracubo". */
+    private int armorRoll(int roll) {
+        if (level <= 0) {
+            return wave >= 2 && roll < 3 ? 1 : wave >= 3 && roll < 5 ? 2 : 0;
+        }
+        boolean cone = level >= 2 && wave >= 2 && roll < 2 + level / 2;
+        boolean bucket = level >= 3 && wave >= Math.max(2, 6 - level) && roll >= 7 - level / 2 && roll < 9;
+        return cone ? 1 : bucket ? 2 : 0;
     }
 
     public void start() {
         clear();
         Arenas.restoreMowers(world);
-        sun = START_SUN;
+        sun = START_SUN + (level >= 4 ? 50 : 0);
         ticks = 0;
         wave = 0;
         nextSpawn = 400; // 20 segundos para plantar antes de la primera oleada
@@ -72,13 +124,35 @@ public class PvzGame {
         for (int r = 0; r < mowerUsed.length; r++) {
             mowerUsed[r] = false;
         }
-        say("¡Planta a tus amigos! Los Sualems llegan en 20 segundos...");
-        SualenidusEntity boss = fight.boss();
+        say(level > 0 ? "Nivel " + level + ": ¡planta a tus amigos! Los " + enemies() + " llegan en 20 segundos..."
+                : "¡Planta a tus amigos! Los Sualems llegan en 20 segundos...");
+        SualenidusEntity boss = boss();
         if (boss != null) {
             boss.setHealth(boss.getMaxHealth() * 0.3f);
-            boss.refreshPositionAndAngles(Arenas.LAWN_X + Arenas.COLS * Arenas.CELL + 9, Arenas.LAWN_Y, Arenas.rowZ(2), 90, 0);
+            fight.moveBoss(boss, Arenas.LAWN_X + Arenas.COLS * Arenas.CELL + 9, Arenas.LAWN_Y, Arenas.rowZ(2), 90);
             boss.getNavigation().stop();
         }
+    }
+
+    /** Cámara fija desde arriba del jardín (la que usa la pantalla del minijuego). */
+    public static net.minecraft.entity.decoration.ArmorStandEntity spawnCamera(ServerWorld world) {
+        net.minecraft.entity.decoration.ArmorStandEntity camera = new net.minecraft.entity.decoration.ArmorStandEntity(world,
+                Arenas.LAWN_X + Arenas.COLS, Arenas.LAWN_Y + 12, Arenas.LAWN_Z + Arenas.ROWS * Arenas.CELL + 11);
+        net.minecraft.nbt.NbtCompound tag = new net.minecraft.nbt.NbtCompound();
+        camera.writeCustomDataToNbt(tag);
+        tag.putBoolean("Marker", true);
+        tag.putBoolean("Invisible", true);
+        tag.putBoolean("NoGravity", true);
+        camera.readCustomDataFromNbt(tag);
+        camera.setInvisible(true);
+        camera.setNoGravity(true);
+        camera.setYaw(180);
+        camera.setPitch(46);
+        camera.setHeadYaw(180);
+        camera.setBodyYaw(180);
+        camera.addCommandTag("turbopapu_camara");
+        world.spawnEntity(camera);
+        return camera;
     }
 
     public void clear() {
@@ -159,7 +233,10 @@ public class PvzGame {
     }
 
     private void tickWaves() {
-        if (wave > TOTAL_WAVES) {
+        if (wave > totalWaves) {
+            if (fight == null && zombies.isEmpty()) {
+                PvzArcade.won(this);
+            }
             return;
         }
         if (--nextSpawn > 0) {
@@ -167,12 +244,12 @@ public class PvzGame {
         }
         if (wave == 0 || (spawnedInWave >= waveSize && zombies.isEmpty())) {
             wave++;
-            if (wave > TOTAL_WAVES) {
+            if (wave > totalWaves) {
                 return;
             }
             spawnedInWave = 0;
-            waveSize = wave == 1 ? 7 : wave == 2 ? 12 : 18;
-            say(wave == TOTAL_WAVES ? "¡UNA ENORME OLEADA DE SUALEMS SE ACERCA!" : "Oleada " + wave + " de " + TOTAL_WAVES);
+            waveSize = waveSize(wave);
+            say(wave == totalWaves ? "¡UNA ENORME OLEADA DE " + enemies().toUpperCase() + " SE ACERCA!" : "Oleada " + wave + " de " + totalWaves);
             world.playSound(null, Arenas.LAWN_X, Arenas.LAWN_Y, Arenas.LAWN_Z, SoundEvents.EVENT_RAID_HORN.value(), SoundCategory.HOSTILE, 2f, 1f);
             nextSpawn = 60;
             return;
@@ -180,8 +257,8 @@ public class PvzGame {
         if (spawnedInWave < waveSize) {
             spawnZombie();
             spawnedInWave++;
-            nextSpawn = wave == 1 ? 150 : wave == 2 ? 90 : 45;
-            if (wave == TOTAL_WAVES && !bossEntered && spawnedInWave >= waveSize / 2) {
+            nextSpawn = spawnInterval(wave);
+            if (fight != null && wave == totalWaves && !bossEntered && spawnedInWave >= waveSize / 2) {
                 bossEntered = true;
                 say("¡SUALENIDUS EN PERSONA ENTRA AL JARDÍN!");
             }
@@ -191,19 +268,19 @@ public class PvzGame {
     }
 
     private void spawnZombie() {
-        SualemMiniEntity z = ModEntities.SUALEM_MINI.create(world);
+        SualemMiniEntity z = (zombiesMode ? ModEntities.ZOMBI_PVZ : ModEntities.SUALEM_MINI).create(world);
         if (z == null) {
             return;
         }
         int row = random.nextInt(Arenas.ROWS);
         z.row = row;
-        int roll = random.nextInt(10);
-        if (wave >= 2 && roll < 3) {
+        int armor = armorRoll(random.nextInt(10));
+        if (armor == 1) {
             // "Caracono": doble de vida.
             z.equipStack(EquipmentSlot.HEAD, new ItemStack(Items.ORANGE_CONCRETE));
             z.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(40);
             z.setHealth(40);
-        } else if (wave >= 3 && roll < 5) {
+        } else if (armor == 2) {
             // "Caracubo": triple de vida.
             z.equipStack(EquipmentSlot.HEAD, new ItemStack(Items.CAULDRON));
             z.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(65);
@@ -236,7 +313,7 @@ public class PvzGame {
                 return true;
             }
         }
-        SualenidusEntity boss = fight.boss();
+        SualenidusEntity boss = boss();
         return bossEntered && boss != null && boss.isAlive() && bossRow() == plant.row && boss.getX() > plant.getX();
     }
 
@@ -308,6 +385,18 @@ public class PvzGame {
                 }
                 case MUDOKON -> {
                 }
+                case MAGO_LARGUIRUCHO -> {
+                    // Agujero mágico delante del mago: salen tres salchichas que ruedan por la fila.
+                    if (plant.timer <= 0 && zombieAhead(plant)) {
+                        plant.timer = 80;
+                        world.spawnParticles(ParticleTypes.PORTAL, plant.getX() + 1, plant.getY() + 0.1, plant.getZ(), 30, 0.4, 0.1, 0.4, 0.3);
+                        world.spawnParticles(ParticleTypes.WITCH, plant.getX(), plant.getY() + 2.2, plant.getZ(), 8, 0.2, 0.2, 0.2, 0.05);
+                        world.playSound(null, plant.getBlockPos(), SoundEvents.ENTITY_EVOKER_CAST_SPELL, SoundCategory.BLOCKS, 0.8f, 1.3f);
+                        for (int i = 0; i < 3; i++) {
+                            shoot(plant, new ItemStack(ModItems.SALCHICHA), 6f, false, 0.9, -0.5 - i * 0.7);
+                        }
+                    }
+                }
             }
         }
     }
@@ -321,7 +410,7 @@ public class PvzGame {
                 hurt(z, 90f);
             }
         }
-        SualenidusEntity boss = fight.boss();
+        SualenidusEntity boss = boss();
         if (bossEntered && boss != null && Math.abs(boss.getX() - plant.getX()) < 3.5 && Math.abs(boss.getZ() - plant.getZ()) < 3.5) {
             hurtBoss(boss, 20f);
         }
@@ -330,7 +419,7 @@ public class PvzGame {
 
     private void tickProjectiles() {
         Iterator<PvzProjectileEntity> it = projectiles.iterator();
-        SualenidusEntity boss = fight.boss();
+        SualenidusEntity boss = boss();
         while (it.hasNext()) {
             PvzProjectileEntity p = it.next();
             if (p.isRemoved() || p.getX() > Arenas.LAWN_X + Arenas.COLS * Arenas.CELL + 10) {
@@ -372,10 +461,10 @@ public class PvzGame {
     }
 
     private void hurt(LivingEntity z, float amount) {
-        fight.pvzDamage = true;
+        damaging = true;
         z.timeUntilRegen = 0;
         z.damage(world.getDamageSources().magic(), amount);
-        fight.pvzDamage = false;
+        damaging = false;
     }
 
     private void hurtBoss(SualenidusEntity boss, float amount) {
@@ -401,7 +490,7 @@ public class PvzGame {
                 return; // se perdió la partida
             }
         }
-        SualenidusEntity boss = fight.boss();
+        SualenidusEntity boss = boss();
         if (bossEntered && boss != null && boss.isAlive()) {
             walkOrEat(boss, bossRow(), 0.15, 2.0);
         }
@@ -448,7 +537,11 @@ public class PvzGame {
                 }
                 return false;
             }
-            fight.pvzLost();
+            if (fight != null) {
+                fight.pvzLost();
+            } else {
+                PvzArcade.lost(this);
+            }
             return true;
         }
         return false;
@@ -463,7 +556,11 @@ public class PvzGame {
     }
 
     public int wave() {
-        return Math.max(1, Math.min(wave, TOTAL_WAVES));
+        return Math.max(1, Math.min(wave, totalWaves));
+    }
+
+    public int totalWaves() {
+        return totalWaves;
     }
 
     public int waveProgress() {
@@ -471,7 +568,7 @@ public class PvzGame {
             return 0;
         }
         int done = (wave - 1) * 100 + (waveSize == 0 ? 0 : spawnedInWave * 100 / waveSize);
-        return Math.min(100, done / TOTAL_WAVES);
+        return Math.min(100, done / totalWaves);
     }
 
     public int cooldownPercent(int i) {

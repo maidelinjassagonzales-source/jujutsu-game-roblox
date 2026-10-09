@@ -203,7 +203,13 @@ public class PvzScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        // Atajos 1-8 para elegir amigo.
+        // En el modo libre, ESC sale del minijuego.
+        if (keyCode == 256 && FightHud.arcade) {
+            net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(com.turbopapu.network.ModPackets.PVZ_QUIT,
+                    net.fabricmc.fabric.api.networking.v1.PacketByteBufs.empty());
+            return true;
+        }
+        // Atajos 1-9 para elegir amigo.
         if (keyCode >= 49 && keyCode < 49 + PvzPlantType.values().length) {
             selected = keyCode - 49;
             shovel = false;
@@ -283,7 +289,10 @@ public class PvzScreen extends Screen {
         ctx.fill(px - 2, py - 2, px + pw + 2, py + 10, 0xFF3A2A10);
         ctx.fill(px, py, px + pw, py + 8, 0xFF5A3A1A);
         ctx.fill(px + pw - pw * FightHud.waveProgress / 100, py, px + pw, py + 8, 0xFF8BC34A);
-        ctx.drawTextWithShadow(textRenderer, "Oleada " + FightHud.wave + "/3", px, py - 12, 0xFFFFFFFF);
+        if (FightHud.arcade) {
+            ctx.drawTextWithShadow(textRenderer, "ESC: salir", px, py - 24, 0xFFAAAAAA);
+        }
+        ctx.drawTextWithShadow(textRenderer, "Oleada " + FightHud.wave + "/" + FightHud.totalWaves, px, py - 12, 0xFFFFFFFF);
 
         // Mensajes grandes.
         String msg = FightHud.message;
