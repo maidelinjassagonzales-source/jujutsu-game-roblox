@@ -661,7 +661,7 @@ def main():
     save(alphatemp(False), "entity", "alphatemp.png")
     save(alphatemp(True), "entity", "alphafaterfur.png")
     save(william(), "entity", "william_piraton.png")
-    save(juanma(), "entity", "juanma.png")
+    # juanma.png viene del mod LoyolaQuest (skin HD de Aroy); no se genera.
     save(guinxu(), "entity", "guinxu.png")
     save(elink(), "entity", "elink_64.png")
     save(sualenidus(), "entity", "sualenidus.png")

@@ -4,6 +4,8 @@ import com.turbopapu.client.model.ModModelLayers;
 import com.turbopapu.client.model.PapuHumanoidModel;
 import com.turbopapu.client.model.TurboPapuenseModel;
 import com.turbopapu.client.render.*;
+import com.turbopapu.client.dialogue.DialogueScreen;
+import com.turbopapu.client.dialogue.Dialogues;
 import com.turbopapu.client.screen.EndingScreen;
 import com.turbopapu.client.screen.LetterScreen;
 import com.turbopapu.client.screen.TravelScreen;
@@ -56,7 +58,14 @@ public class TurboPapuClient implements ClientModInitializer {
             client.execute(() -> client.setScreen(new TravelScreen(toPlanet)));
         });
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.ENDING, (client, handler, buf, sender) ->
-                client.execute(() -> client.setScreen(new EndingScreen())));
+                client.execute(() -> client.setScreen(new DialogueScreen(Dialogues.get("final_victoria"), -1)
+                        .onFinish(() -> client.setScreen(new EndingScreen())))));
+        ClientPlayNetworking.registerGlobalReceiver(ModPackets.DIALOGUE, (client, handler, buf, sender) -> {
+            String key = buf.readString();
+            int variant = buf.readVarInt();
+            int npcId = buf.readVarInt();
+            client.execute(() -> client.setScreen(new DialogueScreen(Dialogues.pick(key, variant), npcId)));
+        });
 
         ClientTickEvents.END_CLIENT_TICK.register(CinematicController::tick);
         HudRenderCallback.EVENT.register((ctx, tickDelta) -> {

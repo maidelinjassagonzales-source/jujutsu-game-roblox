@@ -1,0 +1,543 @@
+{
+ "alphatemp_intro": [
+  {
+   "name": "Alphatemp",
+   "text": "¡Hey! Soy Alphatemp. Bienvenido a mi choza... estilo Mudokon, sí. Los Mudokons de aquí escaparon de RuptureFarms y me la ayudaron a construir."
+  },
+  {
+   "name": "Alphatemp",
+   "text": "¿Vienes por la carta de los Turbopapuenses? Ya decía yo que el meteorito no era un iceberg normal."
+  },
+  {
+   "name": "Alphatemp",
+   "text": "Toma: un Núcleo de Iceberg. Sin él tu cohete se congela en el espacio. Y unos Icebergs de Bolsillo, por si Sualenidus se pone pesado."
+  },
+  {
+   "name": "Sistema",
+   "text": "Has recibido: Núcleo de Iceberg y 3 Icebergs de Bolsillo."
+  },
+  {
+   "name": "Alphatemp",
+   "text": "Ah, y no bajes al sótano. Ahí está Alphafaterfur. Mi versión malvada. No preguntes.",
+   "shake": true
+  }
+ ],
+ "alphatemp_charla_0": [
+  {
+   "name": "Alphatemp",
+   "text": "¿Sabías que TODO tiene un iceberg? Minecraft, FNAF, las tostadoras... TODO."
+  },
+  {
+   "name": "Alphatemp",
+   "text": "Nivel 1 del iceberg de FNAF: Freddy da miedo. Nivel 9: Freddy paga impuestos."
+  }
+ ],
+ "alphatemp_charla_1": [
+  {
+   "name": "Alphatemp",
+   "text": "Mira lo que hago. ¡ICEBERG!",
+   "shake": true
+  },
+  {
+   "name": "Alphatemp",
+   "text": "Puedo invocarlos sobre cualquier juego. Hasta sobre este. Sobre todo sobre este."
+  }
+ ],
+ "alphatemp_charla_2": [
+  {
+   "name": "Alphatemp",
+   "text": "Abe dice que tengo madera de Mudokon. Yo creo que lo dice por las orejas."
+  }
+ ],
+ "alphatemp_charla_3": [
+  {
+   "name": "Alphatemp",
+   "text": "Si un monstruo se acerca a la aldea... iceberg. Si se acerca otro... iceberg. Es mi sistema de seguridad."
+  }
+ ],
+ "alphafaterfur_intro": [
+  {
+   "name": "Alphafaterfur",
+   "text": "Shhh... estoy grabando.",
+   "shake": true
+  },
+  {
+   "name": "Alphafaterfur",
+   "text": "Llevo grabando ESTE video desde 2024. Dura 2 horas. Bueno... dura 2 horas desde hace dos años."
+  },
+  {
+   "name": "Alphafaterfur",
+   "text": "Alphatemp hace icebergs. Yo hago... otras cosas. Cosas MALVADAS. Como no poner timestamps."
+  },
+  {
+   "name": "Alphafaterfur",
+   "text": "Y ahora vete. Si me vuelves a interrumpir te vas a enterar."
+  }
+ ],
+ "alphafaterfur_charla_0": [
+  {
+   "name": "Alphafaterfur",
+   "text": "¡¿OTRA VEZ TÚ?! ¡Se ha cortado la grabación!",
+   "shake": true
+  }
+ ],
+ "alphafaterfur_charla_1": [
+  {
+   "name": "Alphafaterfur",
+   "text": "El render va por el 3%. Vuelve en 2027."
+  }
+ ],
+ "alphafaterfur_charla_2": [
+  {
+   "name": "Alphafaterfur",
+   "text": "Si me pegas te ataco. Si no me pegas... también te miro mal."
+  }
+ ],
+ "william_piraton_intro": [
+  {
+   "name": "William_Piraton",
+   "text": "¡Arrr! William_Piraton, para servirte. Pez, pirata y ex-streamer."
+  },
+  {
+   "name": "William_Piraton",
+   "text": "Antes hacía directos con aroy24... qué tiempos. Ahora me he retirado al mar."
+  },
+  {
+   "name": "William_Piraton",
+   "text": "¿Que vas al Planeta TurboPapu? Necesitarás un Mapa Estelar. Toma el mío, yo ya no viajo."
+  },
+  {
+   "name": "Sistema",
+   "text": "Has recibido: Mapa Estelar."
+  },
+  {
+   "name": "William_Piraton",
+   "text": "Y no, no soy un palito de pescado. Soy NARANJA, que es distinto."
+  }
+ ],
+ "william_piraton_charla_0": [
+  {
+   "name": "William_Piraton",
+   "text": "Si ves a aroy24, dile que el parche del ojo es por estilo."
+  }
+ ],
+ "william_piraton_charla_1": [
+  {
+   "name": "William_Piraton",
+   "text": "El mar está tranquilo hoy. Ideal para no hacer directo."
+  }
+ ],
+ "william_piraton_charla_2": [
+  {
+   "name": "William_Piraton",
+   "text": "¿Un directo de despedida? Mmm... a lo mejor cuando salves ese planeta."
+  }
+ ],
+ "juanma_intro": [
+  {
+   "name": "Juanma",
+   "text": "¡Che, pibe! ¡Por fin llegaste! Soy Juanma, profesor de economía.",
+   "portrait": "juanma_gesto_3",
+   "pw": 84,
+   "ph": 256,
+   "music": "juanma"
+  },
+  {
+   "name": "Juanma",
+   "text": "En otro universo no soportaba a los argentinos... ¡pero en ESTE universo los amo! Por eso vivo acá: son todos argentinos.",
+   "portrait": "juanma_gesto_3",
+   "pw": 84,
+   "ph": 256,
+   "music": "juanma"
+  },
+  {
+   "name": "Juanma",
+   "text": "Pero escuchame bien: ese Sualenidus nos está DURMIENDO A TODOS. ¡La productividad del planeta está por el piso!",
+   "portrait": "juanma_gesto_2_enfadado",
+   "pw": 86,
+   "ph": 256,
+   "shake": true,
+   "music": "juanma"
+  },
+  {
+   "name": "Juanma",
+   "text": "Lección del día: si te duerme, recibís el doble de daño. Tomá mate. Te mantiene despierto contra la lavanda de ese gordo.",
+   "portrait": "juanma_gesto_1",
+   "pw": 79,
+   "ph": 256,
+   "music": "juanma"
+  },
+  {
+   "name": "Sistema",
+   "text": "Has recibido: 6 Mates de Juanma."
+  }
+ ],
+ "juanma_charla_0": [
+  {
+   "name": "Juanma",
+   "text": "La inflación en este planeta es de un 300%... de sueño.",
+   "portrait": "juanma_gesto_3",
+   "pw": 84,
+   "ph": 256,
+   "music": "juanma"
+  }
+ ],
+ "juanma_charla_1": [
+  {
+   "name": "Juanma",
+   "text": "¿Todavía no fuiste a la guarida? ¡¿Y qué hacés acá parado?! ¡A TRABAJAR!",
+   "portrait": "juanma_gesto_2_enfadado",
+   "pw": 86,
+   "ph": 256,
+   "shake": true,
+   "music": "juanma"
+  }
+ ],
+ "juanma_charla_2": [
+  {
+   "name": "Juanma",
+   "text": "Hice un asado para la aldea. Verity Gorda se comió tres. El presupuesto no cuadra.",
+   "portrait": "juanma_gesto_1",
+   "pw": 79,
+   "ph": 256,
+   "music": "juanma"
+  },
+  {
+   "name": "Juanma",
+   "text": "...Pero bueno, son argentinos. Se lo perdono todo.",
+   "portrait": "juanma_gesto_3",
+   "pw": 84,
+   "ph": 256,
+   "music": "juanma"
+  }
+ ],
+ "guinxu_intro": [
+  {
+   "name": "Guinxu",
+   "text": "¡Ey! Soy Guinxu. Sí, el pelo es así de natural. No, no se despeina ni en el espacio."
+  },
+  {
+   "name": "Guinxu",
+   "text": "Estaba haciendo un juego en 48 horas y aparecí aquí. Típico."
+  },
+  {
+   "name": "Guinxu",
+   "text": "La guarida de Sualenidus está lejos, al noreste. Toma mi Brújula Despeinada: apunta siempre a la guarida."
+  },
+  {
+   "name": "Sistema",
+   "text": "Has recibido: Brújula Despeinada de Guinxu."
+  }
+ ],
+ "guinxu_charla_0": [
+  {
+   "name": "Guinxu",
+   "text": "Cuando derrotes a Sualenidus hacemos un juego sobre esto. Lo tengo clarísimo."
+  }
+ ],
+ "guinxu_charla_1": [
+  {
+   "name": "Guinxu",
+   "text": "La brújula a veces apunta a mi peluquero. Ignóralo."
+  }
+ ],
+ "guinxu_charla_2": [
+  {
+   "name": "Guinxu",
+   "text": "Las cúpulas de las aldeas las diseñé yo. Bueno, las dibujé en una servilleta."
+  }
+ ],
+ "elink_64_intro": [
+  {
+   "name": "elink_64",
+   "text": "¡It's-a me, elink_64! El streamer que el internet olvidó... pero el Planeta TurboPapu no."
+  },
+  {
+   "name": "elink_64",
+   "text": "¡Saludos desde Machala! ¿O era Perú? Ya ni me acuerdo, llevo años aquí."
+  },
+  {
+   "name": "elink_64",
+   "text": "Super Mario 64 es el mejor juego de la historia. Y Michael Jackson el mejor cantante. ¡Hee-hee!",
+   "shake": true
+  },
+  {
+   "name": "elink_64",
+   "text": "Toma estas Estrellas de Poder. ¡Here we go! Úsalas si Sualenidus te pega muy fuerte."
+  },
+  {
+   "name": "Sistema",
+   "text": "Has recibido: 3 Estrellas de Poder."
+  }
+ ],
+ "elink_64_charla_0": [
+  {
+   "name": "elink_64",
+   "text": "*hace el moonwalk* ¡Auuu!",
+   "shake": true
+  }
+ ],
+ "elink_64_charla_1": [
+  {
+   "name": "elink_64",
+   "text": "¿Sabías que en Mario 64 puedes saltar las escaleras infinitas? Aquí también hay trucos. Pero no te los digo."
+  }
+ ],
+ "elink_64_charla_2": [
+  {
+   "name": "elink_64",
+   "text": "Algún día volveré a hacer directo. Algún día..."
+  }
+ ],
+ "verity_gorda_intro": [
+  {
+   "name": "Verity Gorda",
+   "text": "¡Hola! :D Soy Verity, la pelota con cara... en versión GORDA. Vine rodando desde mi propio mod."
+  },
+  {
+   "name": "Verity Gorda",
+   "text": "Sualenidus dice que soy redonda. ¡Mira quién habla, con esa barriga! :)"
+  },
+  {
+   "name": "Verity Gorda",
+   "text": "Cuando todo esto acabe hacemos fiesta. Como en Las Vegas. Nadie va a recordar nada."
+  }
+ ],
+ "verity_gorda_charla_0": [
+  {
+   "name": "Verity Gorda",
+   "text": "Juanma me hizo un asado de bienvenida. Me comí tres. Ahora ruedo más despacio."
+  }
+ ],
+ "verity_gorda_charla_1": [
+  {
+   "name": "Verity Gorda",
+   "text": "Sonrío siempre. Hasta dormida. :D"
+  }
+ ],
+ "verity_gorda_charla_2": [
+  {
+   "name": "Verity Gorda",
+   "text": "¿Me empujas cuesta abajo? Es broma. ...¿O no?"
+  }
+ ],
+ "mudokon_intro": [
+  {
+   "name": "Mudokon",
+   "text": "¡Hola!"
+  },
+  {
+   "name": "Mudokon",
+   "text": "¿Tú no eres un Slig, verdad? Uf, menos mal."
+  },
+  {
+   "name": "Mudokon",
+   "text": "Alphatemp nos dejó vivir aquí después de escapar de RuptureFarms. ¡Nada de Mudokon Pops!"
+  }
+ ],
+ "mudokon_charla_0": [
+  {
+   "name": "Mudokon",
+   "text": "¡Vale!"
+  }
+ ],
+ "mudokon_charla_1": [
+  {
+   "name": "Mudokon",
+   "text": "*silbido*"
+  }
+ ],
+ "mudokon_charla_2": [
+  {
+   "name": "Mudokon",
+   "text": "Alphatemp nos enseñó el iceberg de Oddworld. Nivel 1: Abe. Nivel 9: los huevos de Scrab... mejor no."
+  }
+ ],
+ "mudokon_charla_3": [
+  {
+   "name": "Mudokon",
+   "text": "*se tira un pedo* ...Perdón."
+  }
+ ],
+ "abe_intro": [
+  {
+   "name": "Abe",
+   "text": "¡Hola! Soy Abe. Antes limpiaba suelos en RuptureFarms."
+  },
+  {
+   "name": "Abe",
+   "text": "Rescaté a 99 Mudokons. ¿Cuántos Turbopapuenses vas a rescatar tú?"
+  },
+  {
+   "name": "Abe",
+   "text": "Toma unas plumas del portal de pájaros. Dan suerte. Creo."
+  },
+  {
+   "name": "Sistema",
+   "text": "Has recibido: 3 Plumas."
+  }
+ ],
+ "abe_charla_0": [
+  {
+   "name": "Abe",
+   "text": "Sígueme. ...Espera, no, quédate ahí."
+  }
+ ],
+ "abe_charla_1": [
+  {
+   "name": "Abe",
+   "text": "Si ves un portal de pájaros, ¡sáltalo! Así escapamos nosotros."
+  }
+ ],
+ "abe_charla_2": [
+  {
+   "name": "Abe",
+   "text": "Alphatemp es buena gente. Pero no bajes al sótano... ahí está el otro."
+  }
+ ],
+ "turbopapuense_despierto_0": [
+  {
+   "name": "Turbopapuense",
+   "text": "¡Viniste! ¡Leíste nuestra carta! Pensábamos que el meteorito iba a caer en el mar..."
+  }
+ ],
+ "turbopapuense_despierto_1": [
+  {
+   "name": "Turbopapuense",
+   "text": "Somos de los pocos que siguen despiertos. Los demás... huelen a lavanda y roncan."
+  }
+ ],
+ "turbopapuense_despierto_2": [
+  {
+   "name": "Turbopapuense",
+   "text": "Sualenidus vive en su guarida al noreste. Pregúntale a Guinxu, tiene una brújula."
+  }
+ ],
+ "turbopapuense_despierto_3": [
+  {
+   "name": "Turbopapuense",
+   "text": "Si te duerme, ¡bebe mate! Juanma tiene de sobra."
+  }
+ ],
+ "turbopapuense_despierto_4": [
+  {
+   "name": "Turbopapuense",
+   "text": "Cuidado: Sualenidus habla de armas de Valorant sin parar. Es su forma de hipnotizar."
+  }
+ ],
+ "turbopapuense_despierto_5": [
+  {
+   "name": "Turbopapuense",
+   "text": "¡Turbo! ¡Papu! ¡Turbo! ¡Papu!"
+  }
+ ],
+ "turbopapuense_dormido_0": [
+  {
+   "name": "Turbopapuense",
+   "text": "Zzz... la Vandal... es mejor... zzz..."
+  }
+ ],
+ "turbopapuense_dormido_1": [
+  {
+   "name": "Turbopapuense",
+   "text": "Zzz... huele... a lavanda... zzz..."
+  }
+ ],
+ "turbopapuense_dormido_2": [
+  {
+   "name": "Turbopapuense",
+   "text": "Zzz... cinco minutitos más... zzz..."
+  }
+ ],
+ "turbopapuense_dormido_3": [
+  {
+   "name": "Turbopapuense",
+   "text": "Zzz... JAJAJAJA... (se ríe en sueños como Sualenidus)..."
+  }
+ ],
+ "turbopapuense_feliz_0": [
+  {
+   "name": "Turbopapuense",
+   "text": "¡ESTAMOS DESPIERTOS! ¡GRACIAS, HÉROE!"
+  }
+ ],
+ "turbopapuense_feliz_1": [
+  {
+   "name": "Turbopapuense",
+   "text": "¡Fiesta en el planeta! ¿Alguien sabe dónde está el cohete? ¿Y por qué hay un tigre?"
+  }
+ ],
+ "turbopapuense_feliz_2": [
+  {
+   "name": "Turbopapuense",
+   "text": "¡Turbo! ¡Papu! ¡Turbo! ¡Papu! ¡Ganamos!"
+  }
+ ],
+ "sualenidus_intro": [
+  {
+   "name": "Sualenidus",
+   "text": "Mmm... ¿quién huele a NO lavanda en mi guarida?",
+   "music": "soalen"
+  },
+  {
+   "name": "Sualenidus",
+   "text": "¡JAJAJAJAJA! ¡Un terrícola! ¿Vienes a despertar a los Turbopapuenses?",
+   "shake": true,
+   "music": "soalen"
+  },
+  {
+   "name": "Sualenidus",
+   "text": "¿Sabes qué? La Vandal es mejor que la Phantom. NO HAY DEBATE.",
+   "music": "soalen"
+  },
+  {
+   "name": "Sualenidus",
+   "text": "Y mi barriga... mi barriga no para de crecer. Como mi rango en Valorant. ¡JOJOJOJAJAJA!",
+   "shake": true,
+   "music": "soalen"
+  },
+  {
+   "name": "Sualenidus",
+   "text": "Respira hondo... huele a lavanda, ¿verdad? Duérmete... duérmete... ¡y planto la Spike en tu cama!",
+   "music": "soalen"
+  },
+  {
+   "name": "Sistema",
+   "text": "¡Cuidado! Su nube de lavanda te deja DORMIDO y así recibes el doble de daño. Bebe mate de Juanma."
+  }
+ ],
+ "final_victoria": [
+  {
+   "name": "Sualenidus",
+   "text": "Uff... ¡¿perdí?! ¿Contra un terrícola? ¿Sin Operator?",
+   "shake": true,
+   "music": "soalen"
+  },
+  {
+   "name": "Sualenidus",
+   "text": "...Vale. Vale. Os despierto a todos. Pero la Vandal sigue siendo mejor.",
+   "music": "soalen"
+  },
+  {
+   "name": "Turbopapuense",
+   "text": "¡¡¡ESTAMOS DESPIERTOS!!!",
+   "shake": true
+  },
+  {
+   "name": "Juanma",
+   "text": "¡Pibe! ¡Lo lograste! ¡La economía del planeta se recupera! ¡Asado para todos!",
+   "portrait": "juanma_gesto_3",
+   "pw": 84,
+   "ph": 256,
+   "music": "juanma"
+  },
+  {
+   "name": "Verity Gorda",
+   "text": "¡FIESTA! :D"
+  },
+  {
+   "name": "Sistema",
+   "text": "A la mañana siguiente nadie recordaba nada... pero alguien tenía una cámara."
+  }
+ ]
+}

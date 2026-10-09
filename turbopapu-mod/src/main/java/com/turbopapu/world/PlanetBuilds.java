@@ -72,8 +72,10 @@ public final class PlanetBuilds {
         }
         if (!state.sualenidusDefeated) {
             Build.spawn(world, ModEntities.SUALENIDUS, cx + 0.5, y0, cz - 3.5, 0);
-            world.getPlayers(p -> p.getBlockPos().isWithinDistance(new BlockPos(cx, y0, cz), 140)).forEach(p ->
-                    p.sendMessage(Text.translatable("message.turbopapu.lair_found").formatted(Formatting.LIGHT_PURPLE), false));
+            world.getPlayers(p -> p.getBlockPos().isWithinDistance(new BlockPos(cx, y0, cz), 140)).forEach(p -> {
+                p.sendMessage(Text.translatable("message.turbopapu.lair_found").formatted(Formatting.LIGHT_PURPLE), false);
+                com.turbopapu.network.ModPackets.dialogue(p, "sualenidus_intro", 0, -1);
+            });
         }
         state.lairBuilt = true;
         state.markDirty();

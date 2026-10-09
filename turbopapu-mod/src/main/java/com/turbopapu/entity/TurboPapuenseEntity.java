@@ -128,16 +128,11 @@ public class TurboPapuenseEntity extends PathAwareEntity {
             return ActionResult.PASS;
         }
         if (getWorld() instanceof ServerWorld serverWorld) {
-            String line;
-            if (isDormido()) {
-                line = SLEEP_LINES[random.nextInt(SLEEP_LINES.length)];
-            } else if (TurboState.get(serverWorld.getServer()).sualenidusDefeated) {
-                line = HAPPY_LINES[random.nextInt(HAPPY_LINES.length)];
-            } else {
-                line = AWAKE_LINES[random.nextInt(AWAKE_LINES.length)];
+            String key = isDormido() ? "turbopapuense_dormido"
+                    : TurboState.get(serverWorld.getServer()).sualenidusDefeated ? "turbopapuense_feliz" : "turbopapuense_despierto";
+            if (player instanceof net.minecraft.server.network.ServerPlayerEntity serverPlayer) {
+                com.turbopapu.network.ModPackets.dialogue(serverPlayer, key, random.nextInt(100), getId());
             }
-            player.sendMessage(Text.literal("<").append(Text.literal("Turbopapuense").formatted(Formatting.GOLD))
-                    .append(Text.literal("> " + line)), false);
         }
         return ActionResult.success(getWorld().isClient);
     }

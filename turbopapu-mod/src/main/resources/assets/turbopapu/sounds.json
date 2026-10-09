@@ -1,0 +1,18 @@
+{
+  "music.juanma": {
+    "sounds": [
+      {
+        "name": "turbopapu:music/juanma",
+        "stream": true
+      }
+    ]
+  },
+  "music.soalen": {
+    "sounds": [
+      {
+        "name": "turbopapu:music/soalen",
+        "stream": true
+      }
+    ]
+  }
+}

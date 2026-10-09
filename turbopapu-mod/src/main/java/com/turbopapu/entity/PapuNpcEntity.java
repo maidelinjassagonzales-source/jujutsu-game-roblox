@@ -79,15 +79,20 @@ public class PapuNpcEntity extends PathAwareEntity {
         if (getWorld() instanceof ServerWorld world) {
             NpcProfile profile = getProfile();
             this.getLookControl().lookAt(player);
-            String line = profile.lines.get(lineIndex % profile.lines.size());
-            lineIndex++;
-            say(player, line);
-
             String id = player.getUuidAsString();
-            if (!giftedPlayers.contains(id)) {
+            boolean firstTime = !giftedPlayers.contains(id);
+            String base = profile.textureName();
+            if (player instanceof net.minecraft.server.network.ServerPlayerEntity serverPlayer) {
+                if (firstTime) {
+                    com.turbopapu.network.ModPackets.dialogue(serverPlayer, base + "_intro", 0, getId());
+                } else {
+                    com.turbopapu.network.ModPackets.dialogue(serverPlayer, base + "_charla", lineIndex++, getId());
+                }
+            }
+            if (firstTime) {
+                giftedPlayers.add(id);
                 ItemStack[] gifts = profile.gifts(world);
                 if (gifts.length > 0) {
-                    giftedPlayers.add(id);
                     for (ItemStack gift : gifts) {
                         if (!player.giveItemStack(gift.copy())) {
                             player.dropItem(gift.copy(), false);
@@ -99,7 +104,7 @@ public class PapuNpcEntity extends PathAwareEntity {
                 }
             }
 
-            if (profile == NpcProfile.ALPHATEMP && icebergCooldown <= 0) {
+            if (profile == NpcProfile.ALPHATEMP && icebergCooldown <= 0 && !firstTime) {
                 // Alphatemp puede invocar icebergs enormes sobre cualquier juego... incluido este.
                 Vec3d look = player.getRotationVec(1f).multiply(16);
                 BlockPos target = BlockPos.ofFloored(player.getX() + look.x, getY(), player.getZ() + look.z);
