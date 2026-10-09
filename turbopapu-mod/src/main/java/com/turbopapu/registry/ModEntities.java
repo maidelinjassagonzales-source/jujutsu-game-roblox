@@ -29,7 +29,7 @@ public final class ModEntities {
     public static final EntityType<PapuNpcEntity> JUANMA = npc("juanma", 0.6f, 1.95f);
     public static final EntityType<PapuNpcEntity> GUINXU = npc("guinxu", 0.6f, 2.2f);
     public static final EntityType<PapuNpcEntity> ELINK_64 = npc("elink_64", 0.6f, 1.95f);
-    public static final EntityType<PapuNpcEntity> VERITY_GORDA = npc("verity_gorda", 1.1f, 2.3f);
+    public static final EntityType<PapuNpcEntity> VERITY_GORDA = npc("verity_gorda", 1.9f, 2.0f);
 
     public static final EntityType<SualenidusEntity> SUALENIDUS = register("sualenidus",
             FabricEntityTypeBuilder.<SualenidusEntity>createMob()

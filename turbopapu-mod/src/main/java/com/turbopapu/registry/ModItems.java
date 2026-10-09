@@ -42,7 +42,7 @@ public final class ModItems {
     public static final Item JUANMA_SPAWN_EGG = egg("juanma", ModEntities.JUANMA, 0x75AADB, 0xFFFFFF);
     public static final Item GUINXU_SPAWN_EGG = egg("guinxu", ModEntities.GUINXU, 0x6B4423, 0x2E2E2E);
     public static final Item ELINK_64_SPAWN_EGG = egg("elink_64", ModEntities.ELINK_64, 0xE53935, 0x111111);
-    public static final Item VERITY_GORDA_SPAWN_EGG = egg("verity_gorda", ModEntities.VERITY_GORDA, 0xF48FB1, 0x7E57C2);
+    public static final Item VERITY_GORDA_SPAWN_EGG = egg("verity_gorda", ModEntities.VERITY_GORDA, 0xFFD60A, 0x111111);
     public static final Item SUALENIDUS_SPAWN_EGG = egg("sualenidus", ModEntities.SUALENIDUS, 0xB57EDC, 0xFF4655);
 
     private ModItems() {}

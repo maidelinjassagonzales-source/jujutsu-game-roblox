@@ -27,7 +27,7 @@ Fan-mod sin ánimo de lucro.
    - **Guinxu** y su pelo loco: te da la **Brújula Despeinada** que apunta a la guarida.
    - **elink_64**, el streamer olvidado de Machala (¿o Perú?), fan de Mario 64 y Michael Jackson: hace el moonwalk
      y te da **Estrellas de Poder**.
-   - **Verity Gorda**, invitada desde el mod de Verity.
+   - **Verity Gorda**: Verity (la pelota amarilla con cara sonriente) en versión gorda, invitada desde el mod de Verity.
    - Turbopapuenses despiertos y muchos dormidos.
 8. **Sualenidus.** En su guarida de purpur rodeada de lavanda. 400 de vida, barra de jefe, barriga que crece.
    Ataques: **Nube de lavanda** (te deja DORMIDO: casi no te mueves y recibes el doble de daño), **Barrigazo** y

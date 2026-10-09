@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
 
 /**
  * Modelo humanoide con variantes: normal, pelo loco (Guinxu), cabeza de pez con tricornio (William_Piraton)
- * y barriga enorme (Sualenidus / Verity Gorda). Textura estilo skin de 64x64.
+ * y barriga enorme (Sualenidus). Textura estilo skin de 64x64.
  */
 public class PapuHumanoidModel<T extends MobEntity> extends BipedEntityModel<T> {
     private final ModelPart belly;

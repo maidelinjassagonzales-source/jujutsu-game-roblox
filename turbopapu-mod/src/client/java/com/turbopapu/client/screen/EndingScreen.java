@@ -29,7 +29,7 @@ public class EndingScreen extends Screen {
                     List.of(ModEntities.TURBOPAPUENSE, ModEntities.TURBOPAPUENSE, ModEntities.TURBOPAPUENSE)),
             new Photo("Juanma dando una clase de inflación... a Sualenidus. Le cayó bien.",
                     List.of(ModEntities.JUANMA, ModEntities.SUALENIDUS)),
-            new Photo("Alguien le dio mate a Verity Gorda. Se tomó 40.",
+            new Photo("Alguien le dio mate a Verity Gorda. Se tomó 40 y salió rodando.",
                     List.of(ModEntities.VERITY_GORDA)),
             new Photo("elink_64 haciendo el moonwalk encima del cohete. ¡Hee-hee!",
                     List.of(ModEntities.ELINK_64)),
@@ -154,7 +154,7 @@ public class EndingScreen extends Screen {
                 "Juanma, profesor de economía y fan de los argentinos",
                 "Guinxu y su pelo",
                 "elink_64, el streamer que nunca olvidaremos",
-                "Verity Gorda, invitada especial",
+                "Verity Gorda, la pelota con cara (invitada especial)",
                 "Sualenidus, que ahora huele a lavanda... pero en buena onda",
                 "",
                 "Gracias por jugar.  (ESC para cerrar)"

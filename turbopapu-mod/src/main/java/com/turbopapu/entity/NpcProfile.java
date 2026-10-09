@@ -71,11 +71,12 @@ public enum NpcProfile {
                     "*hace el moonwalk* ¡Auuu!"),
             world -> new ItemStack[]{new ItemStack(ModItems.ESTRELLA_DE_PODER, 3)}),
 
-    VERITY_GORDA("Verity Gorda", Formatting.LIGHT_PURPLE, true, true, false,
+    VERITY_GORDA("Verity Gorda", Formatting.YELLOW, true, true, false,
             List.of(
-                    "¡Hola! Soy Verity... en mi versión gorda. Vine desde mi propio mod a ayudar.",
-                    "Juanma me hizo un asado de bienvenida. Me comí tres. Las vacas del planeta me odian.",
-                    "Sualenidus tiene más barriga que yo. Y eso que yo tengo MUCHA.",
+                    "¡Hola! :D Soy Verity, la pelota con cara... en versión GORDA. Vine rodando desde mi propio mod.",
+                    "Juanma me hizo un asado de bienvenida. Me comí tres. Ahora ruedo más despacio.",
+                    "Sualenidus dice que soy redonda. ¡Mira quién habla, con esa barriga! :)",
+                    "Sonrío siempre. Hasta dormida. Por eso la lavanda no me afecta tanto... creo. :D",
                     "Cuando todo esto acabe hacemos fiesta. Como en Las Vegas. Nadie va a recordar nada."),
             world -> new ItemStack[0]);
 

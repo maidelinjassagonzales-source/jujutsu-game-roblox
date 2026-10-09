@@ -28,6 +28,7 @@ public class TurboPapuClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.GUINXU, PapuHumanoidModel::guinxu);
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.WILLIAM, PapuHumanoidModel::william);
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.FAT, PapuHumanoidModel::fat);
+        EntityModelLayerRegistry.registerModelLayer(ModModelLayers.VERITY, com.turbopapu.client.model.VerityModel::getTexturedModelData);
 
         EntityRendererRegistry.register(ModEntities.TURBOPAPUENSE, TurboPapuenseRenderer::new);
         EntityRendererRegistry.register(ModEntities.ALPHATEMP, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.HUMANOID, 1f));
@@ -36,7 +37,7 @@ public class TurboPapuClient implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.JUANMA, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.HUMANOID, 1f));
         EntityRendererRegistry.register(ModEntities.GUINXU, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.GUINXU, 1f));
         EntityRendererRegistry.register(ModEntities.ELINK_64, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.HUMANOID, 1f));
-        EntityRendererRegistry.register(ModEntities.VERITY_GORDA, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.FAT, 1.15f));
+        EntityRendererRegistry.register(ModEntities.VERITY_GORDA, VerityRenderer::new);
         EntityRendererRegistry.register(ModEntities.SUALENIDUS, SualenidusRenderer::new);
         EntityRendererRegistry.register(ModEntities.METEOR, MeteorRenderer::new);
         EntityRendererRegistry.register(ModEntities.ROCKET, RocketRenderer::new);

@@ -361,13 +361,47 @@ def sualenidus():
 
 
 def verity():
-    img = fat(hexc("F1C27D"), hexc("8E5BB5"), hexc("F48FB1"), hexc("7E57C2"), hexc("FFFFFF"), belly_shirt_rows=5)
-    fx, fy = front(HEAD)
-    rect(img, fx + 2, fy + 6, 4, 1, hexc("C2185B"))
-    # Mejillas
-    img.putpixel((fx, fy + 5), hexc("F48FB1"))
-    img.putpixel((fx + 7, fy + 5), hexc("F48FB1"))
-    chest_logo(img, [(1, 0), (3, 0), (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (1, 2), (2, 2), (3, 2), (2, 3)], hexc("FFFFFF"), ox=1, oy=3)
+    """Verity (versión gorda): pelota amarilla con cara sonriente y sonrisa de dientes. Textura 128x128."""
+    img = Image.new("RGBA", (128, 128), (0, 0, 0, 0))
+    yellow = hexc("FFD60A")
+    boxes = [(0, 0, 16, 20, 16), (0, 36, 18, 14, 18), (0, 68, 20, 8, 20)]
+    for box in boxes:
+        for name, (x, y, w, h) in faces(*box).items():
+            for i in range(w):
+                for j in range(h):
+                    # Sombreado suave: más claro arriba, más oscuro abajo y en los bordes.
+                    edge = abs(i - (w - 1) / 2) / max(1, w / 2)
+                    f = 1.08 - 0.12 * edge
+                    if name == "top":
+                        f = 1.12 - 0.1 * edge
+                    elif name == "bottom":
+                        f = 0.72
+                    img.putpixel((x + i, y + j), shade(yellow, f))
+    black, white, gray = hexc("111111"), hexc("FFFFFF"), hexc("B8B8B8")
+    # Ojos en la cara del anillo central (18x14).
+    fx, fy, _, _ = faces(0, 36, 18, 14, 18)["front"]
+    for ex in (5, 11):
+        rect(img, fx + ex, fy + 1, 2, 4, black)
+        img.putpixel((fx + ex, fy + 1), shade(black, 1))
+    # Sonrisa de dientes en la barriga (20x8).
+    bx, by, _, _ = faces(0, 68, 20, 8, 20)["front"]
+    img.putpixel((bx + 2, by), black)
+    img.putpixel((bx + 17, by), black)
+    rect(img, bx + 3, by + 1, 14, 1, black)
+    for j in (2, 3, 4):
+        img.putpixel((bx + 3, by + j), black)
+        img.putpixel((bx + 16, by + j), black)
+        rect(img, bx + 4, by + j, 12, 1, white)
+    rect(img, bx + 4, by + 5, 12, 1, black)
+    rect(img, bx + 5, by + 5, 10, 1, white)
+    img.putpixel((bx + 4, by + 5), black)
+    img.putpixel((bx + 15, by + 5), black)
+    rect(img, bx + 5, by + 6, 10, 1, black)
+    # Separación de dientes.
+    for i in range(6, 15, 2):
+        for j in (2, 3, 4, 5):
+            img.putpixel((bx + i, by + j), gray)
+    rect(img, bx + 4, by + 3, 12, 1, gray)
     return img
 
 
