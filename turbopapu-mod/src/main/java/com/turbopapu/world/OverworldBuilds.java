@@ -3,6 +3,7 @@ package com.turbopapu.world;
 import com.turbopapu.entity.PapuNpcEntity;
 import com.turbopapu.registry.ModEntities;
 import net.minecraft.block.*;
+import com.turbopapu.block.DreamcatcherBlock;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -42,7 +43,9 @@ public final class OverworldBuilds {
                         boolean door = dz > 0 && Math.abs(dx) <= 1 && dy < 3;
                         boolean window = dy == 2 && (dz == 0 || dx == 0) && !door;
                         if (door) continue;
-                        Build.set(world, cx + dx, y0 + dy, cz + dz, window ? Blocks.AIR : (dy == 0 ? Blocks.MUD_BRICKS : Blocks.PACKED_MUD));
+                        Block wallBlock = dy == 0 ? Blocks.MUD_BRICKS
+                                : (dy == 1 && (dx + dz) % 3 == 0) ? com.turbopapu.registry.ModBlocks.LADRILLO_MUDOKON : Blocks.PACKED_MUD;
+                        Build.set(world, cx + dx, y0 + dy, cz + dz, window ? Blocks.AIR : wallBlock);
                     }
                 }
             }
@@ -70,6 +73,19 @@ public final class OverworldBuilds {
         Build.set(world, new BlockPos(cx, y0, cz), Blocks.CAMPFIRE.getDefaultState());
         Build.set(world, new BlockPos(cx, y0 - 1, cz), Blocks.MUD_BRICKS.getDefaultState());
         buildFreddy(world, cx - 3, y0, cz - 2);
+        // Cosas de Oddworld: atrapasueños en las paredes, vasijas, tótem y spooce.
+        BlockState dream = com.turbopapu.registry.ModBlocks.ATRAPASUENOS.getDefaultState();
+        Build.set(world, new BlockPos(cx, y0 + 3, cz - 4), dream.with(DreamcatcherBlock.FACING, Direction.SOUTH));
+        Build.set(world, new BlockPos(cx - 4, y0 + 3, cz), dream.with(DreamcatcherBlock.FACING, Direction.EAST));
+        Build.set(world, new BlockPos(cx + 4, y0 + 3, cz), dream.with(DreamcatcherBlock.FACING, Direction.WEST));
+        Build.set(world, new BlockPos(cx + 2, y0 + 2, cz + 4), dream.with(DreamcatcherBlock.FACING, Direction.NORTH));
+        Build.set(world, cx + 4, y0, cz + 1, com.turbopapu.registry.ModBlocks.VASIJA_MUDOKON);
+        Build.set(world, cx - 4, y0, cz - 1, com.turbopapu.registry.ModBlocks.VASIJA_MUDOKON);
+        Build.set(world, cx - 2, y0, cz + 4, com.turbopapu.registry.ModBlocks.VASIJA_MUDOKON);
+        Build.set(world, new BlockPos(cx + 2, y0, cz - 4), com.turbopapu.registry.ModBlocks.TOTEM_MUDOKON.getDefaultState()
+                .with(com.turbopapu.block.FacingDecorBlock.FACING, Direction.SOUTH));
+        Build.set(world, new BlockPos(cx + 2, y0 + 1, cz - 4), com.turbopapu.registry.ModBlocks.TOTEM_MUDOKON.getDefaultState()
+                .with(com.turbopapu.block.FacingDecorBlock.FACING, Direction.SOUTH));
         Build.set(world, new BlockPos(cx + 3, y0, cz - 3), Blocks.JUKEBOX.getDefaultState());
         Build.set(world, new BlockPos(cx + 4, y0, cz - 1), Blocks.LANTERN.getDefaultState());
         Build.set(world, new BlockPos(cx - 4, y0, cz + 2), Blocks.LANTERN.getDefaultState());

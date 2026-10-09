@@ -19,7 +19,22 @@
   {
    "name": "Alphatemp",
    "text": "Ah, y no bajes al sótano. Ahí está Alphafaterfur. Mi versión malvada. No preguntes.",
-   "shake": true
+   "shake": true,
+   "options": [
+    {
+     "text": "Cuéntame el iceberg de FNAF.",
+     "goto": "alphatemp_fnaf"
+    },
+    {
+     "text": "¡Invoca un iceberg!",
+     "goto": "alphatemp_iceberg",
+     "action": "iceberg"
+    },
+    {
+     "text": "¿Qué pasa en el sótano?",
+     "goto": "alphatemp_sotano"
+    }
+   ]
   }
  ],
  "alphatemp_charla_0": [
@@ -169,7 +184,22 @@
   },
   {
    "name": "Sistema",
-   "text": "Has recibido: 6 Mates de Juanma."
+   "text": "Has recibido: 6 Mates de Juanma.",
+   "options": [
+    {
+     "text": "¿Por qué ahora amas a los argentinos?",
+     "goto": "juanma_por_que"
+    },
+    {
+     "text": "¡Dame más mate, che!",
+     "goto": "juanma_mas_mate",
+     "action": "mate_extra"
+    },
+    {
+     "text": "Gracias, Juanma. Me voy a por Sualenidus.",
+     "goto": "juanma_adios"
+    }
+   ]
   }
  ],
  "juanma_charla_0": [
@@ -507,7 +537,21 @@
   },
   {
    "name": "Sistema",
-   "text": "¡Cuidado! Su nube de lavanda te deja DORMIDO y así recibes el doble de daño. Bebe mate de Juanma."
+   "text": "¡Cuidado! Su nube de lavanda te deja DORMIDO y así recibes el doble de daño. Bebe mate de Juanma.",
+   "options": [
+    {
+     "text": "¡Sube al ring, gordo!",
+     "goto": "sualenidus_pelea"
+    },
+    {
+     "text": "¿Vandal o Phantom?",
+     "goto": "sualenidus_vandal"
+    },
+    {
+     "text": "Despierta a los Turbopapuenses, por favor.",
+     "goto": "sualenidus_porfa"
+    }
+   ]
   }
  ],
  "final_victoria": [
@@ -606,7 +650,22 @@
    "portrait": "aroy_risa_verde",
    "pw": 160,
    "ph": 256,
-   "shake": true
+   "shake": true,
+   "options": [
+    {
+     "text": "¿aroy24 o aroy25? ¿Cuál es el bueno?",
+     "goto": "aroy_canales"
+    },
+    {
+     "text": "¡A mí también me gusta el coco!",
+     "goto": "aroy_coco",
+     "action": "coco_extra"
+    },
+    {
+     "text": "Eres una lata.",
+     "goto": "aroy_lata"
+    }
+   ]
   }
  ],
  "aroy_charla_0": [
@@ -662,6 +721,352 @@
   {
    "name": "Guinxu",
    "text": "Esa Game Boy de la estantería todavía funciona. La de al lado no. La de arriba es un misterio."
+  }
+ ],
+ "juanma_por_que": [
+  {
+   "name": "Juanma",
+   "text": "Mirá, en mi universo los argentinos me desequilibraban el presupuesto...",
+   "portrait": "juanma_gesto_3",
+   "pw": 84,
+   "ph": 256,
+   "music": "juanma"
+  },
+  {
+   "name": "Juanma",
+   "text": "Pero acá me enseñaron el asado, el mate y el dulce de leche. ¡Eso no tiene precio! Literalmente: no cotiza en bolsa.",
+   "portrait": "juanma_gesto_1",
+   "pw": 79,
+   "ph": 256,
+   "music": "juanma"
+  }
+ ],
+ "juanma_mas_mate": [
+  {
+   "name": "Juanma",
+   "text": "¡Así me gusta! Tomá tres más. Pero no se lo digas a Verity, que se los toma todos.",
+   "portrait": "juanma_gesto_3",
+   "pw": 84,
+   "ph": 256,
+   "music": "juanma"
+  }
+ ],
+ "juanma_adios": [
+  {
+   "name": "Juanma",
+   "text": "¡Dale! Y acordate: si te duerme, mate. Si te pega, mate. Si llueve... también mate.",
+   "portrait": "juanma_gesto_1",
+   "pw": 79,
+   "ph": 256,
+   "music": "juanma"
+  }
+ ],
+ "aroy_canales": [
+  {
+   "name": "Aroy",
+   "text": "Los dos. aroy24 es YouTube, aroy25 es Twitch. Es como tener dos latas: una de leche y otra de coco.",
+   "portrait": "aroy_feliz",
+   "pw": 160,
+   "ph": 256,
+   "music": "aroy"
+  },
+  {
+   "name": "Aroy",
+   "text": "...Bueno, las dos son de leche de coco. Pero ya me entiendes.",
+   "portrait": "aroy_risa",
+   "pw": 160,
+   "ph": 256,
+   "music": "aroy"
+  }
+ ],
+ "aroy_coco": [
+  {
+   "name": "Aroy",
+   "text": "¡ESO! ¡Por fin alguien con buen gusto! Toma, dos latas más. Invita la casa. Bueno, invito yo. Que soy la casa.",
+   "shake": true,
+   "portrait": "aroy_risa_verde",
+   "pw": 160,
+   "ph": 256,
+   "music": "aroy"
+  }
+ ],
+ "aroy_lata": [
+  {
+   "name": "Aroy",
+   "text": "...",
+   "portrait": "aroy_serio",
+   "pw": 160,
+   "ph": 256,
+   "music": "aroy"
+  },
+  {
+   "name": "Aroy",
+   "text": "LATA PREMIUM. Con abre-fácil. Que no se te olvide.",
+   "shake": true,
+   "portrait": "aroy_serio",
+   "pw": 160,
+   "ph": 256,
+   "music": "aroy"
+  }
+ ],
+ "alphatemp_fnaf": [
+  {
+   "name": "Alphatemp",
+   "text": "Nivel 1: Freddy da miedo. Nivel 3: Bite of 87. Nivel 5: los minijuegos tienen lore."
+  },
+  {
+   "name": "Alphatemp",
+   "text": "Nivel 9: Freddy paga impuestos. Nivel 10: Freddy es un Mudokon. No preguntes cómo lo sé."
+  }
+ ],
+ "alphatemp_iceberg": [
+  {
+   "name": "Alphatemp",
+   "text": "¡Mira hacia allá! ¡ICEBERG DE MINECRAFT, NIVEL MÁXIMO!",
+   "shake": true
+  }
+ ],
+ "alphatemp_sotano": [
+  {
+   "name": "Alphatemp",
+   "text": "Ahí vive Alphafaterfur. Mi versión malvada. Lleva grabando un video de 2 horas desde 2024."
+  },
+  {
+   "name": "Alphatemp",
+   "text": "Si bajas, no le interrumpas. Se enfada. Y cuando se enfada... se enfada."
+  }
+ ],
+ "sualenidus_pelea": [
+  {
+   "name": "Sualenidus",
+   "text": "¿GORDO? ¡Esto es BARRIGA DE CAMPEÓN! ¡Súbete al ring si te atreves! ¡JAJAJAJA!",
+   "shake": true,
+   "music": "soalen"
+  }
+ ],
+ "sualenidus_vandal": [
+  {
+   "name": "Sualenidus",
+   "text": "...Vandal. Obviamente. Un tiro a la cabeza a cualquier distancia. ¿Ves? Por fin alguien que pregunta lo importante.",
+   "music": "soalen"
+  },
+  {
+   "name": "Sualenidus",
+   "text": "Pero eso no te salva. ¡Al ring! ¡JIJIJIJA!",
+   "shake": true,
+   "music": "soalen"
+  }
+ ],
+ "sualenidus_porfa": [
+  {
+   "name": "Sualenidus",
+   "text": "¿Por favor? ¿POR FAVOR? Jajaja... no. Pero me ha hecho gracia. Te ganaré con cariño.",
+   "music": "soalen"
+  }
+ ],
+ "sualenidus_fase2": [
+  {
+   "name": "Sualenidus",
+   "text": "¡¿QUÉ?! ¡¿Me estás ganando A PUÑETAZOS?!",
+   "shake": true,
+   "music": "soalen"
+  },
+  {
+   "name": "Sualenidus",
+   "text": "¡NO! ¡ESTE NO ES MI JUEGO! ¡VAMOS A JUGAR A LO MÍO!",
+   "shake": true,
+   "music": "soalen"
+  }
+ ],
+ "valorant_intro": [
+  {
+   "name": "Sistema",
+   "text": "¡Bienvenido a VALORANT! Tienes una VANDAL (mantén clic derecho para disparar, agáchate + clic para recargar)."
+  },
+  {
+   "name": "Sistema",
+   "text": "La Spike está plantada en el site A. Sualenidus intentará DESACTIVARLA. Dispárale para interrumpirle hasta que explote."
+  },
+  {
+   "name": "Sualenidus",
+   "text": "¡Esto sí es lo mío! ¡Voy a defusear con los ojos cerrados! ¡JAJAJA!",
+   "shake": true,
+   "music": "soalen"
+  }
+ ],
+ "valorant_defused": [
+  {
+   "name": "Sualenidus",
+   "text": "¡DEFUSE! ¡JAJAJAJA! ¡Otra ronda, otra ronda!",
+   "shake": true,
+   "music": "soalen"
+  },
+  {
+   "name": "Sistema",
+   "text": "Sualenidus desactivó la Spike. Se vuelve a plantar: ¡no le dejes llegar!"
+  }
+ ],
+ "sualenidus_fase3": [
+  {
+   "name": "Sualenidus",
+   "text": "¡¿ME HAS VOLADO CON MI PROPIA SPIKE?!",
+   "shake": true,
+   "music": "soalen"
+  },
+  {
+   "name": "Sualenidus",
+   "text": "¡SE ACABÓ! ¡SUALEMS, VENID TODOS! ¡Que este terrícola está SOLO!",
+   "shake": true,
+   "music": "soalen"
+  },
+  {
+   "name": "Sistema",
+   "text": "...Pero no estás solo."
+  }
+ ],
+ "almas": [
+  {
+   "name": "Turbopapuense",
+   "text": "¡Estamos aquí! ¡Despertamos un momentito para ayudarte!"
+  },
+  {
+   "name": "Alphatemp",
+   "text": "Nivel final del iceberg: los amigos aparecen cuando más los necesitas. Toma mi hielo."
+  },
+  {
+   "name": "Guinxu",
+   "text": "Esto ya es un juego. Y uno bueno. ¡Te presto mi poder!"
+  },
+  {
+   "name": "Mudokon",
+   "text": "¡Hola! ¡Vale! *silbido de apoyo*"
+  },
+  {
+   "name": "Aroy",
+   "text": "¡Las latas premium nunca abandonan a un amigo!",
+   "portrait": "aroy_risa_verde",
+   "pw": 160,
+   "ph": 256,
+   "music": "aroy"
+  },
+  {
+   "name": "Juanma",
+   "text": "¡Che, invertí todo en vos! ¡No me falles!",
+   "portrait": "juanma_gesto_3",
+   "pw": 84,
+   "ph": 256,
+   "music": "juanma"
+  },
+  {
+   "name": "elink_64",
+   "text": "¡Here we go! ¡Hee-hee!"
+  },
+  {
+   "name": "Verity Gorda",
+   "text": "¡Yo ruedo por ti! :D"
+  },
+  {
+   "name": "William_Piraton",
+   "text": "Salí del retiro para esto. ¡Arrr!"
+  },
+  {
+   "name": "Sistema",
+   "text": "Tus amigos te prestan su poder. ¡Es hora de plantarlos contra la horda de Sualems!",
+   "options": [
+    {
+     "text": "¡A por ellos!",
+     "action": "almas_listas"
+    }
+   ]
+  }
+ ],
+ "llegada": [
+  {
+   "name": "Turbopapuense",
+   "text": "¡LLEGÓ! ¡EL TERRÍCOLA DE LA CARTA! ¡Turbo! ¡Papu!",
+   "shake": true
+  },
+  {
+   "name": "Turbopapuense",
+   "text": "Somos de los pocos que seguimos despiertos. Bienvenido a la aldea."
+  },
+  {
+   "name": "Turbopapuense",
+   "text": "¿Ves ese rayo morado en el cielo, hacia el noreste? Ahí está la guarida de Sualenidus."
+  },
+  {
+   "name": "Turbopapuense",
+   "text": "Toma esta brújula: apunta directa a su guarida. Pero antes habla con Juanma y con Aroy, ¡te ayudarán!",
+   "options": [
+    {
+     "text": "¡Vamos a por él!",
+     "goto": "llegada_valiente"
+    },
+    {
+     "text": "¿Quién es Sualenidus?",
+     "goto": "llegada_quien"
+    }
+   ]
+  }
+ ],
+ "llegada_valiente": [
+  {
+   "name": "Turbopapuense",
+   "text": "¡ESO! ¡Turbo! ¡Papu! ¡Turbo! ¡Papu!",
+   "shake": true
+  }
+ ],
+ "llegada_quien": [
+  {
+   "name": "Turbopapuense",
+   "text": "Un gordo enorme que huele a lavanda y habla de Valorant. Su barriga no para de crecer."
+  },
+  {
+   "name": "Turbopapuense",
+   "text": "Su lavanda nos duerme. Y si te duerme a ti, sus golpes duelen el doble. ¡Ten cuidado!"
+  }
+ ],
+ "llegada_paz": [
+  {
+   "name": "Turbopapuense",
+   "text": "¡Bienvenido de vuelta, héroe! Tus amigos viven ahora en la Aldea de los Amigos, al este de aquí."
+  }
+ ],
+ "sualenidus_amigo_intro": [
+  {
+   "name": "Sualenidus",
+   "text": "Eh... hola. Sí, soy yo. Ya no duermo a nadie, lo prometo.",
+   "music": "soalen"
+  },
+  {
+   "name": "Sualenidus",
+   "text": "Me han dejado vivir en la aldea. Huele a lavanda, pero en buena onda. Toma, flores de lavanda.",
+   "music": "soalen"
+  },
+  {
+   "name": "Sistema",
+   "text": "Has recibido: 8 Alliums (lavanda)."
+  }
+ ],
+ "sualenidus_amigo_charla_0": [
+  {
+   "name": "Sualenidus",
+   "text": "¿Revancha de Valorant? Esta vez sin Spike. ¡JAJAJA!",
+   "music": "soalen"
+  }
+ ],
+ "sualenidus_amigo_charla_1": [
+  {
+   "name": "Sualenidus",
+   "text": "La barriga ya no crece. Bueno, un poquito. Después del asado de Juanma.",
+   "music": "soalen"
+  }
+ ],
+ "sualenidus_amigo_charla_2": [
+  {
+   "name": "Sualenidus",
+   "text": "Perdón por dormir a todo el planeta. La Vandal sigue siendo mejor, eso sí.",
+   "music": "soalen"
   }
  ]
 }

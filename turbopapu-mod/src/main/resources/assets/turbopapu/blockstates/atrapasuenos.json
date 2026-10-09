@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "turbopapu:block/atrapasuenos",
+      "y": 0
+    },
+    "facing=west": {
+      "model": "turbopapu:block/atrapasuenos",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "turbopapu:block/atrapasuenos",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "turbopapu:block/atrapasuenos",
+      "y": 270
+    }
+  }
+}

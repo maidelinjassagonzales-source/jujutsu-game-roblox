@@ -78,6 +78,33 @@ public final class TurboCommands {
                             com.turbopapu.world.FriendBuilds.buildElinkCastle((ServerWorld) player.getWorld(), (int) player.getX() + 20, (int) player.getZ());
                             return 1;
                         }))
+                        .then(CommandManager.literal("aldea_amigos").executes(ctx -> {
+                            ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+                            ServerWorld world = (ServerWorld) player.getWorld();
+                            com.turbopapu.world.FriendsVillage.build(world, TurboState.get(ctx.getSource().getServer()));
+                            player.sendMessage(Text.literal("Aldea de los Amigos en X " + com.turbopapu.world.FriendsVillage.CX
+                                    + ", Z " + com.turbopapu.world.FriendsVillage.CZ), false);
+                            return 1;
+                        }))
+                        .then(CommandManager.literal("pelea").executes(ctx -> {
+                            // Teletransporta al ring de Sualenidus.
+                            ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+                            TurboState state = TurboState.get(ctx.getSource().getServer());
+                            ServerWorld planet = ctx.getSource().getServer().getWorld(com.turbopapu.registry.ModDimensions.PLANETA);
+                            if (planet == null) {
+                                return 0;
+                            }
+                            if (!state.lairBuilt) {
+                                com.turbopapu.world.PlanetBuilds.buildLair(planet, state);
+                            }
+                            if (!state.ringBuilt) {
+                                state.ringY = com.turbopapu.fight.Arenas.buildRing(planet, com.turbopapu.fight.Arenas.lairFloor(planet));
+                                state.ringBuilt = true;
+                                state.markDirty();
+                            }
+                            player.teleport(planet, TurboState.LAIR_X + 0.5, state.ringY, TurboState.LAIR_Z + 2.5, 180, 0);
+                            return 1;
+                        }))
                         .then(CommandManager.literal("aldea").executes(ctx -> {
                             // Construye una aldea de Turbopapuenses delante del jugador.
                             ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();

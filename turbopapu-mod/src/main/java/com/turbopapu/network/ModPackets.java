@@ -6,6 +6,9 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import com.turbopapu.fight.BossFight;
+import com.turbopapu.fight.PvzGame;
+import com.turbopapu.fight.PvzPlantType;
 
 /** Paquetes servidor → cliente para las escenas: cinemática, carta, viaje y final. */
 public final class ModPackets {
@@ -14,10 +17,87 @@ public final class ModPackets {
     public static final Identifier TRAVEL = TurboPapuMod.id("travel");
     public static final Identifier ENDING = TurboPapuMod.id("ending");
     public static final Identifier DIALOGUE = TurboPapuMod.id("dialogue");
+    public static final Identifier FIGHT_STATE = TurboPapuMod.id("fight_state");
+    public static final Identifier GLITCH = TurboPapuMod.id("glitch");
+    public static final Identifier PVZ_START = TurboPapuMod.id("pvz_start");
+    public static final Identifier PVZ_END = TurboPapuMod.id("pvz_end");
+    public static final Identifier MUSIC = TurboPapuMod.id("music");
+    public static final Identifier LANDING = TurboPapuMod.id("landing");
+    // Cliente -> servidor
+    public static final Identifier DIALOGUE_ACTION = TurboPapuMod.id("dialogue_action");
+    public static final Identifier PVZ_PLACE = TurboPapuMod.id("pvz_place");
+    public static final Identifier PVZ_SHOVEL = TurboPapuMod.id("pvz_shovel");
 
     private ModPackets() {}
 
     public static void register() {
+        ServerPlayNetworking.registerGlobalReceiver(DIALOGUE_ACTION, (server, player, handler, buf, sender) -> {
+            String action = buf.readString(64);
+            server.execute(() -> DialogueActions.handle(player, action));
+        });
+        ServerPlayNetworking.registerGlobalReceiver(PVZ_PLACE, (server, player, handler, buf, sender) -> {
+            int col = buf.readVarInt(), row = buf.readVarInt(), type = buf.readVarInt();
+            server.execute(() -> BossFight.pvzPlace(player, col, row, type));
+        });
+        ServerPlayNetworking.registerGlobalReceiver(PVZ_SHOVEL, (server, player, handler, buf, sender) -> {
+            int col = buf.readVarInt(), row = buf.readVarInt();
+            server.execute(() -> BossFight.pvzShovel(player, col, row));
+        });
+    }
+
+    public static void fightState(ServerPlayerEntity player, BossFight fight) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeVarInt(fight.phase().ordinal());
+        buf.writeVarInt(fight.round());
+        buf.writeVarInt(fight.spikeTicks());
+        buf.writeVarInt(fight.defuse());
+        PvzGame pvz = fight.pvz();
+        buf.writeBoolean(pvz != null);
+        if (pvz != null) {
+            buf.writeVarInt(pvz.sun());
+            buf.writeVarInt(pvz.wave());
+            buf.writeVarInt(pvz.waveProgress());
+            buf.writeString(pvz.message());
+            for (int i = 0; i < PvzPlantType.values().length; i++) {
+                buf.writeVarInt(pvz.cooldownPercent(i));
+            }
+        }
+        ServerPlayNetworking.send(player, FIGHT_STATE, buf);
+    }
+
+    public static void fightEnded(ServerPlayerEntity player) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeVarInt(-1);
+        ServerPlayNetworking.send(player, FIGHT_STATE, buf);
+    }
+
+    public static void glitch(ServerPlayerEntity player) {
+        ServerPlayNetworking.send(player, GLITCH, PacketByteBufs.empty());
+    }
+
+    public static void pvzStart(ServerPlayerEntity player, int cameraId) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeVarInt(cameraId);
+        ServerPlayNetworking.send(player, PVZ_START, buf);
+    }
+
+    public static void pvzEnd(ServerPlayerEntity player) {
+        ServerPlayNetworking.send(player, PVZ_END, PacketByteBufs.empty());
+    }
+
+    /** Música de zona ("" = parar). */
+    public static void music(ServerPlayerEntity player, String key) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeString(key);
+        ServerPlayNetworking.send(player, MUSIC, buf);
+    }
+
+    /** Cinemática de aterrizaje del cohete en el planeta. */
+    public static void landing(ServerPlayerEntity player, int rocketId, int cameraId) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeVarInt(rocketId);
+        buf.writeVarInt(cameraId);
+        ServerPlayNetworking.send(player, LANDING, buf);
     }
 
     public static void startCinematic(ServerPlayerEntity player, int entityId, int ticks) {

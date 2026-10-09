@@ -29,6 +29,7 @@ public final class ModEntities {
     public static final EntityType<PapuNpcEntity> JUANMA = npc("juanma", 0.6f, 1.95f);
     public static final EntityType<PapuNpcEntity> GUINXU = npc("guinxu", 0.6f, 2.2f);
     public static final EntityType<PapuNpcEntity> ELINK_64 = npc("elink_64", 0.6f, 1.95f);
+    public static final EntityType<PapuNpcEntity> SUALENIDUS_AMIGO = npc("sualenidus_amigo", 1.4f, 2.8f);
     public static final EntityType<PapuNpcEntity> AROY = npc("aroy", 1.1f, 1.6f);
     public static final EntityType<PapuNpcEntity> MUDOKON = npc("mudokon", 0.6f, 2.0f);
     public static final EntityType<PapuNpcEntity> ABE = npc("abe", 0.6f, 2.1f);
@@ -42,6 +43,29 @@ public final class ModEntities {
                     .defaultAttributes(SualenidusEntity::createAttributes)
                     .fireImmune()
                     .trackRangeBlocks(128)
+                    .build());
+
+    public static final EntityType<SualemMiniEntity> SUALEM_MINI = register("sualem_mini",
+            FabricEntityTypeBuilder.<SualemMiniEntity>createMob()
+                    .spawnGroup(SpawnGroup.MISC)
+                    .entityFactory(SualemMiniEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.7f, 1.8f))
+                    .defaultAttributes(SualemMiniEntity::createAttributes)
+                    .build());
+
+    public static final EntityType<PvzPlantEntity> PVZ_PLANT = register("pvz_planta",
+            FabricEntityTypeBuilder.<PvzPlantEntity>createMob()
+                    .spawnGroup(SpawnGroup.MISC)
+                    .entityFactory(PvzPlantEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.9f, 1.3f))
+                    .defaultAttributes(PvzPlantEntity::createAttributes)
+                    .build());
+
+    public static final EntityType<PvzProjectileEntity> PVZ_PROJECTILE = register("pvz_proyectil",
+            FabricEntityTypeBuilder.<PvzProjectileEntity>create(SpawnGroup.MISC, PvzProjectileEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.4f, 0.4f))
+                    .trackRangeBlocks(96)
+                    .trackedUpdateRate(2)
                     .build());
 
     public static final EntityType<MeteorEntity> METEOR = register("meteorito",
@@ -85,6 +109,7 @@ public final class ModEntities {
         NpcProfile.bind(VERITY_GORDA, NpcProfile.VERITY_GORDA);
         NpcProfile.bind(MUDOKON, NpcProfile.MUDOKON);
         NpcProfile.bind(AROY, NpcProfile.AROY);
+        NpcProfile.bind(SUALENIDUS_AMIGO, NpcProfile.SUALENIDUS_AMIGO);
         NpcProfile.bind(ABE, NpcProfile.ABE);
     }
 }

@@ -65,17 +65,21 @@ public final class PlanetBuilds {
         }
         // Algunos Turbopapuenses dormidos (víctimas de la lavanda).
         for (int i = 0; i < 3; i++) {
-            TurboPapuenseEntity papu = Build.spawn(world, ModEntities.TURBOPAPUENSE, cx - 8 + i * 8 + 0.5, y0, cz + 6.5, 0);
+            TurboPapuenseEntity papu = Build.spawn(world, ModEntities.TURBOPAPUENSE, cx - 8 + i * 8 + 0.5, y0, cz + 9.5, 0);
             if (papu != null) {
                 papu.setDormido(!state.sualenidusDefeated);
             }
         }
+        // Faro morado en lo alto de la cúpula: se ve desde la aldea.
+        Build.fill(world, cx - 1, y0 + r, cz - 1, cx + 1, y0 + r, cz + 1, Blocks.IRON_BLOCK);
+        Build.set(world, cx, y0 + r + 1, cz, Blocks.BEACON);
+        Build.set(world, cx, y0 + r + 2, cz, Blocks.PURPLE_STAINED_GLASS);
+        state.ringY = com.turbopapu.fight.Arenas.buildRing(world, y0);
+        state.ringBuilt = true;
         if (!state.sualenidusDefeated) {
-            Build.spawn(world, ModEntities.SUALENIDUS, cx + 0.5, y0, cz - 3.5, 0);
-            world.getPlayers(p -> p.getBlockPos().isWithinDistance(new BlockPos(cx, y0, cz), 140)).forEach(p -> {
-                p.sendMessage(Text.translatable("message.turbopapu.lair_found").formatted(Formatting.LIGHT_PURPLE), false);
-                com.turbopapu.network.ModPackets.dialogue(p, "sualenidus_intro", 0, -1);
-            });
+            Build.spawn(world, ModEntities.SUALENIDUS, cx + 0.5, state.ringY, cz - 2.5, 0);
+            world.getPlayers(p -> p.getBlockPos().isWithinDistance(new BlockPos(cx, y0, cz), 140)).forEach(p ->
+                    p.sendMessage(Text.translatable("message.turbopapu.lair_found").formatted(Formatting.LIGHT_PURPLE), false));
         }
         state.lairBuilt = true;
         state.markDirty();

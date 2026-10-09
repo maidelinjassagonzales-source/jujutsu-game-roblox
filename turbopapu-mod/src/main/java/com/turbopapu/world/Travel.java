@@ -34,14 +34,13 @@ public final class Travel {
         if (firstTime) {
             PlanetBuilds.buildVillage(planet, state);
         }
+        if (!state.lairBuilt) {
+            // Así el rayo morado de la guarida ya se ve desde la aldea.
+            PlanetBuilds.buildLair(planet, state);
+        }
         ModPackets.showTravel(player, true);
         player.fallDistance = 0;
-        player.teleport(planet, 0.5, state.villageY + 1, 6.5, 180f, 0f);
-        giveRocketBack(player);
-        player.sendMessage(Text.translatable("message.turbopapu.arrived").formatted(Formatting.GOLD, Formatting.BOLD), false);
-        if (firstTime) {
-            player.sendMessage(Text.translatable("message.turbopapu.welcome").formatted(Formatting.YELLOW), false);
-        }
+        Landing.start(player, planet, state);
     }
 
     public static void toOverworld(ServerPlayerEntity player) {

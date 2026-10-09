@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "turbopapu:block/totem_mudokon_front",
+    "side": "turbopapu:block/totem_mudokon_side",
+    "top": "turbopapu:block/totem_mudokon_top"
+  }
+}

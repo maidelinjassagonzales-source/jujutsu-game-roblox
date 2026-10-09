@@ -77,5 +77,17 @@
   "item.turbopapu.aroy_spawn_egg": "Huevo de Aroy",
   "item.turbopapu.leche_de_coco": "Leche de Coco Aroy-D",
   "item.turbopapu.leche_de_coco.tooltip": "De Aroy. Te cura y te hace duro como una lata. ¡A mí me gusta el coco!",
-  "message.turbopapu.leche_de_coco": "¡Leche de coco Aroy-D! Duro como una lata."
+  "message.turbopapu.leche_de_coco": "¡Leche de coco Aroy-D! Duro como una lata.",
+  "item.turbopapu.vandal": "Vandal",
+  "item.turbopapu.vandal.tooltip": "Mantén clic derecho para disparar. Agáchate + clic: recargar. ¡Apunta a la cabeza!",
+  "block.turbopapu.atrapasuenos": "Atrapasueños Mudokon",
+  "block.turbopapu.totem_mudokon": "Tótem Mudokon",
+  "block.turbopapu.vasija_mudokon": "Vasija Mudokon",
+  "block.turbopapu.ladrillo_mudokon": "Ladrillo Mudokon con Glifo",
+  "block.turbopapu.arbusto_spooce": "Arbusto de Spooce",
+  "entity.turbopapu.sualem_mini": "Sualem",
+  "entity.turbopapu.pvz_planta": "Amigo plantado",
+  "entity.turbopapu.pvz_proyectil": "Proyectil",
+  "entity.turbopapu.sualenidus_amigo": "Sualenidus (amigo)",
+  "item.turbopapu.sualenidus_amigo_spawn_egg": "Huevo de Sualenidus (amigo)"
 }

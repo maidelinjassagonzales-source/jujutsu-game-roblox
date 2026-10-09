@@ -128,6 +128,10 @@ public class SualenidusEntity extends HostileEntity {
             laughCooldown = 100 + random.nextInt(80);
             laugh(world);
         }
+        com.turbopapu.fight.BossFight fight = com.turbopapu.fight.BossFight.forBoss(this);
+        if (fight != null && fight.isScripted()) {
+            return; // En Valorant / almas / PvZ los ataques los controla BossFight.
+        }
         if (target2 != null && (lavenderCooldown -= speedUp) <= 0) {
             lavenderCooldown = 160 + random.nextInt(60);
             lavenderCloud(world);
@@ -198,16 +202,53 @@ public class SualenidusEntity extends HostileEntity {
         return hit;
     }
 
+    /** Activa/desactiva las IA normales (las fases guionizadas de la pelea mueven al jefe a mano). */
+    public void setScriptedGoals(boolean scripted) {
+        if (scripted) {
+            this.goalSelector.disableControl(net.minecraft.entity.ai.goal.Goal.Control.MOVE);
+            this.goalSelector.disableControl(net.minecraft.entity.ai.goal.Goal.Control.LOOK);
+            this.targetSelector.disableControl(net.minecraft.entity.ai.goal.Goal.Control.TARGET);
+            this.setTarget(null);
+        } else {
+            this.goalSelector.enableControl(net.minecraft.entity.ai.goal.Goal.Control.MOVE);
+            this.goalSelector.enableControl(net.minecraft.entity.ai.goal.Goal.Control.LOOK);
+            this.targetSelector.enableControl(net.minecraft.entity.ai.goal.Goal.Control.TARGET);
+        }
+    }
+
+    @Override
+    public boolean damage(DamageSource source, float amount) {
+        if (!getWorld().isClient && source.getAttacker() instanceof PlayerEntity) {
+            com.turbopapu.fight.BossFight.ensureFight(this);
+        }
+        com.turbopapu.fight.BossFight fight = com.turbopapu.fight.BossFight.forBoss(this);
+        if (fight != null && !source.isOf(net.minecraft.entity.damage.DamageTypes.OUT_OF_WORLD)
+                && !source.isOf(net.minecraft.entity.damage.DamageTypes.GENERIC_KILL)) {
+            amount = fight.filterBossDamage(this, amount);
+            if (amount <= 0) {
+                return false;
+            }
+        }
+        return super.damage(source, amount);
+    }
+
     @Override
     public void onDeath(DamageSource damageSource) {
         super.onDeath(damageSource);
+        com.turbopapu.fight.BossFight fight = com.turbopapu.fight.BossFight.forBoss(this);
+        if (fight != null) {
+            fight.onBossDeath(this);
+        }
         if (getWorld() instanceof ServerWorld world) {
             TurboState state = TurboState.get(world.getServer());
             state.sualenidusDefeated = true;
             state.markDirty();
             world.getServer().getPlayerManager().broadcast(
                     Text.translatable("message.turbopapu.victory").formatted(Formatting.GOLD, Formatting.BOLD), false);
-            Fireworks.celebrate(world, getBlockPos(), 12);
+            Fireworks.celebrate(world, new net.minecraft.util.math.BlockPos(0, state.villageY, 0), 16);
+            if (!state.friendsVillageBuilt) {
+                com.turbopapu.world.FriendsVillage.build(world, state);
+            }
             for (ServerPlayerEntity player : world.getPlayers()) {
                 player.removeStatusEffect(ModEffects.DORMIDO);
                 ModPackets.showEnding(player);

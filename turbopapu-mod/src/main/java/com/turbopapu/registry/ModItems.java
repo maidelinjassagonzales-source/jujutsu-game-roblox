@@ -21,6 +21,11 @@ public final class ModItems {
             new BlockItem(ModBlocks.FRAGMENTO_METEORITO, new Item.Settings()));
     public static final Item REGOLITO_PAPU = register("regolito_papu", new BlockItem(ModBlocks.REGOLITO_PAPU, new Item.Settings()));
     public static final Item ROCA_PAPU = register("roca_papu", new BlockItem(ModBlocks.ROCA_PAPU, new Item.Settings()));
+    public static final Item ATRAPASUENOS = register("atrapasuenos", new BlockItem(ModBlocks.ATRAPASUENOS, new Item.Settings()));
+    public static final Item TOTEM_MUDOKON = register("totem_mudokon", new BlockItem(ModBlocks.TOTEM_MUDOKON, new Item.Settings()));
+    public static final Item VASIJA_MUDOKON = register("vasija_mudokon", new BlockItem(ModBlocks.VASIJA_MUDOKON, new Item.Settings()));
+    public static final Item LADRILLO_MUDOKON = register("ladrillo_mudokon", new BlockItem(ModBlocks.LADRILLO_MUDOKON, new Item.Settings()));
+    public static final Item ARBUSTO_SPOOCE = register("arbusto_spooce", new BlockItem(ModBlocks.ARBUSTO_SPOOCE, new Item.Settings()));
 
     // --- Piezas del cohete ---
     public static final Item CASCO_COHETE = register("casco_cohete", new TooltipItem(new Item.Settings().maxCount(1), "casco_cohete"));
@@ -34,6 +39,7 @@ public final class ModItems {
     public static final Item CARTA_DE_AUXILIO = register("carta_de_auxilio", new LetterItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
     public static final Item ICEBERG_DE_BOLSILLO = register("iceberg_de_bolsillo", new PocketIcebergItem(new Item.Settings().maxCount(16).rarity(Rarity.RARE)));
     public static final Item MATE = register("mate", new MateItem(new Item.Settings().maxCount(16)));
+    public static final Item VANDAL = register("vandal", new VandalItem(new Item.Settings().maxCount(1).rarity(Rarity.EPIC)));
     public static final Item LECHE_DE_COCO = register("leche_de_coco", new CoconutMilkItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON)));
     public static final Item ESTRELLA_DE_PODER = register("estrella_de_poder", new PowerStarItem(new Item.Settings().maxCount(8).rarity(Rarity.EPIC)));
 
@@ -46,6 +52,7 @@ public final class ModItems {
     public static final Item GUINXU_SPAWN_EGG = egg("guinxu", ModEntities.GUINXU, 0x6B4423, 0x2E2E2E);
     public static final Item ELINK_64_SPAWN_EGG = egg("elink_64", ModEntities.ELINK_64, 0xE53935, 0x111111);
     public static final Item VERITY_GORDA_SPAWN_EGG = egg("verity_gorda", ModEntities.VERITY_GORDA, 0xFFD60A, 0x111111);
+    public static final Item SUALENIDUS_AMIGO_SPAWN_EGG = egg("sualenidus_amigo", ModEntities.SUALENIDUS_AMIGO, 0xB57EDC, 0x77DD77);
     public static final Item AROY_SPAWN_EGG = egg("aroy", ModEntities.AROY, 0x3A1A08, 0xF28C28);
     public static final Item MUDOKON_SPAWN_EGG = egg("mudokon", ModEntities.MUDOKON, 0x6E8C6A, 0xE07A1F);
     public static final Item ABE_SPAWN_EGG = egg("abe", ModEntities.ABE, 0x7FA08A, 0x5A3A1E);

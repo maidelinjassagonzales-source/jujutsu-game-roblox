@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "L",
+    "G",
+    "L"
+  ],
+  "key": {
+    "L": {
+      "item": "minecraft:stripped_dark_oak_log"
+    },
+    "G": {
+      "item": "minecraft:green_dye"
+    }
+  },
+  "result": {
+    "item": "turbopapu:totem_mudokon",
+    "count": 2
+  }
+}

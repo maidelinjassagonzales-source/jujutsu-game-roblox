@@ -21,7 +21,11 @@ import java.util.Optional;
  * Las variantes se llaman clave_0, clave_1, ...
  */
 public final class Dialogues {
-    public record Step(String name, String text, String portrait, int pw, int ph, boolean shake, String music, String photo) {}
+    /** Respuesta que puede elegir el jugador: salta a otro diálogo ("goto") y/o avisa al servidor ("action"). */
+    public record Option(String text, String gotoKey, String action) {}
+
+    public record Step(String name, String text, String portrait, int pw, int ph, boolean shake, String music, String photo,
+                       List<Option> options) {}
 
     private static Map<String, List<Step>> cache;
 
@@ -31,7 +35,7 @@ public final class Dialogues {
         if (cache == null) {
             load();
         }
-        return cache.getOrDefault(key, List.of(new Step("Sistema", "(Falta el diálogo: " + key + ")", null, 0, 0, false, null, null)));
+        return cache.getOrDefault(key, List.of(new Step("Sistema", "(Falta el diálogo: " + key + ")", null, 0, 0, false, null, null, List.of())));
     }
 
     /** La clave exacta si existe; si no, la variante número {@code variant} de clave_0, clave_1, ... */
@@ -71,12 +75,19 @@ public final class Dialogues {
                 JsonArray array = entry.getValue().getAsJsonArray();
                 for (JsonElement e : array) {
                     JsonObject o = e.getAsJsonObject();
+                    List<Option> options = new ArrayList<>();
+                    if (o.has("options")) {
+                        for (JsonElement oe : o.getAsJsonArray("options")) {
+                            JsonObject oo = oe.getAsJsonObject();
+                            options.add(new Option(str(oo, "text"), str(oo, "goto"), str(oo, "action")));
+                        }
+                    }
                     steps.add(new Step(
                             str(o, "name"), str(o, "text"), str(o, "portrait"),
                             o.has("pw") ? o.get("pw").getAsInt() : 0,
                             o.has("ph") ? o.get("ph").getAsInt() : 0,
                             o.has("shake") && o.get("shake").getAsBoolean(),
-                            str(o, "music"), str(o, "photo")));
+                            str(o, "music"), str(o, "photo"), options));
                 }
                 cache.put(entry.getKey(), steps);
             }

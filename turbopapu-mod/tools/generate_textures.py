@@ -694,6 +694,105 @@ def leche_de_coco_item():
     return out
 
 
+def vandal_item():
+    """La Vandal de Valorant en pixel art (de lado)."""
+    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    dark, mid, red = hexc("2B2B33"), hexc("4A4A55"), hexc("FF4655")
+    d.rectangle([1, 6, 13, 8], fill=mid)        # cuerpo
+    d.rectangle([13, 7, 15, 7], fill=dark)      # cañón
+    d.rectangle([0, 6, 2, 9], fill=dark)        # culata
+    d.rectangle([5, 9, 6, 13], fill=dark)       # empuñadura
+    d.rectangle([8, 9, 10, 12], fill=dark)      # cargador
+    d.rectangle([5, 5, 9, 5], fill=dark)        # mira
+    d.rectangle([3, 7, 11, 7], fill=red)        # franja roja
+    return outline(img)
+
+
+def atrapasuenos():
+    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    d.ellipse([3, 0, 12, 9], outline=hexc("6B4423"), width=1)
+    for a in range(0, 360, 45):
+        x = 7.5 + math.cos(math.radians(a)) * 4
+        y = 4.5 + math.sin(math.radians(a)) * 4
+        d.line([(7.5, 4.5), (x, y)], fill=hexc("E8E0D0"))
+    d.point([(7, 4), (8, 4)], fill=hexc("2EC4C4"))
+    for (x, c) in [(4, "3B6FD8"), (7, "FF4655"), (11, "3B6FD8")]:
+        d.line([(x, 9), (x, 12)], fill=hexc("6B4423"))
+        d.rectangle([x - 1, 12, x + 1, 15], fill=hexc(c))
+        d.point([(x, 15)], fill=hexc("FFFFFF"))
+    return img
+
+
+def totem(face):
+    img = Image.new("RGBA", (16, 16))
+    wood = hexc("4E6B3A") if face != "top" else hexc("5A4630")
+    for x in range(16):
+        for y in range(16):
+            img.putpixel((x, y), shade(wood, 0.85 + 0.3 * ((x * 3 + y) % 7) / 7))
+    d = ImageDraw.Draw(img)
+    if face == "front":
+        # Cara Mudokon: ojos naranjas grandes, boca cosida.
+        for ex in (3, 9):
+            d.ellipse([ex, 4, ex + 4, 8], fill=hexc("1A1A1A"))
+            d.ellipse([ex + 1, 5, ex + 3, 7], fill=hexc("F2A33A"))
+        d.line([(4, 12), (11, 12)], fill=hexc("2A1A0A"))
+        for x in range(5, 11, 2):
+            d.line([(x, 11), (x, 13)], fill=hexc("2A1A0A"))
+        d.line([(7, 8), (8, 10)], fill=shade(wood, 0.6))
+    elif face == "side":
+        for y in (2, 7, 12):
+            d.line([(0, y), (15, y)], fill=shade(wood, 0.6))
+        d.line([(3, 3), (5, 6)], fill=hexc("F2A33A"))
+    else:
+        d.ellipse([2, 2, 13, 13], outline=shade(wood, 0.7))
+    return img
+
+
+def vasija(top):
+    img = Image.new("RGBA", (16, 16))
+    clay = hexc("B5652D")
+    for x in range(16):
+        for y in range(16):
+            img.putpixel((x, y), shade(clay, 0.9 + 0.2 * rng.random()))
+    d = ImageDraw.Draw(img)
+    if top:
+        d.ellipse([5, 5, 10, 10], fill=hexc("2A1408"))
+    else:
+        for x in range(0, 16, 4):
+            d.line([(x, 10), (x + 2, 8), (x + 4, 10)], fill=hexc("1A1A1A"))
+        d.line([(0, 13), (15, 13)], fill=hexc("F2E2C0"))
+    return img
+
+
+def ladrillo_mudokon():
+    img = Image.new("RGBA", (16, 16))
+    for x in range(16):
+        for y in range(16):
+            mortar = y % 4 == 3 or (x + (4 if (y // 4) % 2 else 0)) % 8 == 7
+            img.putpixel((x, y), shade(hexc("6B5040") if mortar else hexc("8A6B50"), 0.9 + 0.2 * rng.random()))
+    d = ImageDraw.Draw(img)
+    # Huella de mano roja (pintura Mudokon).
+    red = hexc("B22222")
+    d.rectangle([6, 7, 9, 11], fill=red)
+    for i, h in enumerate([3, 4, 4, 3]):
+        d.line([(5 + i * 1.3 + 0.5, 7), (5 + i * 1.3 + 0.5, 7 - h)], fill=red)
+    d.line([(10, 9), (12, 7)], fill=red)
+    return img
+
+
+def arbusto_spooce():
+    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    for (x0, x1) in [(7, 3), (8, 12), (7, 6), (8, 10)]:
+        d.line([(x0, 15), (x1, 4)], fill=hexc("3E8E2E"))
+    for (x, y) in [(3, 4), (12, 4), (6, 2), (10, 6), (8, 1)]:
+        d.ellipse([x - 1, y - 1, x + 1, y + 1], fill=hexc("C6FF3A"))
+        d.point([(x, y)], fill=hexc("FFFFFF"))
+    return img
+
+
 def effect_dormido():
     img = Image.new("RGBA", (18, 18), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
@@ -772,6 +871,16 @@ def main():
     save(roca(), "block", "roca_papu.png")
     save(mudokon(False), "entity", "mudokon.png")
     save(mudokon(True), "entity", "abe.png")
+    save(vandal_item(), "item", "vandal.png")
+    save(atrapasuenos(), "block", "atrapasuenos.png")
+    save(totem("front"), "block", "totem_mudokon_front.png")
+    save(totem("side"), "block", "totem_mudokon_side.png")
+    save(totem("top"), "block", "totem_mudokon_top.png")
+    save(vasija(False), "block", "vasija_mudokon.png")
+    save(vasija(True), "block", "vasija_mudokon_top.png")
+    save(ladrillo_mudokon(), "block", "ladrillo_mudokon.png")
+    save(arbusto_spooce(), "block", "arbusto_spooce.png")
+    save(sualenidus(), "entity", "sualenidus_amigo.png")
     aroy_portraits()
     save(aroy_entity(), "entity", "aroy.png")
     save(leche_de_coco_item(), "item", "leche_de_coco.png")

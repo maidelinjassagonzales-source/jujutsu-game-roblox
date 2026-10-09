@@ -1,5 +1,6 @@
 package com.turbopapu.world;
 
+import com.turbopapu.registry.ModBlocks;
 import com.turbopapu.registry.ModEntities;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -52,6 +53,17 @@ public final class MudokonVillage {
         Build.set(world, rx + 3, ry, rz - 1, Blocks.BARREL);
         Build.fill(world, rx, ry + 10, rz, rx + 2, ry + 10, rz, Blocks.RED_CONCRETE);
 
+        // Arbustos de spooce brillantes y vasijas por la aldea.
+        for (int i = 0; i < 16; i++) {
+            double a = random.nextDouble() * Math.PI * 2;
+            double d = 8 + random.nextDouble() * 16;
+            int x = cx + MathHelper.floor(Math.cos(a) * d), z = cz + MathHelper.floor(Math.sin(a) * d);
+            int y = ground(world, x, z);
+            if (world.getBlockState(new BlockPos(x, y, z)).isAir()) {
+                Build.set(world, x, y, z, i % 3 == 0 ? ModBlocks.VASIJA_MUDOKON : ModBlocks.ARBUSTO_SPOOCE);
+            }
+        }
+
         // Los Mudokons y Abe.
         for (int i = 0; i < 5; i++) {
             double a = i * Math.PI * 2 / 5 + 0.4;
@@ -99,20 +111,23 @@ public final class MudokonVillage {
         }
         Build.set(world, hx, y0 + r + 5, hz, Blocks.BONE_BLOCK);
         Build.set(world, new BlockPos(hx, y0, hz), Blocks.LANTERN.getDefaultState());
+        Build.set(world, new BlockPos(hx, y0 + 2, hz + r - 1), ModBlocks.ATRAPASUENOS.getDefaultState()
+                .with(com.turbopapu.block.DreamcatcherBlock.FACING, net.minecraft.util.math.Direction.NORTH));
+        Build.set(world, hx + 1, y0, hz - r - 1, ModBlocks.VASIJA_MUDOKON);
     }
 
     /** Tótem verde con cara Mudokon (ojos grandes naranjas y boca cosida). */
     private static void totem(ServerWorld world, int x, int z) {
         int y = ground(world, x, z);
         Build.fill(world, x, y, z, x, y + 3, z, Blocks.STRIPPED_DARK_OAK_LOG);
-        Build.set(world, x, y + 4, z, Blocks.GREEN_TERRACOTTA);
-        Build.set(world, x, y + 5, z, Blocks.LIME_TERRACOTTA);
-        Build.set(world, x, y + 6, z, Blocks.GREEN_TERRACOTTA);
-        Block eye = Blocks.ORANGE_CONCRETE;
-        Build.set(world, x - 1, y + 5, z, eye);
-        Build.set(world, x + 1, y + 5, z, eye);
+        net.minecraft.block.BlockState totem = ModBlocks.TOTEM_MUDOKON.getDefaultState()
+                .with(com.turbopapu.block.FacingDecorBlock.FACING, net.minecraft.util.math.Direction.SOUTH);
+        Build.set(world, new BlockPos(x, y + 4, z), totem);
+        Build.set(world, new BlockPos(x, y + 5, z), totem);
+        Build.set(world, new BlockPos(x, y + 6, z), totem);
         Build.set(world, x, y + 7, z, Blocks.SKELETON_SKULL);
-        Build.set(world, x, y + 4, z + 1, Blocks.BLACK_CONCRETE);
+        Build.set(world, new BlockPos(x, y + 3, z + 1), ModBlocks.ATRAPASUENOS.getDefaultState()
+                .with(com.turbopapu.block.DreamcatcherBlock.FACING, net.minecraft.util.math.Direction.SOUTH));
     }
 
     /** Anillo de luz flotante: el portal de pájaros por el que escapan los Mudokons. */

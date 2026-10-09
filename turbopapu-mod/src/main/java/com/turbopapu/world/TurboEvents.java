@@ -20,12 +20,23 @@ public final class TurboEvents {
 
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(TurboEvents::onTick);
+        net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents.ALLOW_DEATH.register((entity, source, amount) -> {
+            if (entity instanceof ServerPlayerEntity player && com.turbopapu.fight.BossFight.protects(player)) {
+                com.turbopapu.fight.BossFight.onPlayerSaved(player);
+                return false;
+            }
+            return true;
+        });
     }
 
+    private static final java.util.Set<java.util.UUID> MUSIC_PLAYERS = new java.util.HashSet<>();
+
     private static void onTick(MinecraftServer server) {
+        com.turbopapu.fight.BossFight.tick(server);
         if (++ticks % 20 != 0) {
             return;
         }
+        tickAreaMusic(server);
         TurboState state = TurboState.get(server);
         ServerWorld overworld = server.getOverworld();
 
@@ -72,10 +83,30 @@ public final class TurboEvents {
                     PlanetBuilds.buildLair(planet, state);
                 }
                 RandomVillages.tick(planet, player, state);
+                if (state.lairBuilt && !state.sualenidusDefeated && near(player, TurboState.LAIR_X, TurboState.LAIR_Z, 45)
+                        && player.getCommandTags().add("turbopapu_intro_sualenidus")) {
+                    com.turbopapu.network.ModPackets.dialogue(player, "sualenidus_intro", 0, -1);
+                }
                 // Gravedad lunar: se salta más alto.
                 if (!player.isSpectator()) {
                     player.addStatusEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 50, 1, true, false, true));
                 }
+            }
+        }
+    }
+
+    /** La música de Oddworld suena cuando estás en la aldea Mudokon de Alphatemp. */
+    private static void tickAreaMusic(MinecraftServer server) {
+        TurboState state = TurboState.get(server);
+        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            boolean inOverworld = player.getWorld().getRegistryKey() == net.minecraft.world.World.OVERWORLD;
+            boolean playing = MUSIC_PLAYERS.contains(player.getUuid());
+            if (!playing && inOverworld && state.hutBuilt && near(player, state.hutX, state.hutZ, 40)) {
+                MUSIC_PLAYERS.add(player.getUuid());
+                com.turbopapu.network.ModPackets.music(player, "aldea_mudokon");
+            } else if (playing && (!inOverworld || !near(player, state.hutX, state.hutZ, 60))) {
+                MUSIC_PLAYERS.remove(player.getUuid());
+                com.turbopapu.network.ModPackets.music(player, "");
             }
         }
     }

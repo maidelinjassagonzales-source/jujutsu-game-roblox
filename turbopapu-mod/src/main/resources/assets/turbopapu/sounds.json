@@ -22,5 +22,13 @@
         "stream": true
       }
     ]
+  },
+  "music.aldea_mudokon": {
+    "sounds": [
+      {
+        "name": "turbopapu:music/aldea_mudokon",
+        "stream": true
+      }
+    ]
   }
 }

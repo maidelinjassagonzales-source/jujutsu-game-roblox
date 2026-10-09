@@ -29,6 +29,15 @@ import net.minecraft.world.World;
 /** La nave para ir al Planeta TurboPapu (y volver). Súbete con clic derecho: cuenta atrás y ¡despegue! */
 public class RocketEntity extends Entity {
     private static final TrackedData<Integer> FLIGHT = DataTracker.registerData(RocketEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Boolean> LANDING = DataTracker.registerData(RocketEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final int LANDING_DELAY = 110;
+
+    // Aterrizaje (solo servidor)
+    private int landingTicks = -1;
+    private int touchdownTicks = -1;
+    private double targetY;
+    private java.util.UUID pilot;
+    public Entity camera;
     private static final int COUNTDOWN = 60;
     private static final int FLIGHT_TIME = COUNTDOWN + 110;
 
@@ -39,6 +48,7 @@ public class RocketEntity extends Entity {
     @Override
     protected void initDataTracker() {
         this.dataTracker.startTracking(FLIGHT, -1);
+        this.dataTracker.startTracking(LANDING, false);
     }
 
     /** -1 = en tierra, 0..COUNTDOWN = cuenta atrás, más = volando. */
@@ -48,6 +58,55 @@ public class RocketEntity extends Entity {
 
     public boolean isFlying() {
         return getFlight() > COUNTDOWN;
+    }
+
+    public boolean isLanding() {
+        return this.dataTracker.get(LANDING);
+    }
+
+    /** Empieza la cinemática de aterrizaje: baja desde el cielo hasta groundY con el piloto dentro. */
+    public void startLanding(double groundY, ServerPlayerEntity player) {
+        this.dataTracker.set(LANDING, true);
+        this.landingTicks = 0;
+        this.targetY = groundY;
+        this.pilot = player.getUuid();
+    }
+
+    private void tickLanding(World world) {
+        if (world.isClient) {
+            for (int i = 0; i < 6; i++) {
+                world.addParticle(ParticleTypes.FLAME, getX() + random.nextGaussian() * 0.25, getY() - 0.3, getZ() + random.nextGaussian() * 0.25,
+                        random.nextGaussian() * 0.04, -0.5, random.nextGaussian() * 0.04);
+                world.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, getX() + random.nextGaussian() * 0.5, getY() - 0.8, getZ() + random.nextGaussian() * 0.5, 0, 0.02, 0);
+            }
+            return;
+        }
+        landingTicks++;
+        // Sube al piloto en cuanto llega a este mundo.
+        if (pilot != null && !hasPassengers() && world instanceof ServerWorld sw && sw.getEntity(pilot) instanceof ServerPlayerEntity p) {
+            p.startRiding(this, true);
+        }
+        if (landingTicks < LANDING_DELAY) {
+            return;
+        }
+        if (landingTicks % 6 == 0) {
+            world.playSound(null, getX(), getY(), getZ(), SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.NEUTRAL, 2f, 0.4f);
+        }
+        double dy = getY() - targetY;
+        if (dy > 0.05) {
+            double speed = Math.max(0.1, Math.min(0.9, dy * 0.035));
+            setPosition(getX(), Math.max(targetY, getY() - speed), getZ());
+            return;
+        }
+        // ¡Aterrizaje!
+        this.dataTracker.set(LANDING, false);
+        touchdownTicks = 0;
+        landingTicks = -1;
+        ServerWorld sw = (ServerWorld) world;
+        sw.spawnParticles(ParticleTypes.CLOUD, getX(), getY() + 0.2, getZ(), 80, 2.5, 0.3, 2.5, 0.08);
+        sw.spawnParticles(ParticleTypes.POOF, getX(), getY() + 0.2, getZ(), 40, 1.5, 0.2, 1.5, 0.1);
+        world.playSound(null, getX(), getY(), getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.NEUTRAL, 1.5f, 0.7f);
+        world.playSound(null, getX(), getY(), getZ(), SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.NEUTRAL, 1f, 0.6f);
     }
 
     @Override
@@ -66,6 +125,26 @@ public class RocketEntity extends Entity {
     public void tick() {
         super.tick();
         World world = getWorld();
+        if (isLanding() || landingTicks >= 0) {
+            tickLanding(world);
+            return;
+        }
+        if (touchdownTicks >= 0 && !world.isClient) {
+            if (++touchdownTicks >= 30) {
+                touchdownTicks = -1;
+                for (Entity e : getPassengerList()) {
+                    if (e instanceof ServerPlayerEntity player) {
+                        e.stopRiding();
+                        com.turbopapu.world.Landing.arrive(player, this);
+                    }
+                }
+                if (camera != null) {
+                    camera.discard();
+                    camera = null;
+                }
+            }
+            return;
+        }
         int flight = getFlight();
 
         if (flight < 0) {

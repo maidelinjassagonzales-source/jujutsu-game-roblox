@@ -29,7 +29,8 @@ import java.util.Random;
 public class DialogueScreen extends Screen {
     private static final long MS_PER_CHAR = 22;
 
-    private final List<Dialogues.Step> steps;
+    private List<Dialogues.Step> steps;
+    private int selected;
     private final Random random = new Random();
     private final int npcId;
     private Runnable onFinish;
@@ -96,9 +97,38 @@ public class DialogueScreen extends Screen {
         return (int) ((System.currentTimeMillis() - stepStart) / MS_PER_CHAR);
     }
 
+    private boolean choosing() {
+        return fullyShown && !step().options().isEmpty();
+    }
+
+    /** El jugador elige una respuesta. */
+    private void choose(int i) {
+        Dialogues.Option option = step().options().get(i);
+        client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK.value(), 1.2f, 0.4f));
+        if (option.action() != null) {
+            com.turbopapu.client.FightHud.sendDialogueAction(option.action());
+        }
+        if (option.gotoKey() != null) {
+            steps = Dialogues.get(option.gotoKey());
+            index = 0;
+            selected = 0;
+            startStep();
+        } else if (index + 1 < steps.size()) {
+            index++;
+            selected = 0;
+            startStep();
+        } else {
+            close();
+        }
+    }
+
     private void advance() {
         if (visibleChars() < step().text().length()) {
             fullyShown = true;
+            return;
+        }
+        if (choosing()) {
+            choose(selected);
             return;
         }
         if (index + 1 >= steps.size()) {
@@ -128,12 +158,72 @@ public class DialogueScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (choosing()) {
+            int hit = optionAt(mouseX, mouseY);
+            if (hit >= 0) {
+                choose(hit);
+            }
+            return true;
+        }
         advance();
         return true;
     }
 
     @Override
+    public void mouseMoved(double mouseX, double mouseY) {
+        if (choosing()) {
+            int hit = optionAt(mouseX, mouseY);
+            if (hit >= 0) {
+                selected = hit;
+            }
+        }
+    }
+
+    private int optionsTop() {
+        int boxH = Math.max(70, height / 4);
+        int boxY = height - boxH - 12;
+        return boxY - 8 - step().options().size() * 16;
+    }
+
+    private int optionAt(double mx, double my) {
+        int n = step().options().size();
+        int top = optionsTop();
+        int w = optionsWidth();
+        int x = width - 20 - w;
+        for (int i = 0; i < n; i++) {
+            int y = top + i * 16;
+            if (mx >= x && mx <= x + w && my >= y && my < y + 14) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int optionsWidth() {
+        int w = 80;
+        for (Dialogues.Option o : step().options()) {
+            w = Math.max(w, textRenderer.getWidth("▶ 9. " + o.text()) + 16);
+        }
+        return w;
+    }
+
+    @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (choosing()) {
+            int n = step().options().size();
+            if (keyCode == GLFW.GLFW_KEY_UP || keyCode == GLFW.GLFW_KEY_W) {
+                selected = Math.floorMod(selected - 1, n);
+                return true;
+            }
+            if (keyCode == GLFW.GLFW_KEY_DOWN || keyCode == GLFW.GLFW_KEY_S) {
+                selected = Math.floorMod(selected + 1, n);
+                return true;
+            }
+            if (keyCode >= GLFW.GLFW_KEY_1 && keyCode < GLFW.GLFW_KEY_1 + n) {
+                choose(keyCode - GLFW.GLFW_KEY_1);
+                return true;
+            }
+        }
         if (keyCode == GLFW.GLFW_KEY_SPACE || keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
             advance();
             return true;
@@ -249,10 +339,28 @@ public class DialogueScreen extends Screen {
             ctx.drawText(textRenderer, line, x + 12 + sx, lineY, 0xFFFFFFFF, true);
             lineY += 11;
         }
-        if (fullyShown && (System.currentTimeMillis() / 400) % 2 == 0) {
+        if (choosing()) {
+            renderOptions(ctx);
+        } else if (fullyShown && (System.currentTimeMillis() / 400) % 2 == 0) {
             String hint = index + 1 < steps.size() ? "▶ Clic / Espacio" : "■ Cerrar";
             ctx.drawText(textRenderer, hint, x + w - textRenderer.getWidth(hint) - 10, y + h - 14, 0xFFAAAAAA, false);
         }
         ctx.drawText(textRenderer, (index + 1) + "/" + steps.size(), x + 10, y + h - 14, 0xFF666677, false);
+    }
+
+    /** Lista de respuestas encima de la caja, a la derecha (mismo estilo: fondo oscuro y borde dorado). */
+    private void renderOptions(DrawContext ctx) {
+        List<Dialogues.Option> options = step().options();
+        int top = optionsTop();
+        int w = optionsWidth();
+        int x = width - 20 - w;
+        for (int i = 0; i < options.size(); i++) {
+            int y = top + i * 16;
+            boolean sel = i == selected;
+            ctx.fill(x, y, x + w, y + 14, sel ? 0xF0403018 : 0xE0101018);
+            ctx.drawBorder(x, y, w, 14, sel ? 0xFFFFD34E : 0xFF806020);
+            String label = (sel ? "▶ " : "  ") + (i + 1) + ". " + options.get(i).text();
+            ctx.drawText(textRenderer, label, x + 6, y + 3, sel ? 0xFFFFE080 : 0xFFDDDDDD, true);
+        }
     }
 }

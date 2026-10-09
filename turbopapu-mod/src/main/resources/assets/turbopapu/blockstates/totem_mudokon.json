@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "turbopapu:block/totem_mudokon",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "turbopapu:block/totem_mudokon",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "turbopapu:block/totem_mudokon",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "turbopapu:block/totem_mudokon",
+      "y": 270
+    }
+  }
+}

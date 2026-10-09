@@ -80,6 +80,10 @@ public enum NpcProfile {
                     "Cuando todo esto acabe hacemos fiesta. Como en Las Vegas. Nadie va a recordar nada."),
             world -> new ItemStack[0]),
 
+    SUALENIDUS_AMIGO("Sualenidus", Formatting.LIGHT_PURPLE, true, true, false,
+            List.of("Ya no duermo a nadie. Bueno, solo con mis historias de Valorant."),
+            world -> new ItemStack[]{new ItemStack(net.minecraft.item.Items.ALLIUM, 8)}),
+
     AROY("Aroy", Formatting.GOLD, true, true, false,
             List.of("¡A mí me gusta el coco!"),
             world -> new ItemStack[]{new ItemStack(ModItems.LECHE_DE_COCO, 4)}),

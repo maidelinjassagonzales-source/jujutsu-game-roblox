@@ -7,6 +7,9 @@ import com.turbopapu.client.render.*;
 import com.turbopapu.client.dialogue.DialogueScreen;
 import com.turbopapu.client.dialogue.Dialogues;
 import com.turbopapu.client.screen.EndingScreen;
+import com.turbopapu.client.screen.PvzScreen;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.network.PacketByteBuf;
 import com.turbopapu.client.screen.LetterScreen;
 import com.turbopapu.client.screen.TravelScreen;
 import com.turbopapu.network.ModPackets;
@@ -46,6 +49,13 @@ public class TurboPapuClient implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.ABE, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.HUMANOID, 1.05f));
         EntityRendererRegistry.register(ModEntities.SUALENIDUS, SualenidusRenderer::new);
         EntityRendererRegistry.register(ModEntities.METEOR, MeteorRenderer::new);
+        EntityRendererRegistry.register(ModEntities.SUALEM_MINI, SualemMiniRenderer::new);
+        EntityRendererRegistry.register(ModEntities.PVZ_PLANT, PvzPlantRenderer::new);
+        EntityRendererRegistry.register(ModEntities.PVZ_PROJECTILE, ctx -> new net.minecraft.client.render.entity.FlyingItemEntityRenderer<>(ctx, 1.4f, true));
+        EntityRendererRegistry.register(ModEntities.SUALENIDUS_AMIGO, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.FAT, 1.4f));
+        net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlocks(net.minecraft.client.render.RenderLayer.getCutout(),
+                com.turbopapu.registry.ModBlocks.ATRAPASUENOS, com.turbopapu.registry.ModBlocks.ARBUSTO_SPOOCE,
+                com.turbopapu.registry.ModBlocks.VASIJA_MUDOKON);
         EntityRendererRegistry.register(ModEntities.ROCKET, RocketRenderer::new);
 
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.CINEMATIC, (client, handler, buf, sender) -> {
@@ -62,6 +72,34 @@ public class TurboPapuClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.ENDING, (client, handler, buf, sender) ->
                 client.execute(() -> client.setScreen(new DialogueScreen(Dialogues.get("final_victoria"), -1)
                         .onFinish(() -> client.setScreen(new EndingScreen())))));
+        ClientPlayNetworking.registerGlobalReceiver(ModPackets.FIGHT_STATE, (client, handler, buf, sender) -> {
+            PacketByteBuf copy = PacketByteBufs.copy(buf);
+            client.execute(() -> FightHud.read(copy));
+        });
+        ClientPlayNetworking.registerGlobalReceiver(ModPackets.GLITCH, (client, handler, buf, sender) ->
+                client.execute(FightHud::glitch));
+        ClientPlayNetworking.registerGlobalReceiver(ModPackets.PVZ_START, (client, handler, buf, sender) -> {
+            int cam = buf.readVarInt();
+            client.execute(() -> client.setScreen(new PvzScreen(cam)));
+        });
+        ClientPlayNetworking.registerGlobalReceiver(ModPackets.PVZ_END, (client, handler, buf, sender) ->
+                client.execute(() -> {
+                    if (client.currentScreen instanceof PvzScreen) {
+                        client.setScreen(null);
+                    }
+                    if (client.player != null) {
+                        client.setCameraEntity(client.player);
+                    }
+                }));
+        ClientPlayNetworking.registerGlobalReceiver(ModPackets.MUSIC, (client, handler, buf, sender) -> {
+            String key = buf.readString();
+            client.execute(() -> FightHud.setAreaMusic(key));
+        });
+        ClientPlayNetworking.registerGlobalReceiver(ModPackets.LANDING, (client, handler, buf, sender) -> {
+            int rocket = buf.readVarInt();
+            int cam = buf.readVarInt();
+            client.execute(() -> LandingCinematic.start(rocket, cam));
+        });
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.DIALOGUE, (client, handler, buf, sender) -> {
             String key = buf.readString();
             int variant = buf.readVarInt();
@@ -70,9 +108,15 @@ public class TurboPapuClient implements ClientModInitializer {
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(CinematicController::tick);
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            FightHud.tick();
+            LandingCinematic.tick(client);
+        });
         HudRenderCallback.EVENT.register((ctx, tickDelta) -> {
             renderSleepOverlay(ctx);
             CinematicController.renderHud(ctx, tickDelta);
+            FightHud.render(ctx);
+            LandingCinematic.renderHud(ctx);
         });
     }
 

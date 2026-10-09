@@ -24,6 +24,8 @@ public class TurboState extends PersistentState {
     public int villageY;
     public boolean lairBuilt;
     public boolean sualenidusDefeated;
+    public boolean ringBuilt, valorantBuilt, lawnBuilt, friendsVillageBuilt, landedOnce;
+    public int ringY;
     /** Celdas del mapa del planeta cuyas aldeas aleatorias ya se construyeron (ChunkPos.toLong). */
     public final Set<Long> builtVillages = new HashSet<>();
 
@@ -67,6 +69,12 @@ public class TurboState extends PersistentState {
         s.villageY = nbt.getInt("VillageY");
         s.lairBuilt = nbt.getBoolean("LairBuilt");
         s.sualenidusDefeated = nbt.getBoolean("SualenidusDefeated");
+        s.ringBuilt = nbt.getBoolean("RingBuilt");
+        s.valorantBuilt = nbt.getBoolean("ValorantBuilt");
+        s.lawnBuilt = nbt.getBoolean("LawnBuilt");
+        s.friendsVillageBuilt = nbt.getBoolean("FriendsVillageBuilt");
+        s.landedOnce = nbt.getBoolean("LandedOnce");
+        s.ringY = nbt.getInt("RingY");
         for (long cell : nbt.getLongArray("BuiltVillages")) {
             s.builtVillages.add(cell);
         }
@@ -93,6 +101,12 @@ public class TurboState extends PersistentState {
         nbt.putInt("VillageY", villageY);
         nbt.putBoolean("LairBuilt", lairBuilt);
         nbt.putBoolean("SualenidusDefeated", sualenidusDefeated);
+        nbt.putBoolean("RingBuilt", ringBuilt);
+        nbt.putBoolean("ValorantBuilt", valorantBuilt);
+        nbt.putBoolean("LawnBuilt", lawnBuilt);
+        nbt.putBoolean("FriendsVillageBuilt", friendsVillageBuilt);
+        nbt.putBoolean("LandedOnce", landedOnce);
+        nbt.putInt("RingY", ringY);
         nbt.putLongArray("BuiltVillages", builtVillages.stream().mapToLong(Long::longValue).toArray());
         return nbt;
     }
