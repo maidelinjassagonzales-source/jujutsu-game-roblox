@@ -1,0 +1,25 @@
+{
+  "type": "turbopapu:mundo_caca",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "minecraft:swamp",
+      "layers": [
+        {
+          "block": "minecraft:bedrock",
+          "height": 1
+        },
+        {
+          "block": "minecraft:brown_terracotta",
+          "height": 3
+        },
+        {
+          "block": "minecraft:mud",
+          "height": 1
+        }
+      ],
+      "lakes": false,
+      "features": false
+    }
+  }
+}

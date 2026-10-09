@@ -45,6 +45,51 @@ public final class GordoClient {
             ClientPlayNetworking.send(ModPackets.CAGARSE, PacketByteBufs.empty());
         }
         slide(client);
+        bounce(client);
+    }
+
+    private static double fallSpeed;
+    private static boolean wasAirborne;
+    private static int bounces;
+    private static final int TOO_MANY_BOUNCES = 15;
+
+    /** Pañal cagado: al caer rebotas como en un bloque de slime. Demasiados rebotes seguidos... Mundo de Caca. */
+    private static void bounce(MinecraftClient client) {
+        var player = client.player;
+        if (player == null || player.isSpectator() || player.getAbilities().flying) {
+            return;
+        }
+        var legs = player.getEquippedStack(net.minecraft.entity.EquipmentSlot.LEGS);
+        boolean pooped = legs.isOf(com.turbopapu.registry.ModItems.PANAL) && legs.hasNbt() && legs.getNbt().getBoolean("Cagado");
+        if (!pooped) {
+            bounces = 0;
+            return;
+        }
+        if (!player.isOnGround()) {
+            wasAirborne = true;
+            fallSpeed = player.getVelocity().y;
+            return;
+        }
+        if (wasAirborne) {
+            wasAirborne = false;
+            if (fallSpeed < -0.35 && !player.isSneaking()) {
+                Vec3d v = player.getVelocity();
+                // Manteniendo saltar, cada rebote sube un poco más.
+                double keep = client.options.jumpKey.isPressed() ? 1.04 : 0.9;
+                player.setVelocity(v.x, Math.min(2.0, -fallSpeed * keep), v.z);
+                player.playSound(SoundEvents.ENTITY_SLIME_JUMP, 0.8f, 0.8f + bounces * 0.05f);
+                bounces++;
+                if (bounces >= TOO_MANY_BOUNCES) {
+                    bounces = 0;
+                    ClientPlayNetworking.send(ModPackets.REBOTES, PacketByteBufs.empty());
+                } else if (bounces >= TOO_MANY_BOUNCES - 4) {
+                    player.sendMessage(net.minecraft.text.Text.literal("El suelo empieza a ceder... (" + bounces + "/" + TOO_MANY_BOUNCES + ")")
+                            .formatted(net.minecraft.util.Formatting.GOLD), true);
+                }
+                return;
+            }
+        }
+        bounces = 0;
     }
 
     /** Con mantequilla en los pies casi no hay rozamiento y aceleras muchísimo. */

@@ -53,6 +53,8 @@ public class TurboPapuClient implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.MAGO_LARGUIRUCHO, com.turbopapu.client.render.MagoRenderer::new);
         EntityRendererRegistry.register(ModEntities.SALCHICHA, com.turbopapu.client.render.SalchichaRenderer::new);
         EntityRendererRegistry.register(ModEntities.GORDO_PANALES, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.FAT, 1.3f));
+        EntityRendererRegistry.register(ModEntities.VERITY_CACA, VerityRenderer::new);
+        EntityRendererRegistry.register(ModEntities.GORDO_RUBIO, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.FAT, 1.2f));
         EntityRendererRegistry.register(ModEntities.AGUACATE_CUBANO, com.turbopapu.client.render.AguacateRenderer::new);
         EntityRendererRegistry.register(ModEntities.SUALENIDUS, SualenidusRenderer::new);
         EntityRendererRegistry.register(ModEntities.METEOR, MeteorRenderer::new);

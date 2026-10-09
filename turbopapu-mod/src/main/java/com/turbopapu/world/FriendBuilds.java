@@ -37,7 +37,7 @@ public final class FriendBuilds {
         }
     }
 
-    private static void sign(ServerWorld world, BlockPos pos, Direction facing, DyeColor color, String... lines) {
+    public static void sign(ServerWorld world, BlockPos pos, Direction facing, DyeColor color, String... lines) {
         Build.set(world, pos, Blocks.BIRCH_WALL_SIGN.getDefaultState().with(WallSignBlock.FACING, facing));
         if (world.getBlockEntity(pos) instanceof SignBlockEntity sign) {
             SignText text = new SignText().withColor(color).withGlowing(true);

@@ -66,5 +66,8 @@ public class PanalItem extends ArmorItem {
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         tooltip.add(Text.literal("Regalo del Gordo Pañales.").formatted(Formatting.GRAY));
         tooltip.add(Text.literal("Póntelo y pulsa G para cagarte encima.").formatted(Formatting.GOLD));
+        if (stack.hasNbt() && stack.getNbt().getBoolean("Cagado")) {
+            tooltip.add(Text.literal("Cagado: rebotas al caer. Si rebotas demasiado...").formatted(Formatting.DARK_RED));
+        }
     }
 }

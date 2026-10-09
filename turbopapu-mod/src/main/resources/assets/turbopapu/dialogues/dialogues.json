@@ -1272,5 +1272,109 @@
    "name": "Sistema",
    "text": "Has recibido: Pañal del Gordo. Póntelo como pantalones y pulsa G para cagarte encima."
   }
+ ],
+ "verity_caca_intro": [
+  {
+   "name": "Verity de Caca",
+   "text": "¡Hola! :D Soy Verity... de Caca. La prima marrón de Verity Gorda."
+  },
+  {
+   "name": "Verity de Caca",
+   "text": "Has rebotado tanto con ese pañal que has atravesado el mundo. Pasa mucho. Bueno, no. Solo tú."
+  },
+  {
+   "name": "Verity de Caca",
+   "text": "Esto es el Mundo de Caca. Todo es caca. Pero yo sonrío igual. :)",
+   "options": [
+    {
+     "text": "Quiero volver a casa.",
+     "action": "salir_mundo_caca"
+    },
+    {
+     "text": "Me quedo un rato.",
+     "goto": "verity_caca_quedar"
+    }
+   ]
+  }
+ ],
+ "verity_caca_charla_0": [
+  {
+   "name": "Verity de Caca",
+   "text": "¿Ya te quieres ir? Nadie se queda mucho. No sé por qué. :(",
+   "options": [
+    {
+     "text": "Quiero volver a casa.",
+     "action": "salir_mundo_caca"
+    },
+    {
+     "text": "Me quedo un rato.",
+     "goto": "verity_caca_quedar"
+    }
+   ]
+  }
+ ],
+ "verity_caca_charla_1": [
+  {
+   "name": "Verity de Caca",
+   "text": "Ese montón de allí es mi favorito. Lo llamo Gerardo. :D",
+   "options": [
+    {
+     "text": "Quiero volver a casa.",
+     "action": "salir_mundo_caca"
+    },
+    {
+     "text": "Me quedo un rato.",
+     "goto": "verity_caca_quedar"
+    }
+   ]
+  }
+ ],
+ "verity_caca_quedar": [
+  {
+   "name": "Verity de Caca",
+   "text": "¡Bien! :D Cuando quieras volver, háblame otra vez."
+  }
+ ],
+ "gordo_rubio_intro": [
+  {
+   "name": "Gordo Rubio",
+   "text": "¿Qué haces tú aquí? Esto es un Centro de FP de Jardinería, no un parque."
+  },
+  {
+   "name": "Gordo Rubio",
+   "text": "Soy el profe. Sí, rubio natural. No, no te importa."
+  },
+  {
+   "name": "Gordo Rubio",
+   "text": "Toma una azada. Estás suspendido. Por la cara."
+  },
+  {
+   "name": "Sistema",
+   "text": "El Gordo Rubio te ha dado una azada... y un suspenso."
+  }
+ ],
+ "gordo_rubio_charla_0": [
+  {
+   "name": "Gordo Rubio",
+   "text": "¿Otra vez tú? Suspenso. Y no me toques, que te reviento."
+  }
+ ],
+ "gordo_rubio_charla_1": [
+  {
+   "name": "Gordo Rubio",
+   "text": "Las petunias se riegan, no se pisan, ANIMAL."
+  }
+ ],
+ "gordo_rubio_charla_2": [
+  {
+   "name": "Gordo Rubio",
+   "text": "¿Recuperación? En septiembre. O nunca. Más bien nunca."
+  }
+ ],
+ "gordo_rubio_charla_3": [
+  {
+   "name": "Gordo Rubio",
+   "text": "Llevo veinte años dando clase y tú eres el peor alumno que he tenido. Y eso que no estás matriculado."
+  }
  ]
 }

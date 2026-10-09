@@ -65,6 +65,8 @@ public final class ModItems {
     public static final Item MAGO_LARGUIRUCHO_SPAWN_EGG = egg("mago_larguirucho", ModEntities.MAGO_LARGUIRUCHO, 0x4A1A7A, 0xE8D44D);
     public static final Item GORDO_PANALES_SPAWN_EGG = egg("gordo_panales", ModEntities.GORDO_PANALES, 0xF2C9A0, 0xFFFFFF);
     public static final Item AGUACATE_CUBANO_SPAWN_EGG = egg("aguacate_cubano", ModEntities.AGUACATE_CUBANO, 0x2E4A1E, 0xC8D96A);
+    public static final Item VERITY_CACA_SPAWN_EGG = egg("verity_caca", ModEntities.VERITY_CACA, 0x6B4423, 0x3B2410);
+    public static final Item GORDO_RUBIO_SPAWN_EGG = egg("gordo_rubio", ModEntities.GORDO_RUBIO, 0xF5D76E, 0x2E7D32);
     public static final Item SUALENIDUS_SPAWN_EGG = egg("sualenidus", ModEntities.SUALENIDUS, 0xB57EDC, 0xFF4655);
 
     private ModItems() {}

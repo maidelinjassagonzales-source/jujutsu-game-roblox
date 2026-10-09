@@ -35,6 +35,7 @@ public final class DialogueActions {
                     IcebergBuilder.summon(world, target, world.getRandom());
                 }
             }
+            case "salir_mundo_caca" -> com.turbopapu.world.PoopWorld.leave(player);
             case "coco_extra" -> {
                 if (player.getCommandTags().add("turbopapu_coco_extra")) {
                     player.giveItemStack(new ItemStack(ModItems.LECHE_DE_COCO, 2));

@@ -30,6 +30,7 @@ public final class ModPackets {
     public static final Identifier PVZ_QUIT = TurboPapuMod.id("pvz_quit");
     public static final Identifier SCREAMER = TurboPapuMod.id("screamer");
     public static final Identifier CAGARSE = TurboPapuMod.id("cagarse");
+    public static final Identifier REBOTES = TurboPapuMod.id("rebotes");
 
     private ModPackets() {}
 
@@ -48,6 +49,8 @@ public final class ModPackets {
         });
         ServerPlayNetworking.registerGlobalReceiver(CAGARSE, (server, player, handler, buf, sender) ->
                 server.execute(() -> com.turbopapu.world.GordoEvents.poop(player)));
+        ServerPlayNetworking.registerGlobalReceiver(REBOTES, (server, player, handler, buf, sender) ->
+                server.execute(() -> com.turbopapu.world.PoopWorld.bouncedTooMuch(player)));
         ServerPlayNetworking.registerGlobalReceiver(PVZ_QUIT, (server, player, handler, buf, sender) ->
                 server.execute(() -> com.turbopapu.fight.PvzArcade.quit(player)));
     }

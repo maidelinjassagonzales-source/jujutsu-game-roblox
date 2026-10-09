@@ -96,6 +96,9 @@ public final class TurboEvents {
                 state.gordoSpawned = true;
                 state.markDirty();
             }
+            if (ticks % 40 == 0) {
+                FpCenters.tick(overworld, player, state);
+            }
             if (state.meteorFallen && !state.hutBuilt && near(player, state.hutX, state.hutZ, 80)) {
                 OverworldBuilds.buildAlphatempHut(overworld, state.hutX, state.hutZ);
                 state.hutBuilt = true;

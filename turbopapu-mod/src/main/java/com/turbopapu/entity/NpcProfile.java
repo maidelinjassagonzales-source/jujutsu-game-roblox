@@ -118,6 +118,18 @@ public enum NpcProfile {
             List.of("Mantequilla. Todos. Los. Días."),
             world -> new ItemStack[]{new ItemStack(ModItems.MANTEQUILLA, 3)}),
 
+    VERITY_CACA("Verity de Caca", Formatting.GOLD, true, true, false,
+            List.of("Bienvenido al Mundo de Caca. :D"),
+            world -> new ItemStack[0]),
+
+    GORDO_RUBIO("Gordo Rubio", Formatting.YELLOW, false, false, true,
+            List.of("¿Y tú qué miras? Suspendido."),
+            world -> {
+                ItemStack hoe = new ItemStack(net.minecraft.item.Items.WOODEN_HOE);
+                hoe.setCustomName(net.minecraft.text.Text.literal("Azada de 1º de FP (suspensa)"));
+                return new ItemStack[]{hoe};
+            }),
+
     AGUACATE_CUBANO("Aguacate Cubano", Formatting.GREEN, true, true, false,
             List.of("¡Pinga asere!"),
             world -> new ItemStack[]{new ItemStack(ModItems.AGUACATE, 1)});

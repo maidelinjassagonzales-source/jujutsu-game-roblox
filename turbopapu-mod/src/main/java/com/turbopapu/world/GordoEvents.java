@@ -70,6 +70,12 @@ public final class GordoEvents {
     public static void tick(MinecraftServer server) {
         TurboState state = TurboState.get(server);
         tickSwallowing(server, state);
+        // Con el pañal cagado se rebota: nada de daño por caída.
+        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            if (isPooped(player.getEquippedStack(net.minecraft.entity.EquipmentSlot.LEGS))) {
+                player.fallDistance = 0;
+            }
+        }
         ServerWorld stomach = server.getWorld(ModDimensions.ESTOMAGO);
         if (stomach != null) {
             for (ServerPlayerEntity player : stomach.getPlayers()) {
@@ -255,7 +261,16 @@ public final class GordoEvents {
         }
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 100, 2, false, false, true));
         player.sendMessage(Text.literal("💩 ¡Te has cagado encima! Todos huyen del olor...").formatted(Formatting.GOLD), true);
+        if (!isPooped(legs)) {
+            legs.getOrCreateNbt().putBoolean("Cagado", true);
+            legs.setCustomName(Text.literal("Pañal cagado").formatted(Formatting.GOLD));
+            player.sendMessage(Text.literal("Ahora el pañal está cagado... y rebota. Salta y verás.").formatted(Formatting.YELLOW), false);
+        }
         legs.damage(1, player, p -> p.sendEquipmentBreakStatus(net.minecraft.entity.EquipmentSlot.LEGS));
+    }
+
+    public static boolean isPooped(net.minecraft.item.ItemStack stack) {
+        return stack.isOf(com.turbopapu.registry.ModItems.PANAL) && stack.hasNbt() && stack.getNbt().getBoolean("Cagado");
     }
 
     private static double sq(double v, double r) {

@@ -10,7 +10,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 public class VerityRenderer extends MobEntityRenderer<PapuNpcEntity, VerityModel> {
-    private static final Identifier TEXTURE = TurboPapuMod.id("textures/entity/verity_gorda.png");
     private static final float SCALE = 1.6f;
 
     public VerityRenderer(EntityRendererFactory.Context ctx) {
@@ -19,7 +18,7 @@ public class VerityRenderer extends MobEntityRenderer<PapuNpcEntity, VerityModel
 
     @Override
     public Identifier getTexture(PapuNpcEntity entity) {
-        return TEXTURE;
+        return TurboPapuMod.id("textures/entity/" + entity.getProfile().textureName() + ".png");
     }
 
     @Override
