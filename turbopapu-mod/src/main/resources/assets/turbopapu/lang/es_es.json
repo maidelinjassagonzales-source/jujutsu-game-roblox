@@ -72,5 +72,10 @@
   "entity.turbopapu.abe": "Abe",
   "item.turbopapu.mudokon_spawn_egg": "Huevo de Mudokon",
   "item.turbopapu.abe_spawn_egg": "Huevo de Abe",
-  "message.turbopapu.village_found": "Ves cúpulas a lo lejos... ¡otra aldea de Turbopapuenses!"
+  "message.turbopapu.village_found": "Ves cúpulas a lo lejos... ¡otra aldea de Turbopapuenses!",
+  "entity.turbopapu.aroy": "Aroy",
+  "item.turbopapu.aroy_spawn_egg": "Huevo de Aroy",
+  "item.turbopapu.leche_de_coco": "Leche de Coco Aroy-D",
+  "item.turbopapu.leche_de_coco.tooltip": "De Aroy. Te cura y te hace duro como una lata. ¡A mí me gusta el coco!",
+  "message.turbopapu.leche_de_coco": "¡Leche de coco Aroy-D! Duro como una lata."
 }

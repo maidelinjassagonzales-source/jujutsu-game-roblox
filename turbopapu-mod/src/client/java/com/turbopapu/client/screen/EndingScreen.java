@@ -36,7 +36,9 @@ public class EndingScreen extends Screen {
             new Photo("Guinxu después de que le cayera un iceberg. El pelo, intacto.",
                     List.of(ModEntities.GUINXU, ModEntities.ALPHATEMP)),
             new Photo("William_Piraton salió del retiro solo por esta noche. Hizo directo. Con aroy24.",
-                    List.of(ModEntities.WILLIAM_PIRATON)),
+                    List.of(ModEntities.WILLIAM_PIRATON, ModEntities.AROY)),
+            new Photo("Aroy se bebió su propia leche de coco. Nadie sabe cómo. Ni él.",
+                    List.of(ModEntities.AROY)),
             new Photo("Alphafaterfur sigue grabando su video de 2 horas. Ahora sale todo esto en el video.",
                     List.of(ModEntities.ALPHAFATERFUR)),
             new Photo("Sualenidus, ya bueno y despierto. Sigue oliendo a lavanda. Sigue hablando de la Vandal.",
@@ -155,6 +157,7 @@ public class EndingScreen extends Screen {
                 "Guinxu y su pelo",
                 "elink_64, el streamer que nunca olvidaremos",
                 "Verity Gorda, la pelota con cara (invitada especial)",
+                "Aroy (aroy24 / aroy25), la lata de leche de coco",
                 "Sualenidus, que ahora huele a lavanda... pero en buena onda",
                 "",
                 "Gracias por jugar.  (ESC para cerrar)"

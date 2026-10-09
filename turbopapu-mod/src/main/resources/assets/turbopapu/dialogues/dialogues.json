@@ -118,7 +118,7 @@
  "william_piraton_charla_0": [
   {
    "name": "William_Piraton",
-   "text": "Si ves a aroy24, dile que el parche del ojo es por estilo."
+   "text": "Si ves a aroy24, dile que el parche del ojo es por estilo. Y que lo siento por retirarme sin avisar."
   }
  ],
  "william_piraton_charla_1": [
@@ -536,8 +536,122 @@
    "text": "¡FIESTA! :D"
   },
   {
+   "name": "Aroy",
+   "text": "¡GG! ¡Esto lo subo a aroy24 y lo stremeo en aroy25 a la vez!",
+   "music": "aroy",
+   "portrait": "aroy_risa_verde",
+   "pw": 160,
+   "ph": 256,
+   "shake": true
+  },
+  {
    "name": "Sistema",
    "text": "A la mañana siguiente nadie recordaba nada... pero alguien tenía una cámara."
+  }
+ ],
+ "aroy_intro": [
+  {
+   "name": "Aroy",
+   "text": "¡Eyyy! Soy Aroy. Bueno, aroy24 en YouTube y aroy25 en Twitch.",
+   "music": "aroy",
+   "portrait": "aroy_feliz",
+   "pw": 160,
+   "ph": 256
+  },
+  {
+   "name": "Aroy",
+   "text": "Sí, soy una lata de leche de coco. Aroy-D. No preguntes.",
+   "music": "aroy",
+   "portrait": "aroy_risa",
+   "pw": 160,
+   "ph": 256
+  },
+  {
+   "name": "Aroy",
+   "text": "Yo hacía directos con William_Piraton antes de que se retirara al mar. ¿Lo has visto? ¿Sigue igual de naranja?",
+   "music": "aroy",
+   "portrait": "aroy_feliz_verde",
+   "pw": 160,
+   "ph": 256
+  },
+  {
+   "name": "Aroy",
+   "text": "...Que se retiró sin avisarme, por cierto.",
+   "music": "aroy",
+   "portrait": "aroy_serio",
+   "pw": 160,
+   "ph": 256,
+   "shake": true
+  },
+  {
+   "name": "Aroy",
+   "text": "Bueno, vine al Planeta TurboPapu a echar una mano. Toma: leche de coco Aroy-D. Te cura y te deja duro como una lata.",
+   "music": "aroy",
+   "portrait": "aroy_feliz",
+   "pw": 160,
+   "ph": 256
+  },
+  {
+   "name": "Sistema",
+   "text": "Has recibido: 4 Leches de Coco Aroy-D."
+  },
+  {
+   "name": "Aroy",
+   "text": "Y recuerda: ¡A MÍ ME GUSTA EL COCO!",
+   "music": "aroy",
+   "portrait": "aroy_risa_verde",
+   "pw": 160,
+   "ph": 256,
+   "shake": true
+  }
+ ],
+ "aroy_charla_0": [
+  {
+   "name": "Aroy",
+   "text": "aroy24 + 1 = aroy25. Matemáticas avanzadas. Juanma me aprobó.",
+   "music": "aroy",
+   "portrait": "aroy_risa",
+   "pw": 160,
+   "ph": 256
+  }
+ ],
+ "aroy_charla_1": [
+  {
+   "name": "Aroy",
+   "text": "...¿Me acabas de llamar \"lata\"?",
+   "music": "aroy",
+   "portrait": "aroy_serio",
+   "pw": 160,
+   "ph": 256,
+   "shake": true
+  },
+  {
+   "name": "Aroy",
+   "text": "Soy una LATA PREMIUM.",
+   "music": "aroy",
+   "portrait": "aroy_feliz_verde",
+   "pw": 160,
+   "ph": 256
+  }
+ ],
+ "aroy_charla_2": [
+  {
+   "name": "Aroy",
+   "text": "Si Sualenidus te pega, bébete una leche de coco. Si te duerme, mate. Si te aburres, mi canal.",
+   "music": "aroy",
+   "portrait": "aroy_feliz",
+   "pw": 160,
+   "ph": 256
+  }
+ ],
+ "aroy_charla_3": [
+  {
+   "name": "Aroy",
+   "text": "¿Sabes lo que es vivir enlatado? Yo sí. Desde siempre. Se está calentito.",
+   "music": "aroy",
+   "portrait": "aroy_risa_verde",
+   "pw": 160,
+   "ph": 256
   }
  ]
 }

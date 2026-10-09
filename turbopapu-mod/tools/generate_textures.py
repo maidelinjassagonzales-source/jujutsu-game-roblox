@@ -598,6 +598,82 @@ def mudokon(abe=False):
     return img
 
 
+SOURCE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "source")
+AROY_PORTRAITS = ["aroy_feliz", "aroy_risa", "aroy_serio", "aroy_feliz_verde", "aroy_risa_verde"]
+
+
+def aroy_portraits():
+    """Retratos de Aroy (la lata de leche de coco) para los diálogos: 160x256."""
+    for name in AROY_PORTRAITS:
+        im = Image.open(os.path.join(SOURCE, name + ".png")).convert("RGBA")
+        save(im.resize((160, 256), Image.LANCZOS), "portrait", name + ".png")
+
+
+def aroy_entity():
+    """Lata Aroy-D en 3D. Modelo declarado a 64x128 y textura HD x4 (256x512)."""
+    K = 4
+    img = Image.new("RGBA", (64 * K, 128 * K), (0, 0, 0, 0))
+    src = Image.open(os.path.join(SOURCE, "aroy_feliz.png")).convert("RGBA")
+    label = src.crop((15, 70, 630, 980)).convert("RGBA")
+    front_img = label.resize((12 * K, 18 * K), Image.LANCZOS)
+    top_c, bottom_c = hexc("1A0F06"), hexc("8A3A10")
+
+    def side(x, y, w, h):
+        for j in range(h * K):
+            c = lerp(top_c, bottom_c, (j / (h * K)) ** 1.4)
+            for i in range(w * K):
+                edge = abs(i - (w * K - 1) / 2) / (w * K / 2)
+                img.putpixel((x * K + i, y * K + j), shade((c[0], c[1], c[2], 255), 1.05 - 0.25 * edge))
+
+    def lid(x, y, w, h, color):
+        for i in range(w * K):
+            for j in range(h * K):
+                dx = (i - (w * K - 1) / 2) / (w * K / 2)
+                dy = (j - (h * K - 1) / 2) / (h * K / 2)
+                r = math.hypot(dx, dy)
+                f = 0.75 if 0.78 < r < 0.9 else 1.0 - 0.15 * r
+                img.putpixel((x * K + i, y * K + j), shade(color, f))
+
+    silver = hexc("C9CCD2")
+    # Cuerpo 12x18x12
+    f = faces(0, 0, 12, 18, 12)
+    for name in ("right", "left"):
+        side(*f[name])
+    for name in ("front", "back"):
+        x, y, w, h = f[name]
+        img.paste(front_img, (x * K, y * K))
+    lid(*f["top"], silver)
+    lid(*f["bottom"], silver)
+    # Cuerpo girado 9x18x9 (redondea la lata)
+    f = faces(0, 32, 9, 18, 9)
+    for name in ("right", "left", "front", "back"):
+        side(*f[name])
+    lid(*f["top"], silver)
+    lid(*f["bottom"], silver)
+    # Bordes metálicos
+    for v in (64, 80):
+        for name, (x, y, w, h) in faces(0, v, 13, 1, 13).items():
+            if name in ("top", "bottom"):
+                lid(x, y, w, h, silver)
+            else:
+                for i in range(w * K):
+                    for j in range(h * K):
+                        img.putpixel((x * K + i, y * K + j), shade(silver, 0.8 + 0.3 * (j / (h * K))))
+    return img
+
+
+def leche_de_coco_item():
+    im = Image.open(os.path.join(SOURCE, "aroy_feliz.png")).convert("RGBA")
+    im = im.resize((10, 16), Image.LANCZOS)
+    out = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    out.paste(im, (3, 0), im)
+    for x in range(16):
+        for y in range(16):
+            r, g, b, a = out.getpixel((x, y))
+            out.putpixel((x, y), (r, g, b, 255 if a > 100 else 0))
+    return out
+
+
 def effect_dormido():
     img = Image.new("RGBA", (18, 18), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
@@ -676,6 +752,9 @@ def main():
     save(roca(), "block", "roca_papu.png")
     save(mudokon(False), "entity", "mudokon.png")
     save(mudokon(True), "entity", "abe.png")
+    aroy_portraits()
+    save(aroy_entity(), "entity", "aroy.png")
+    save(leche_de_coco_item(), "item", "leche_de_coco.png")
     save(effect_dormido(), "mob_effect", "dormido.png")
     save(effect_despierto(), "mob_effect", "despierto.png")
     p = planet(256)

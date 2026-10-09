@@ -30,6 +30,7 @@ public class TurboPapuClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.GUINXU, PapuHumanoidModel::guinxu);
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.WILLIAM, PapuHumanoidModel::william);
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.FAT, PapuHumanoidModel::fat);
+        EntityModelLayerRegistry.registerModelLayer(ModModelLayers.AROY, com.turbopapu.client.model.AroyModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(ModModelLayers.VERITY, com.turbopapu.client.model.VerityModel::getTexturedModelData);
 
         EntityRendererRegistry.register(ModEntities.TURBOPAPUENSE, TurboPapuenseRenderer::new);
@@ -40,6 +41,7 @@ public class TurboPapuClient implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.GUINXU, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.GUINXU, 1f));
         EntityRendererRegistry.register(ModEntities.ELINK_64, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.HUMANOID, 1f));
         EntityRendererRegistry.register(ModEntities.VERITY_GORDA, VerityRenderer::new);
+        EntityRendererRegistry.register(ModEntities.AROY, AroyRenderer::new);
         EntityRendererRegistry.register(ModEntities.MUDOKON, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.HUMANOID, 1f));
         EntityRendererRegistry.register(ModEntities.ABE, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.HUMANOID, 1.05f));
         EntityRendererRegistry.register(ModEntities.SUALENIDUS, SualenidusRenderer::new);

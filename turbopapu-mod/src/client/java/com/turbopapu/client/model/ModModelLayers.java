@@ -9,6 +9,7 @@ public final class ModModelLayers {
     public static final EntityModelLayer GUINXU = layer("guinxu");
     public static final EntityModelLayer WILLIAM = layer("william_piraton");
     public static final EntityModelLayer FAT = layer("fat");
+    public static final EntityModelLayer AROY = layer("aroy");
     public static final EntityModelLayer VERITY = layer("verity_gorda");
 
     private ModModelLayers() {}

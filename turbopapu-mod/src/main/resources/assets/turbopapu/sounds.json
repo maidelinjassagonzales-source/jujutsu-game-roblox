@@ -14,5 +14,13 @@
         "stream": true
       }
     ]
+  },
+  "music.aroy": {
+    "sounds": [
+      {
+        "name": "turbopapu:music/aroy",
+        "stream": true
+      }
+    ]
   }
 }

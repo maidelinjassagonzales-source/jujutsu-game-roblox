@@ -34,6 +34,7 @@ public final class ModItems {
     public static final Item CARTA_DE_AUXILIO = register("carta_de_auxilio", new LetterItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
     public static final Item ICEBERG_DE_BOLSILLO = register("iceberg_de_bolsillo", new PocketIcebergItem(new Item.Settings().maxCount(16).rarity(Rarity.RARE)));
     public static final Item MATE = register("mate", new MateItem(new Item.Settings().maxCount(16)));
+    public static final Item LECHE_DE_COCO = register("leche_de_coco", new CoconutMilkItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON)));
     public static final Item ESTRELLA_DE_PODER = register("estrella_de_poder", new PowerStarItem(new Item.Settings().maxCount(8).rarity(Rarity.EPIC)));
 
     // --- Huevos de invocación ---
@@ -45,6 +46,7 @@ public final class ModItems {
     public static final Item GUINXU_SPAWN_EGG = egg("guinxu", ModEntities.GUINXU, 0x6B4423, 0x2E2E2E);
     public static final Item ELINK_64_SPAWN_EGG = egg("elink_64", ModEntities.ELINK_64, 0xE53935, 0x111111);
     public static final Item VERITY_GORDA_SPAWN_EGG = egg("verity_gorda", ModEntities.VERITY_GORDA, 0xFFD60A, 0x111111);
+    public static final Item AROY_SPAWN_EGG = egg("aroy", ModEntities.AROY, 0x3A1A08, 0xF28C28);
     public static final Item MUDOKON_SPAWN_EGG = egg("mudokon", ModEntities.MUDOKON, 0x6E8C6A, 0xE07A1F);
     public static final Item ABE_SPAWN_EGG = egg("abe", ModEntities.ABE, 0x7FA08A, 0x5A3A1E);
     public static final Item SUALENIDUS_SPAWN_EGG = egg("sualenidus", ModEntities.SUALENIDUS, 0xB57EDC, 0xFF4655);

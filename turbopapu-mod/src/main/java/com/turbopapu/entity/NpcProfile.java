@@ -80,6 +80,10 @@ public enum NpcProfile {
                     "Cuando todo esto acabe hacemos fiesta. Como en Las Vegas. Nadie va a recordar nada."),
             world -> new ItemStack[0]),
 
+    AROY("Aroy", Formatting.GOLD, true, true, false,
+            List.of("¡A mí me gusta el coco!"),
+            world -> new ItemStack[]{new ItemStack(ModItems.LECHE_DE_COCO, 4)}),
+
     MUDOKON("Mudokon", Formatting.DARK_GREEN, true, true, false,
             List.of(
                     "¡Hola!",
