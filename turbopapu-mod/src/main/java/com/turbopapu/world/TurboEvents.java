@@ -4,10 +4,18 @@ import com.turbopapu.registry.ModDimensions;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.tag.BiomeTags;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.math.BlockPos;
 
 /** Lógica de la historia que corre cada segundo en el servidor. */
 public final class TurboEvents {
@@ -51,6 +59,13 @@ public final class TurboEvents {
             if (state.meteorFallen && holdsHutCompass(player)) {
                 showHutDistance(player, state);
             }
+            ItemStack lairCompass = heldLairCompass(player);
+            if (lairCompass != null && state.meteorFallen) {
+                // La guarida está en el planeta: aquí la aguja lleva al meteorito, donde empieza el viaje.
+                aimCompass(lairCompass, net.minecraft.world.World.OVERWORLD, state.meteorX, state.meteorY, state.meteorZ);
+                player.sendMessage(Text.literal("La guarida de Sualenidus está en el planeta Turbopapu. La aguja te lleva al meteorito"
+                        + " (X " + state.meteorX + ", Z " + state.meteorZ + "): construye el cohete.").formatted(Formatting.LIGHT_PURPLE), true);
+            }
             if (state.meteorFallen && !state.guinxuBuilt && near(player, state.guinxuX, state.guinxuZ, 80)) {
                 FriendBuilds.buildGuinxuStudio(overworld, state.guinxuX, state.guinxuZ);
                 state.guinxuBuilt = true;
@@ -83,6 +98,11 @@ public final class TurboEvents {
                     PlanetBuilds.buildLair(planet, state);
                 }
                 RandomVillages.tick(planet, player, state);
+                ItemStack lairCompass = heldLairCompass(player);
+                if (lairCompass != null && state.meteorFallen) {
+                    aimCompass(lairCompass, ModDimensions.PLANETA, TurboState.LAIR_X, 80, TurboState.LAIR_Z);
+                    showLairDistance(player);
+                }
                 if (state.lairBuilt && !state.sualenidusDefeated && near(player, TurboState.LAIR_X, TurboState.LAIR_Z, 45)
                         && player.getCommandTags().add("turbopapu_intro_sualenidus")) {
                     com.turbopapu.network.ModPackets.dialogue(player, "sualenidus_intro", 0, -1);
@@ -118,6 +138,51 @@ public final class TurboEvents {
             }
         }
         return false;
+    }
+
+    /** La brújula de la guarida (también las que se dieron antes de tener la marca: apuntan al planeta). */
+    private static ItemStack heldLairCompass(ServerPlayerEntity player) {
+        String planeta = ModDimensions.PLANETA.getValue().toString();
+        for (ItemStack stack : new ItemStack[]{player.getMainHandStack(), player.getOffHandStack()}) {
+            NbtCompound nbt = stack.getNbt();
+            if (stack.isOf(Items.COMPASS) && nbt != null && (nbt.getBoolean("TurboPapuGuarida")
+                    || (nbt.contains("LodestonePos") && planeta.equals(nbt.getString("LodestoneDimension"))
+                    && NbtHelper.toBlockPos(nbt.getCompound("LodestonePos")).getX() == TurboState.LAIR_X))) {
+                return stack;
+            }
+        }
+        return null;
+    }
+
+    /** Hace que la aguja apunte a ese sitio de la dimensión en la que estás (si no, la brújula gira sin rumbo). */
+    private static void aimCompass(ItemStack stack, RegistryKey<net.minecraft.world.World> dim, int x, int y, int z) {
+        NbtCompound nbt = stack.getOrCreateNbt();
+        String dimId = dim.getValue().toString();
+        BlockPos target = new BlockPos(x, y, z);
+        if (dimId.equals(nbt.getString("LodestoneDimension")) && nbt.contains("LodestonePos")
+                && NbtHelper.toBlockPos(nbt.getCompound("LodestonePos")).equals(target)) {
+            return;
+        }
+        nbt.put("LodestonePos", NbtHelper.fromBlockPos(target));
+        nbt.putString("LodestoneDimension", dimId);
+        nbt.putBoolean("LodestoneTracked", false);
+        nbt.putBoolean("TurboPapuGuarida", true);
+    }
+
+    /** En el planeta: distancia y dirección a la guarida de Sualenidus encima de la barra de objetos. */
+    private static void showLairDistance(ServerPlayerEntity player) {
+        double dx = TurboState.LAIR_X + 0.5 - player.getX();
+        double dz = TurboState.LAIR_Z + 0.5 - player.getZ();
+        int dist = (int) Math.sqrt(dx * dx + dz * dz);
+        if (dist < 20) {
+            player.sendMessage(Text.literal("¡Estás en la guarida de Sualenidus!").formatted(Formatting.LIGHT_PURPLE), true);
+            return;
+        }
+        String[] dirs = {"sur", "suroeste", "oeste", "noroeste", "norte", "noreste", "este", "sureste"};
+        double angle = Math.toDegrees(Math.atan2(-dx, dz));
+        String dir = dirs[Math.floorMod((int) Math.round(angle / 45.0), 8)];
+        player.sendMessage(Text.literal("Guarida de Sualenidus: " + dist + " bloques al " + dir
+                + "  (X " + TurboState.LAIR_X + ", Z " + TurboState.LAIR_Z + ")").formatted(Formatting.LIGHT_PURPLE), true);
     }
 
     /** Con la brújula en la mano: distancia y dirección a la choza de Alphatemp encima de la barra de objetos. */

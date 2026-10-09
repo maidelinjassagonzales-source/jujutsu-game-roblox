@@ -72,6 +72,7 @@ public final class Books {
         World.CODEC.encodeStart(NbtOps.INSTANCE, ModDimensions.PLANETA).result()
                 .ifPresent(dim -> nbt.put("LodestoneDimension", dim));
         nbt.putBoolean("LodestoneTracked", false);
+        nbt.putBoolean("TurboPapuGuarida", true);
         compass.setCustomName(Text.literal("Brújula Despeinada de Guinxu").formatted(Formatting.YELLOW));
         return compass;
     }
