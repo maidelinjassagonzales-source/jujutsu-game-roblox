@@ -37,6 +37,7 @@ public final class DialogueActions {
             }
             case "salir_mundo_caca" -> com.turbopapu.world.PoopWorld.leave(player);
             case "entrar_lata" -> com.turbopapu.world.CoconutWorld.enter(player);
+            case "ritual_cocoide" -> com.turbopapu.world.CocoideRitual.tryStart(player);
             case "salir_lata" -> com.turbopapu.world.CoconutWorld.leave(player);
             case "coco_extra" -> {
                 if (player.getCommandTags().add("turbopapu_coco_extra")) {

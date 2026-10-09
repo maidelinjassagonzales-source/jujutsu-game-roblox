@@ -55,6 +55,9 @@ public class TurboPapuClient implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.GORDO_PANALES, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.FAT, 1.3f));
         EntityRendererRegistry.register(ModEntities.VERITY_CACA, VerityRenderer::new);
         EntityRendererRegistry.register(ModEntities.GORDO_RUBIO, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.FAT, 1.2f));
+        EntityRendererRegistry.register(ModEntities.COCOIDE, com.turbopapu.client.render.AguacateRenderer::new);
+        EntityRendererRegistry.register(ModEntities.CHAMAN_COCOIDE, com.turbopapu.client.render.AguacateRenderer::new);
+        EntityRendererRegistry.register(ModEntities.GORDO_JEFE, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.FAT, 5f));
         EntityRendererRegistry.register(ModEntities.AGUACATE_CUBANO, com.turbopapu.client.render.AguacateRenderer::new);
         EntityRendererRegistry.register(ModEntities.SUALENIDUS, SualenidusRenderer::new);
         EntityRendererRegistry.register(ModEntities.METEOR, MeteorRenderer::new);
@@ -71,7 +74,8 @@ public class TurboPapuClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.CINEMATIC, (client, handler, buf, sender) -> {
             int id = buf.readVarInt();
             int ticks = buf.readVarInt();
-            client.execute(() -> CinematicController.start(id, ticks));
+            String caption = buf.isReadable() ? buf.readString() : "";
+            client.execute(() -> CinematicController.start(id, ticks, caption));
         });
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.OPEN_LETTER, (client, handler, buf, sender) ->
                 client.execute(() -> client.setScreen(new LetterScreen())));

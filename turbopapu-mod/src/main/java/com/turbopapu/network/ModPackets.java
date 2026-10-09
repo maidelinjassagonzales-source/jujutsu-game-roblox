@@ -131,9 +131,15 @@ public final class ModPackets {
     }
 
     public static void startCinematic(ServerPlayerEntity player, int entityId, int ticks) {
+        startCinematic(player, entityId, ticks, "");
+    }
+
+    /** Cinemática siguiendo a una entidad, con un texto propio en las bandas negras ("" = el del meteorito). */
+    public static void startCinematic(ServerPlayerEntity player, int entityId, int ticks, String caption) {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeVarInt(entityId);
         buf.writeVarInt(ticks);
+        buf.writeString(caption);
         ServerPlayNetworking.send(player, CINEMATIC, buf);
     }
 

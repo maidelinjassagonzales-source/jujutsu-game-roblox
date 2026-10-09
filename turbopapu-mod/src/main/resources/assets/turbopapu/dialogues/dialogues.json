@@ -793,20 +793,17 @@
  "aroy_lata": [
   {
    "name": "Aroy",
-   "text": "...",
-   "portrait": "aroy_serio",
-   "pw": 160,
-   "ph": 256,
-   "music": "aroy"
-  },
-  {
-   "name": "Aroy",
-   "text": "LATA PREMIUM. Con abre-fácil. Que no se te olvide.",
-   "shake": true,
-   "portrait": "aroy_serio",
-   "pw": 160,
-   "ph": 256,
-   "music": "aroy"
+   "text": "¿Quieres meterte en mi lata? Dentro hay un mar entero de agua de coco. Con islas. Y palmeras. ¡A mí me gusta el coco!",
+   "options": [
+    {
+     "text": "¡Métete en la lata!",
+     "action": "entrar_lata"
+    },
+    {
+     "text": "Mejor no, que me empapo.",
+     "goto": "aroy_lata_no"
+    }
+   ]
   }
  ],
  "alphatemp_fnaf": [
@@ -1180,23 +1177,23 @@
  "gordo_panales_intro": [
   {
    "name": "Gordo Pañales",
-   "text": "Hola... soy el Gordo Pañales. Tengo hambre. Siempre tengo hambre."
+   "text": "¿TÚ otra vez? ¡Fuera de mi Centro de FP! Soy el profe de Jardinería y aquí mando yo."
   },
   {
    "name": "Gordo Pañales",
-   "text": "Me gusta la mantequilla. Mucho. Muchísimo."
+   "text": "Ya sé lo que quieres: sacarte MI FP de Jardinería. Pues te odio. Te odio muchísimo."
   },
   {
    "name": "Gordo Pañales",
-   "text": "Tienes que darme mantequilla TODOS los días. Un día sí, y otro también."
+   "text": "Bueno... hay una cosa que calma mi odio. La mantequilla. Mucha mantequilla."
   },
   {
    "name": "Gordo Pañales",
-   "text": "Si un día se te olvida... vendré a por ti. Y te comeré. Y te irás a vivir a mi estómago."
+   "text": "Tráeme mantequilla TODOS los días. El día que no me la traigas... vendré a por ti y te comeré. Vivirás en mi estómago."
   },
   {
    "name": "Gordo Pañales",
-   "text": "Toma, te doy algo de mantequilla para empezar. Se hace con un cubo de leche en la mesa de crafteo."
+   "text": "Toma, algo de mantequilla para empezar. Se hace con un cubo de leche en la mesa de crafteo. ¡Y ni se te ocurra tocar mis petunias!"
   },
   {
    "name": "Sistema",
@@ -1224,7 +1221,7 @@
  "gordo_panales_comer": [
   {
    "name": "Gordo Pañales",
-   "text": "¡ÑAM! Mmmmantequilla... Hoy no te como. Vuelve mañana con más."
+   "text": "¡ÑAM! Mmmmantequilla... Vale, hoy te odio un poquito menos. Mañana más."
   }
  ],
  "gordo_panales_lleno": [
@@ -1377,22 +1374,6 @@
    "text": "Llevo veinte años dando clase y tú eres el peor alumno que he tenido. Y eso que no estás matriculado."
   }
  ],
- "aroy_lata": [
-  {
-   "name": "Aroy",
-   "text": "¿Quieres meterte en mi lata? Dentro hay un mar entero de agua de coco. Con islas. Y palmeras. ¡A mí me gusta el coco!",
-   "options": [
-    {
-     "text": "¡Métete en la lata!",
-     "action": "entrar_lata"
-    },
-    {
-     "text": "Mejor no, que me empapo.",
-     "goto": "aroy_lata_no"
-    }
-   ]
-  }
- ],
  "aroy_lata_no": [
   {
    "name": "Aroy",
@@ -1419,6 +1400,164 @@
   {
    "name": "Aroy",
    "text": "¡Bien! Cuando quieras salir, vuelve a esta isla y háblame. Estaré aquí. Con el coco."
+  }
+ ],
+ "cocoide_intro": [
+  {
+   "name": "Cocoide",
+   "text": "¡Coco, coco! Somos los Cocoides. Vivimos en la lata de Aroy desde siempre."
+  },
+  {
+   "name": "Cocoide",
+   "text": "Muy lejos, al ESTE, hay una isla enorme. Larga, como Cuba. Allí vive nuestro Chamán, en el edificio espectral."
+  },
+  {
+   "name": "Cocoide",
+   "text": "Dicen que algo enorme y con pañales quiere comerse nuestro mundo... Toma unos cocos, por si acaso."
+  }
+ ],
+ "cocoide_charla_0": [
+  {
+   "name": "Cocoide",
+   "text": "¡Coco! El Chamán está al este. Siempre al este. Sigue nadando, asere."
+  }
+ ],
+ "cocoide_charla_1": [
+  {
+   "name": "Cocoide",
+   "text": "El agua de coco no se bebe. Bueno, sí. Pero no se lo digas a Aroy."
+  }
+ ],
+ "cocoide_charla_2": [
+  {
+   "name": "Cocoide",
+   "text": "A veces, por la noche, se oye una barriga rugir en el cielo... ¡Coco!"
+  }
+ ],
+ "chaman_pide": [
+  {
+   "name": "Chamán Cocoide",
+   "text": "Asere... los espíritus del coco me avisaron de que vendrías."
+  },
+  {
+   "name": "Chamán Cocoide",
+   "text": "El Gordo Pañales quiere comerse nuestro mundo. Solo un ritual puede hacerle venir... y entonces podrás pararlo."
+  },
+  {
+   "name": "Chamán Cocoide",
+   "text": "Vuelve a tu mundo y tráeme: Plátanos de Canarias, un Aguacate cubano, un Mate argentino y Mantequilla del Gordo."
+  },
+  {
+   "name": "Chamán Cocoide",
+   "text": "Los plátanos están en el cofre del huerto de la FP de Jardinería. El aguacate, en el Planeta TurboPapu. El mate te lo da Juanma. La mantequilla... ya sabes."
+  }
+ ],
+ "chaman_listo": [
+  {
+   "name": "Chamán Cocoide",
+   "text": "Huelo plátano, aguacate, mate... y mantequilla. Lo tienes todo, asere.",
+   "options": [
+    {
+     "text": "Hacer el ritual",
+     "action": "ritual_cocoide"
+    },
+    {
+     "text": "Todavía no estoy listo.",
+     "goto": "chaman_espera"
+    }
+   ]
+  }
+ ],
+ "chaman_espera": [
+  {
+   "name": "Chamán Cocoide",
+   "text": "Los espíritus del coco esperan. Pero no mucho, que se aburren."
+  }
+ ],
+ "chaman_asere": [
+  {
+   "name": "Chamán Cocoide",
+   "text": "¡Asere, tú sí que sabes!"
+  },
+  {
+   "name": "Chamán Cocoide",
+   "text": "¡Espíritus del coco, del plátano y del mate! ¡Que venga el que se come los mundos!"
+  }
+ ],
+ "gordo_jefe_reproche": [
+  {
+   "name": "Gordo Pañales",
+   "text": "¿Mantequilla? ¿Plátanos? ¿Un aguacate y un mate? ¿Para un RITUAL?"
+  },
+  {
+   "name": "Gordo Pañales",
+   "text": "¡Eso es MI ciclo! ¡Dar de comer a algo para que no se enfade! ¡Has hecho exactamente lo mismo que yo!"
+  },
+  {
+   "name": "Gordo Pañales",
+   "text": "Llevo años comiendo mantequilla para no odiar a todo el mundo... y ahora me cebas para invocarme. ¡Pues tendrás lo que quieres!"
+  },
+  {
+   "name": "Gordo Pañales",
+   "text": "¡ME VOY A COMER VUESTRO MUNDO COCOIDE ENTERO! ¡ÑAAAAAM!"
+  }
+ ],
+ "chaman_reintentar": [
+  {
+   "name": "Chamán Cocoide",
+   "text": "El Gordo te digirió, asere... pero el ritual ya está pagado. ¿Volvemos a llamarlo?",
+   "options": [
+    {
+     "text": "¡Otra vez! Esta vez lo reviento.",
+     "action": "ritual_cocoide"
+    },
+    {
+     "text": "Dame un momento.",
+     "goto": "chaman_espera"
+    }
+   ]
+  }
+ ],
+ "chaman_victoria": [
+  {
+   "name": "Chamán Cocoide",
+   "text": "¡Lo has destruido desde dentro! El Gordo ha escupido nuestro mundo y los Cocoides son libres."
+  },
+  {
+   "name": "Chamán Cocoide",
+   "text": "Asere... tú sí que sabes. Toma estos regalos de parte de todos los Cocoides."
+  },
+  {
+   "name": "Sistema",
+   "text": "FIN DEL CAPÍTULO 1. ¡Gracias por jugar a TurboPapu!"
+  }
+ ],
+ "chaman_fin": [
+  {
+   "name": "Chamán Cocoide",
+   "text": "Gracias a ti, el mundo cocoide sigue entero. Los espíritus del coco cantan tu nombre. Mal, pero lo cantan."
+  }
+ ],
+ "chaman_cocoide_intro": [
+  {
+   "name": "Chamán Cocoide",
+   "text": "Asere... los espíritus del coco me avisaron de que vendrías."
+  },
+  {
+   "name": "Chamán Cocoide",
+   "text": "El Gordo Pañales quiere comerse nuestro mundo. Solo un ritual puede hacerle venir... y entonces podrás pararlo."
+  },
+  {
+   "name": "Chamán Cocoide",
+   "text": "Vuelve a tu mundo y tráeme: Plátanos de Canarias, un Aguacate cubano, un Mate argentino y Mantequilla del Gordo."
+  },
+  {
+   "name": "Chamán Cocoide",
+   "text": "Los plátanos están en el cofre del huerto de la FP de Jardinería. El aguacate, en el Planeta TurboPapu. El mate te lo da Juanma. La mantequilla... ya sabes."
+  },
+  {
+   "name": "Chamán Cocoide",
+   "text": "Cuando lo tengas todo, vuelve a hablar conmigo."
   }
  ]
 }

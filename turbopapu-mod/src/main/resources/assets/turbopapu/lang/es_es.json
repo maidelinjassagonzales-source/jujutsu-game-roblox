@@ -108,5 +108,11 @@
   "entity.turbopapu.verity_caca": "Verity de Caca",
   "item.turbopapu.verity_caca_spawn_egg": "Huevo de Verity de Caca",
   "entity.turbopapu.gordo_rubio": "Gordo Rubio",
-  "item.turbopapu.gordo_rubio_spawn_egg": "Huevo de Gordo Rubio"
+  "item.turbopapu.gordo_rubio_spawn_egg": "Huevo de Gordo Rubio",
+  "item.turbopapu.platano_canarias": "Plátanos de Canarias",
+  "entity.turbopapu.cocoide": "Cocoide",
+  "entity.turbopapu.chaman_cocoide": "Chamán Cocoide",
+  "entity.turbopapu.gordo_jefe": "Gordo Pañales (jefe)",
+  "item.turbopapu.cocoide_spawn_egg": "Huevo de Cocoide",
+  "item.turbopapu.chaman_cocoide_spawn_egg": "Huevo de Chamán Cocoide"
 }

@@ -32,7 +32,9 @@ public class TurboState extends PersistentState {
     /** Celdas del planeta con su arboleda de aguacates ya plantada. */
     public final Set<Long> builtGroves = new HashSet<>();
     /** El Gordo Pañales: dónde vive y el último día que cada jugador le dio mantequilla. */
-    public boolean gordoSpawned, stomachBuilt, poopWorldBuilt, canWorldBuilt;
+    public boolean gordoSpawned, stomachBuilt, poopWorldBuilt, canWorldBuilt, mainFpBuilt;
+    /** Capítulo 1: isla de Cuba en la lata, ritual del chamán y el Gordo como jefe secreto. */
+    public boolean cubaBuilt, ritualPaid, chapter1Done, bossStomachBuilt;
     /** Celdas del mundo de la lata de coco cuyas islas ya se generaron. */
     public final Set<Long> builtCanIslands = new HashSet<>();
     /** Celdas del mundo normal con su Centro de FP de Jardinería ya construido. */
@@ -99,6 +101,11 @@ public class TurboState extends PersistentState {
         s.stomachBuilt = nbt.getBoolean("StomachBuilt");
         s.poopWorldBuilt = nbt.getBoolean("PoopWorldBuilt");
         s.canWorldBuilt = nbt.getBoolean("CanWorldBuilt");
+        s.mainFpBuilt = nbt.getBoolean("MainFpBuilt");
+        s.cubaBuilt = nbt.getBoolean("CubaBuilt");
+        s.ritualPaid = nbt.getBoolean("RitualPaid");
+        s.chapter1Done = nbt.getBoolean("Chapter1Done");
+        s.bossStomachBuilt = nbt.getBoolean("BossStomachBuilt");
         for (long cell : nbt.getLongArray("BuiltCanIslands")) {
             s.builtCanIslands.add(cell);
         }
@@ -151,6 +158,11 @@ public class TurboState extends PersistentState {
         nbt.putBoolean("StomachBuilt", stomachBuilt);
         nbt.putBoolean("PoopWorldBuilt", poopWorldBuilt);
         nbt.putBoolean("CanWorldBuilt", canWorldBuilt);
+        nbt.putBoolean("MainFpBuilt", mainFpBuilt);
+        nbt.putBoolean("CubaBuilt", cubaBuilt);
+        nbt.putBoolean("RitualPaid", ritualPaid);
+        nbt.putBoolean("Chapter1Done", chapter1Done);
+        nbt.putBoolean("BossStomachBuilt", bossStomachBuilt);
         nbt.putLongArray("BuiltCanIslands", builtCanIslands.stream().mapToLong(Long::longValue).toArray());
         nbt.putLongArray("BuiltFpCenters", builtFpCenters.stream().mapToLong(Long::longValue).toArray());
         nbt.putInt("GordoX", gordoX);

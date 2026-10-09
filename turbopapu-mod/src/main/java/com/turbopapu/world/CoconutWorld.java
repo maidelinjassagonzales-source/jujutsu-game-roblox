@@ -49,6 +49,9 @@ public final class CoconutWorld {
         if (!state.canWorldBuilt) {
             island(can, 0, 0, 9, Random.create(99L));
             Build.spawn(can, ModEntities.AROY, 3.5, SEA + 1, 0.5, 6);
+            for (int i = 0; i < 3; i++) {
+                Build.spawn(can, ModEntities.COCOIDE, -3.5 + i * 2, SEA + 1, -3.5, 7);
+            }
             state.canWorldBuilt = true;
             state.builtCanIslands.add(ChunkPos.toLong(0, 0));
             state.markDirty();
@@ -59,6 +62,10 @@ public final class CoconutWorld {
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.WATER_BREATHING, 20 * 60 * 5, 0, false, true, true));
         player.sendMessage(Text.literal("¡Te has metido dentro de la lata de leche de coco de Aroy! Todo es agua de coco...")
                 .formatted(Formatting.GOLD), false);
+        if (!state.chapter1Done) {
+            player.sendMessage(Text.literal("Los Cocoides hablan de una isla enorme muy lejos al ESTE (X " + CUBA_X + ")...")
+                    .formatted(Formatting.AQUA), false);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -78,8 +85,36 @@ public final class CoconutWorld {
         player.sendMessage(Text.literal("Sales de la lata empapado en leche de coco. Hueles de maravilla.").formatted(Formatting.YELLOW), false);
     }
 
+    /** La isla con forma de Cuba, lejos al este, con el edificio espectral del Chamán Cocoide. */
+    public static final int CUBA_X = 640, CUBA_Z = 0;
+
+    public static int cubaSpineZ(int x) {
+        return CUBA_Z + (int) Math.round(Math.sin((x - CUBA_X) / 45.0) * 22);
+    }
+
+    /** Centro del templo (donde está el altar). */
+    public static BlockPos templeCenter() {
+        return new BlockPos(CUBA_X, SEA + 3, cubaSpineZ(CUBA_X));
+    }
+
     /** Islas nuevas a medida que exploras. */
     public static void tick(ServerWorld world, ServerPlayerEntity player, TurboState state) {
+        if (!state.cubaBuilt) {
+            double cdx = player.getX() - CUBA_X, cdz = player.getZ() - CUBA_Z;
+            if (cdx * cdx + cdz * cdz < 200 * 200) {
+                buildCuba(world, Random.create(1959L));
+                state.cubaBuilt = true;
+                state.markDirty();
+                player.sendMessage(Text.literal("Ves en el horizonte una isla larguísima... ¡parece Cuba! En el centro brilla un edificio fantasmal.")
+                        .formatted(Formatting.AQUA, Formatting.BOLD), false);
+            }
+        }
+        if (state.cubaBuilt && world.getTime() % 10 == 0) {
+            BlockPos t = templeCenter();
+            if (player.squaredDistanceTo(t.getX(), t.getY(), t.getZ()) < 40 * 40) {
+                world.spawnParticles(net.minecraft.particle.ParticleTypes.SOUL, t.getX() + 0.5, t.getY() + 3, t.getZ() + 0.5, 6, 6, 3, 6, 0.01);
+            }
+        }
         int pcx = Math.floorDiv((int) player.getX(), CELL);
         int pcz = Math.floorDiv((int) player.getZ(), CELL);
         for (int cx = pcx - 1; cx <= pcx + 1; cx++) {
@@ -97,11 +132,93 @@ public final class CoconutWorld {
                 }
                 state.builtCanIslands.add(key);
                 state.markDirty();
+                if (Math.abs(x - CUBA_X) < 150 && Math.abs(z - CUBA_Z) < 60) {
+                    continue; // ahí va Cuba
+                }
                 if (random.nextFloat() < 0.75f) {
-                    island(world, x, z, 4 + random.nextInt(7), random);
+                    int radius = 4 + random.nextInt(7);
+                    island(world, x, z, radius, random);
+                    int cocoides = 1 + random.nextInt(2);
+                    for (int i = 0; i < cocoides; i++) {
+                        Build.spawn(world, ModEntities.COCOIDE, x + 0.5 + i, Build.surface(world, x + i, z), z + 0.5, radius);
+                    }
                 }
             }
         }
+    }
+
+    /** Una isla larga y curvada como Cuba: playas, interior verde, muchas palmeras y el templo espectral. */
+    private static void buildCuba(ServerWorld world, Random random) {
+        int x1 = CUBA_X - 130, x2 = CUBA_X + 130;
+        for (int x = x1; x <= x2; x++) {
+            double t = (x - x1) / (double) (x2 - x1);
+            // Más ancha al oeste (La Habana) y fina en la punta este.
+            int half = (int) Math.round(4 + 14 * Math.sin(Math.PI * Math.pow(t, 0.8)));
+            int cz = cubaSpineZ(x);
+            for (int dz = -half - 2; dz <= half + 2; dz++) {
+                double edge = Math.abs(dz) / (double) (half + 1);
+                int top = SEA + (int) Math.round(Math.max(-1, 3.5 * (1 - edge * edge)));
+                int z = cz + dz;
+                Build.fill(world, x, SEA - 5, z, x, top, z, Blocks.SAND);
+                if (top >= SEA + 2) {
+                    Build.set(world, x, top, z, Blocks.GRASS_BLOCK);
+                    if (random.nextInt(40) == 0) {
+                        Build.set(world, x, top + 1, z, random.nextBoolean() ? Blocks.FERN : Blocks.SUGAR_CANE);
+                    }
+                }
+            }
+            if (random.nextInt(9) == 0) {
+                BlockPos t2 = templeCenter();
+                int pz = cz + random.nextInt(half * 2 + 1) - half;
+                if (Math.abs(x - t2.getX()) > 12 || Math.abs(pz - t2.getZ()) > 12) {
+                    palm(world, x, pz, random);
+                }
+            }
+        }
+        buildTemple(world);
+        for (int i = 0; i < 6; i++) {
+            int x = CUBA_X - 40 + random.nextInt(80);
+            int z = cubaSpineZ(x) + random.nextInt(7) - 3;
+            Build.spawn(world, ModEntities.COCOIDE, x + 0.5, Build.surface(world, x, z), z + 0.5, 20);
+        }
+    }
+
+    /** El edificio espectral: cristal fantasmal, columnas de cuarzo, fuego de almas y el altar del ritual. */
+    private static void buildTemple(ServerWorld world) {
+        BlockPos c = templeCenter();
+        int cx = c.getX(), cz = c.getZ(), y = c.getY();
+        Build.fill(world, cx - 8, y - 4, cz - 8, cx + 8, y - 1, cz + 8, Blocks.SMOOTH_QUARTZ);
+        Build.clear(world, cx - 8, y, cz - 8, cx + 8, y + 12, cz + 8);
+        Build.fill(world, cx - 7, y - 1, cz - 7, cx + 7, y - 1, cz + 7, Blocks.WHITE_CONCRETE);
+        for (int r = 0; r < 7; r++) {
+            Build.fill(world, cx - 6 + r, y + 6 + r, cz - 6 + r, cx + 6 - r, y + 6 + r, cz + 6 - r,
+                    r % 2 == 0 ? Blocks.WHITE_STAINED_GLASS : Blocks.LIGHT_BLUE_STAINED_GLASS);
+        }
+        for (int dx = -6; dx <= 6; dx++) {
+            for (int dz = -6; dz <= 6; dz++) {
+                boolean wall = Math.abs(dx) == 6 || Math.abs(dz) == 6;
+                if (!wall) {
+                    continue;
+                }
+                boolean pillar = Math.abs(dx) == 6 && Math.abs(dz) == 6;
+                Build.fill(world, cx + dx, y, cz + dz, cx + dx, y + 5, cz + dz,
+                        pillar ? Blocks.QUARTZ_PILLAR : Blocks.LIGHT_GRAY_STAINED_GLASS);
+            }
+        }
+        // Puerta al oeste (por donde se llega desde la lata).
+        Build.clear(world, cx - 6, y, cz - 1, cx - 6, y + 2, cz + 1);
+        // Altar: lodestone rodeado de fuego de almas.
+        Build.set(world, cx, y, cz, Blocks.LODESTONE);
+        Build.set(world, cx - 2, y, cz - 2, Blocks.SOUL_CAMPFIRE);
+        Build.set(world, cx + 2, y, cz - 2, Blocks.SOUL_CAMPFIRE);
+        Build.set(world, cx - 2, y, cz + 2, Blocks.SOUL_CAMPFIRE);
+        Build.set(world, cx + 2, y, cz + 2, Blocks.SOUL_CAMPFIRE);
+        for (int[] l : new int[][]{{-5, -5}, {5, -5}, {-5, 5}, {5, 5}}) {
+            Build.set(world, cx + l[0], y, cz + l[1], Blocks.SOUL_LANTERN);
+        }
+        Build.set(world, cx, y + 5, cz, Blocks.SEA_LANTERN);
+        // El chamán, detrás del altar.
+        Build.spawn(world, ModEntities.CHAMAN_COCOIDE, cx + 3.5, y, cz + 0.5, 3);
     }
 
     /** Isla redonda de arena con 1-3 palmeras cocoteras. */
@@ -125,7 +242,7 @@ public final class CoconutWorld {
     }
 
     /** Palmera: tronco que se inclina un poco, copa en estrella y cocos (cacao maduro) colgando. */
-    private static void palm(ServerWorld world, int x, int z, Random random) {
+    static void palm(ServerWorld world, int x, int z, Random random) {
         int y = Build.surface(world, x, z);
         int height = 6 + random.nextInt(3);
         Direction lean = Direction.Type.HORIZONTAL.random(random);

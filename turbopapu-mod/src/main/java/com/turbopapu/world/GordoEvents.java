@@ -33,9 +33,9 @@ public final class GordoEvents {
     /** Centro del estómago, radios, nivel del ácido y plataforma de la garganta. */
     private static final int SX = 0, SZ = 0, CY = 70;
     private static final int RX = 15, RY = 12, RZ = 20;
-    private static final int FLOOR = CY - 6;
+    static final int FLOOR = CY - 6;
     private static final int THROAT_Y = CY + 8, THROAT_Z = SZ + 4;
-    private static final double ARRIVAL_Z = SZ - 9.5;
+    static final double ARRIVAL_Z = SZ - 9.5;
     private static final int SCREAMER_TICKS = 50;
 
     /** Jugadores con el screamer en pantalla, esperando a ser tragados (ticks restantes). */
@@ -88,7 +88,7 @@ public final class GordoEvents {
         long day = today(server);
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
             Long last = state.gordoFedDay.get(player.getUuid());
-            if (last == null || last >= day - 1 || SWALLOWING.containsKey(player.getUuid())
+            if (last == null || last >= day - 1 || SWALLOWING.containsKey(player.getUuid()) || CocoideRitual.isBusy(player)
                     || player.getWorld().getRegistryKey() == ModDimensions.ESTOMAGO || player.isSpectator()
                     || BossFight.current() != null || PvzArcade.isActive()) {
                 continue;
@@ -131,7 +131,7 @@ public final class GordoEvents {
             return;
         }
         if (!state.stomachBuilt) {
-            buildStomach(stomach);
+            buildStomach(stomach, 0, true);
             state.stomachBuilt = true;
             state.markDirty();
         }
@@ -182,7 +182,8 @@ public final class GordoEvents {
     }
 
     /** Estómago: una gran cueva de carne con ácido en el fondo, costillas para escalar y la garganta arriba. */
-    private static void buildStomach(ServerWorld world) {
+    static void buildStomach(ServerWorld world, int ox, boolean throat) {
+        int SX = GordoEvents.SX + ox;
         Random random = Random.create(1234L);
         Block[] flesh = {Blocks.PINK_TERRACOTTA, Blocks.RED_TERRACOTTA, Blocks.PINK_WOOL, Blocks.NETHER_WART_BLOCK, Blocks.PINK_CONCRETE};
         for (int x = -RX - 1; x <= RX + 1; x++) {
@@ -217,6 +218,9 @@ public final class GordoEvents {
             int z = az + 3 + i * (THROAT_Z - 2 - az - 3) / steps;
             int x = SX + (i % 2 == 0 ? -1 : 1);
             Build.fill(world, x - 1, y, z - 1, x + 1, y, z + 1, Blocks.BONE_BLOCK);
+        }
+        if (!throat) {
+            return;
         }
         // Garganta: plataforma con luz y un agujero hacia arriba.
         Build.fill(world, SX - 2, THROAT_Y - 1, THROAT_Z - 2, SX + 2, THROAT_Y - 1, THROAT_Z + 2, Blocks.BONE_BLOCK);

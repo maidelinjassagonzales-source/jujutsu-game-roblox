@@ -45,6 +45,8 @@ public final class ModItems {
             new net.minecraft.item.FoodComponent.Builder().hunger(4).saturationModifier(0.6f).meat().snack().build())));
     public static final Item MANTEQUILLA = register("mantequilla", new com.turbopapu.item.MantequillaItem(new Item.Settings().maxCount(64)));
     public static final Item PANAL = register("panal", new com.turbopapu.item.PanalItem(new Item.Settings().maxCount(1).rarity(Rarity.EPIC)));
+    public static final Item PLATANO_CANARIAS = register("platano_canarias", new Item(new Item.Settings().food(
+            new net.minecraft.item.FoodComponent.Builder().hunger(4).saturationModifier(0.5f).build())));
     public static final Item AGUACATE = register("aguacate", new Item(new Item.Settings().food(
             new net.minecraft.item.FoodComponent.Builder().hunger(5).saturationModifier(0.7f).build())));
     public static final Item ESTRELLA_DE_PODER = register("estrella_de_poder", new PowerStarItem(new Item.Settings().maxCount(8).rarity(Rarity.EPIC)));
@@ -66,7 +68,8 @@ public final class ModItems {
     public static final Item GORDO_PANALES_SPAWN_EGG = egg("gordo_panales", ModEntities.GORDO_PANALES, 0xF2C9A0, 0xFFFFFF);
     public static final Item AGUACATE_CUBANO_SPAWN_EGG = egg("aguacate_cubano", ModEntities.AGUACATE_CUBANO, 0x2E4A1E, 0xC8D96A);
     public static final Item VERITY_CACA_SPAWN_EGG = egg("verity_caca", ModEntities.VERITY_CACA, 0x6B4423, 0x3B2410);
-    public static final Item GORDO_RUBIO_SPAWN_EGG = egg("gordo_rubio", ModEntities.GORDO_RUBIO, 0xF5D76E, 0x2E7D32);
+    public static final Item COCOIDE_SPAWN_EGG = egg("cocoide", ModEntities.COCOIDE, 0x6B4423, 0xF5F0E1);
+    public static final Item CHAMAN_COCOIDE_SPAWN_EGG = egg("chaman_cocoide", ModEntities.CHAMAN_COCOIDE, 0x3B2410, 0x7FFFD4);
     public static final Item SUALENIDUS_SPAWN_EGG = egg("sualenidus", ModEntities.SUALENIDUS, 0xB57EDC, 0xFF4655);
 
     private ModItems() {}

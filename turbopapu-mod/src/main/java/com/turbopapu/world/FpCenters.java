@@ -15,7 +15,7 @@ import net.minecraft.util.math.random.Random;
 
 /**
  * Centros de FP de Jardinería que aparecen al azar por el mundo normal, como si fueran aldeas
- * (celdas de 512x512). Dentro está el Gordo Rubio, el profe más borde del mundo.
+ * (celdas de 512x512). Dentro da clase el Gordo Pañales, que nos odia porque queremos sacarnos su FP.
  */
 public final class FpCenters {
     private static final int CELL = 512;
@@ -108,7 +108,15 @@ public final class FpCenters {
         Build.set(world, x1 + 8, y0, z2 + 1, Blocks.OAK_FENCE);
         FriendBuilds.sign(world, new BlockPos(x1 + 6, y0 + 3, z2 + 1), Direction.SOUTH, DyeColor.GREEN,
                 "CENTRO DE FP", "JARDINERÍA", "Grado Medio", "Prohibido llorar");
-        // El Gordo Rubio, en su mesa.
-        Build.spawn(world, ModEntities.GORDO_RUBIO, x1 + 4.5, y0, z1 + 8.5, 4);
+        // Cofre del huerto: plátanos de Canarias (los pide el chamán cocoide).
+        BlockPos chestPos = new BlockPos(x2 - 1, y0, z2 + 6);
+        Build.set(world, chestPos, Blocks.CHEST.getDefaultState());
+        if (world.getBlockEntity(chestPos) instanceof net.minecraft.block.entity.ChestBlockEntity chest) {
+            chest.setStack(0, new net.minecraft.item.ItemStack(com.turbopapu.registry.ModItems.PLATANO_CANARIAS, 6));
+            chest.setStack(4, new net.minecraft.item.ItemStack(net.minecraft.item.Items.BONE_MEAL, 8));
+            chest.setStack(8, new net.minecraft.item.ItemStack(com.turbopapu.registry.ModItems.MANTEQUILLA, 2));
+        }
+        // El Gordo Pañales, en su mesa de profe.
+        Build.spawn(world, ModEntities.GORDO_PANALES, x1 + 4.5, y0, z1 + 8.5, 4);
     }
 }

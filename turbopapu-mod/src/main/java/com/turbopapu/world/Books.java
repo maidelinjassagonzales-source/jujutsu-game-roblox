@@ -42,6 +42,8 @@ public final class Books {
                 "5. MAPA ESTELAR\n\nLo tiene WILLIAM_PIRATON, un pez pirata retirado que navega por el MAR. Explora los océanos hasta encontrar su balsa.",
                 "AMIGOS EN LA TIERRA\n\nGUINXU tiene su estudio cerca de\nX: " + state.guinxuX + "\nZ: " + state.guinxuZ
                         + "\n\nELINK_64 vive en un castillo en\nX: " + state.elinkX + "\nZ: " + state.elinkZ + "\n\n¡Visítalos!",
+                "FP DE JARDINERÍA\n\nEl GORDO PAÑALES da clase en su Centro de FP cerca de\nX: " + (state.meteorX - 130) + "\nZ: " + (state.meteorZ - 90)
+                        + "\n\nNos odia. Llévale mantequilla.",
                 "EL COHETE\n(sin forma)\n\nCasco + Motor + Combustible + Núcleo de Iceberg + Mapa Estelar\n\nColócalo en el suelo, súbete con clic derecho y... ¡TURBO PAPU!",
                 "En el planeta te esperan los pocos que siguen despiertos.\n\nGuárdate el cohete: al llegar te lo devolvemos para volver a casa.\n\n¡Te esperamos!\n- Los Turbopapuenses");
     }

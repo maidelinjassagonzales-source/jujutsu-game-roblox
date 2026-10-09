@@ -39,6 +39,17 @@ public final class ModEntities {
     public static final EntityType<PapuNpcEntity> AGUACATE_CUBANO = npc("aguacate_cubano", 0.7f, 1.3f);
     public static final EntityType<PapuNpcEntity> VERITY_CACA = npc("verity_caca", 1.9f, 2.0f);
     public static final EntityType<PapuNpcEntity> GORDO_RUBIO = npc("gordo_rubio", 1.2f, 2.4f);
+    public static final EntityType<PapuNpcEntity> COCOIDE = npc("cocoide", 0.7f, 1.3f);
+    public static final EntityType<PapuNpcEntity> CHAMAN_COCOIDE = npc("chaman_cocoide", 0.7f, 1.4f);
+    /** El Gordo Pañales gigante de la cinemática del ritual. */
+    public static final EntityType<PapuNpcEntity> GORDO_JEFE = register("gordo_jefe",
+            FabricEntityTypeBuilder.<PapuNpcEntity>createMob()
+                    .spawnGroup(SpawnGroup.MISC)
+                    .entityFactory(PapuNpcEntity::new)
+                    .dimensions(EntityDimensions.fixed(6f, 12f))
+                    .defaultAttributes(PapuNpcEntity::createAttributes)
+                    .trackRangeBlocks(256)
+                    .build());
 
     public static final EntityType<SalchichaEntity> SALCHICHA = register("salchicha",
             FabricEntityTypeBuilder.<SalchichaEntity>createMob()
@@ -138,5 +149,8 @@ public final class ModEntities {
         NpcProfile.bind(AGUACATE_CUBANO, NpcProfile.AGUACATE_CUBANO);
         NpcProfile.bind(VERITY_CACA, NpcProfile.VERITY_CACA);
         NpcProfile.bind(GORDO_RUBIO, NpcProfile.GORDO_RUBIO);
+        NpcProfile.bind(COCOIDE, NpcProfile.COCOIDE);
+        NpcProfile.bind(CHAMAN_COCOIDE, NpcProfile.CHAMAN_COCOIDE);
+        NpcProfile.bind(GORDO_JEFE, NpcProfile.GORDO_JEFE);
     }
 }

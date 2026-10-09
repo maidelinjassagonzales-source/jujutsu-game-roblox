@@ -20,7 +20,14 @@ public final class CinematicController {
 
     private CinematicController() {}
 
+    private static String caption = "";
+
     public static void start(int id, int ticks) {
+        start(id, ticks, "");
+    }
+
+    public static void start(int id, int ticks, String text) {
+        caption = text == null ? "" : text;
         entityId = id;
         ticksLeft = ticks;
         shake = 0;
@@ -72,7 +79,7 @@ public final class CinematicController {
         int bar = Math.min(h / 8, Math.min(ticksLeft, 20) * 2);
         ctx.fill(0, 0, w, bar, 0xFF000000);
         ctx.fill(0, h - bar, w, h, 0xFF000000);
-        Text caption = shake > 0 || (lastPos != null && client.world != null && client.world.getEntityById(entityId) == null)
+        Text caption = !CinematicController.caption.isEmpty() ? Text.literal(CinematicController.caption) : shake > 0 || (lastPos != null && client.world != null && client.world.getEntityById(entityId) == null)
                 ? Text.translatable("cinematic.turbopapu.impact")
                 : Text.translatable("cinematic.turbopapu.falling");
         ctx.drawCenteredTextWithShadow(client.textRenderer, caption, w / 2, h - bar / 2 - 4, 0xFFF2A33A);

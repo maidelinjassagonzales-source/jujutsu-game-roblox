@@ -9,7 +9,6 @@ import net.minecraft.client.render.entity.MobEntityRenderer;
 import net.minecraft.util.Identifier;
 
 public class AguacateRenderer extends MobEntityRenderer<PapuNpcEntity, AguacateModel> {
-    private static final Identifier TEXTURE = TurboPapuMod.id("textures/entity/aguacate_cubano.png");
 
     public AguacateRenderer(EntityRendererFactory.Context ctx) {
         super(ctx, new AguacateModel(ctx.getPart(ModModelLayers.AGUACATE)), 0.4f);
@@ -17,6 +16,6 @@ public class AguacateRenderer extends MobEntityRenderer<PapuNpcEntity, AguacateM
 
     @Override
     public Identifier getTexture(PapuNpcEntity entity) {
-        return TEXTURE;
+        return TurboPapuMod.id("textures/entity/" + entity.getProfile().textureName() + ".png");
     }
 }

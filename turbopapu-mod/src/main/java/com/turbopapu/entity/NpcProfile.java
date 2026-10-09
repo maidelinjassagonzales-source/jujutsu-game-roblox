@@ -130,6 +130,18 @@ public enum NpcProfile {
                 return new ItemStack[]{hoe};
             }),
 
+    COCOIDE("Cocoide", Formatting.WHITE, true, true, false,
+            List.of("¡Coco, coco!"),
+            world -> new ItemStack[]{new ItemStack(net.minecraft.item.Items.COCOA_BEANS, 3)}),
+
+    CHAMAN_COCOIDE("Chamán Cocoide", Formatting.AQUA, true, false, false,
+            List.of("Los espíritus del coco te observan, asere."),
+            world -> new ItemStack[0]),
+
+    GORDO_JEFE("Gordo Pañales", Formatting.DARK_RED, true, false, false,
+            List.of("¡ÑAM!"),
+            world -> new ItemStack[0]),
+
     AGUACATE_CUBANO("Aguacate Cubano", Formatting.GREEN, true, true, false,
             List.of("¡Pinga asere!"),
             world -> new ItemStack[]{new ItemStack(ModItems.AGUACATE, 1)});

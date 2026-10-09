@@ -1,5 +1,6 @@
 package com.turbopapu.entity;
 
+import com.turbopapu.world.Build;
 import com.turbopapu.world.IcebergBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
@@ -95,6 +96,21 @@ public class PapuNpcEntity extends PathAwareEntity {
             if (player instanceof net.minecraft.server.network.ServerPlayerEntity serverPlayer) {
                 if (firstTime) {
                     com.turbopapu.network.ModPackets.dialogue(serverPlayer, base + "_intro", 0, getId());
+                } else if (profile == NpcProfile.CHAMAN_COCOIDE) {
+                    com.turbopapu.world.TurboState st = com.turbopapu.world.TurboState.get(world.getServer());
+                    String key;
+                    if (st.chapter1Done) {
+                        key = "chaman_fin";
+                    } else if (st.ritualPaid) {
+                        key = "chaman_reintentar";
+                    } else if (com.turbopapu.world.CocoideRitual.hasOfferings(serverPlayer)) {
+                        key = "chaman_listo";
+                    } else {
+                        key = "chaman_pide";
+                        serverPlayer.sendMessage(Text.literal("Te falta: " + com.turbopapu.world.CocoideRitual.missing(serverPlayer))
+                                .formatted(Formatting.AQUA), false);
+                    }
+                    com.turbopapu.network.ModPackets.dialogue(serverPlayer, key, 0, getId());
                 } else if (profile == NpcProfile.AROY && world.getRegistryKey() == com.turbopapu.registry.ModDimensions.LATA_COCO) {
                     com.turbopapu.network.ModPackets.dialogue(serverPlayer, "aroy_dentro_lata", 0, getId());
                 } else if (profile == NpcProfile.AROY && player.isSneaking()) {
@@ -316,6 +332,12 @@ public class PapuNpcEntity extends PathAwareEntity {
         super.tick();
         if (getWorld() instanceof ServerWorld world && getProfile() == NpcProfile.ALPHATEMP) {
             alphatempTick(world);
+        }
+        if (getWorld() instanceof ServerWorld world && getProfile() == NpcProfile.GORDO_RUBIO && age > 5) {
+            // El Gordo Rubio ya no existe: ahora el profe de la FP es el Gordo Pañales.
+            Build.spawn(world, com.turbopapu.registry.ModEntities.GORDO_PANALES, getX(), getY(), getZ(), 4);
+            discard();
+            return;
         }
         if (getWorld() instanceof ServerWorld world && getProfile() == NpcProfile.MAGO_LARGUIRUCHO) {
             magoTick(world);
