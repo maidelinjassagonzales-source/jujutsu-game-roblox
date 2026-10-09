@@ -38,6 +38,8 @@ public class TurboPapuClient implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.GUINXU, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.GUINXU, 1f));
         EntityRendererRegistry.register(ModEntities.ELINK_64, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.HUMANOID, 1f));
         EntityRendererRegistry.register(ModEntities.VERITY_GORDA, VerityRenderer::new);
+        EntityRendererRegistry.register(ModEntities.MUDOKON, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.HUMANOID, 1f));
+        EntityRendererRegistry.register(ModEntities.ABE, ctx -> new PapuNpcRenderer(ctx, ModModelLayers.HUMANOID, 1.05f));
         EntityRendererRegistry.register(ModEntities.SUALENIDUS, SualenidusRenderer::new);
         EntityRendererRegistry.register(ModEntities.METEOR, MeteorRenderer::new);
         EntityRendererRegistry.register(ModEntities.ROCKET, RocketRenderer::new);

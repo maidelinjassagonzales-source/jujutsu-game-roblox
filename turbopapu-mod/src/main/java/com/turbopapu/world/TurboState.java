@@ -1,6 +1,8 @@
 package com.turbopapu.world;
 
 import net.minecraft.nbt.NbtCompound;
+import java.util.HashSet;
+import java.util.Set;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
@@ -20,6 +22,8 @@ public class TurboState extends PersistentState {
     public int villageY;
     public boolean lairBuilt;
     public boolean sualenidusDefeated;
+    /** Celdas del mapa del planeta cuyas aldeas aleatorias ya se construyeron (ChunkPos.toLong). */
+    public final Set<Long> builtVillages = new HashSet<>();
 
     /** No se guarda: evita lanzar dos meteoritos a la vez. */
     public transient boolean meteorIncoming;
@@ -43,6 +47,9 @@ public class TurboState extends PersistentState {
         s.villageY = nbt.getInt("VillageY");
         s.lairBuilt = nbt.getBoolean("LairBuilt");
         s.sualenidusDefeated = nbt.getBoolean("SualenidusDefeated");
+        for (long cell : nbt.getLongArray("BuiltVillages")) {
+            s.builtVillages.add(cell);
+        }
         return s;
     }
 
@@ -60,6 +67,7 @@ public class TurboState extends PersistentState {
         nbt.putInt("VillageY", villageY);
         nbt.putBoolean("LairBuilt", lairBuilt);
         nbt.putBoolean("SualenidusDefeated", sualenidusDefeated);
+        nbt.putLongArray("BuiltVillages", builtVillages.stream().mapToLong(Long::longValue).toArray());
         return nbt;
     }
 }

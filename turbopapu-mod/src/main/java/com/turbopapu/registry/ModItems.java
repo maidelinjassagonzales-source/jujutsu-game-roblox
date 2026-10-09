@@ -19,6 +19,8 @@ public final class ModItems {
 
     public static final Item FRAGMENTO_METEORITO = register("fragmento_meteorito",
             new BlockItem(ModBlocks.FRAGMENTO_METEORITO, new Item.Settings()));
+    public static final Item REGOLITO_PAPU = register("regolito_papu", new BlockItem(ModBlocks.REGOLITO_PAPU, new Item.Settings()));
+    public static final Item ROCA_PAPU = register("roca_papu", new BlockItem(ModBlocks.ROCA_PAPU, new Item.Settings()));
 
     // --- Piezas del cohete ---
     public static final Item CASCO_COHETE = register("casco_cohete", new TooltipItem(new Item.Settings().maxCount(1), "casco_cohete"));
@@ -43,6 +45,8 @@ public final class ModItems {
     public static final Item GUINXU_SPAWN_EGG = egg("guinxu", ModEntities.GUINXU, 0x6B4423, 0x2E2E2E);
     public static final Item ELINK_64_SPAWN_EGG = egg("elink_64", ModEntities.ELINK_64, 0xE53935, 0x111111);
     public static final Item VERITY_GORDA_SPAWN_EGG = egg("verity_gorda", ModEntities.VERITY_GORDA, 0xFFD60A, 0x111111);
+    public static final Item MUDOKON_SPAWN_EGG = egg("mudokon", ModEntities.MUDOKON, 0x6E8C6A, 0xE07A1F);
+    public static final Item ABE_SPAWN_EGG = egg("abe", ModEntities.ABE, 0x7FA08A, 0x5A3A1E);
     public static final Item SUALENIDUS_SPAWN_EGG = egg("sualenidus", ModEntities.SUALENIDUS, 0xB57EDC, 0xFF4655);
 
     private ModItems() {}

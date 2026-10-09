@@ -529,6 +529,75 @@ def fragmento():
     return img
 
 
+def regolito():
+    """Polvo lunar naranja con motas moradas y mini cráteres."""
+    img = Image.new("RGBA", (16, 16))
+    base = hexc("E8963A")
+    for x in range(16):
+        for y in range(16):
+            c = shade(base, 0.85 + rng.random() * 0.3)
+            if rng.random() < 0.08:
+                c = hexc("9A5BC4")
+            img.putpixel((x, y), c)
+    for (cx, cy) in [(4, 4), (11, 10), (3, 12)]:
+        img.putpixel((cx, cy), shade(base, 0.6))
+        img.putpixel((cx + 1, cy), shade(base, 0.7))
+        img.putpixel((cx, cy + 1), shade(base, 1.2))
+    return img
+
+
+def roca():
+    """Roca lunar morada con vetas naranjas."""
+    img = Image.new("RGBA", (16, 16))
+    base = hexc("5B3F8C")
+    for x in range(16):
+        for y in range(16):
+            img.putpixel((x, y), shade(base, 0.8 + rng.random() * 0.35))
+    d = ImageDraw.Draw(img)
+    d.line([(1, 3), (5, 5), (8, 4)], fill=shade(hexc("F2A33A"), 0.85))
+    d.line([(9, 12), (14, 10)], fill=shade(hexc("F2A33A"), 0.85))
+    d.point([(12, 3), (3, 10), (7, 14)], fill=hexc("3B2A5E"))
+    return img
+
+
+def mudokon(abe=False):
+    """Mudokon de Oddworld: piel verde grisácea, ojos naranjas, boca cosida, taparrabos."""
+    skin = hexc("7FA08A") if abe else hexc("6E8C6A")
+    img = humanoid(skin, skin, skin, skin, shade(skin, 0.85))
+    f = faces(*HEAD)
+    for name, (x, y, w, h) in f.items():
+        rect(img, x, y, w, h, skin, 0.08)
+    fx, fy = front(HEAD)
+    for ex in (fx + 1, fx + 5):
+        rect(img, ex, fy + 2, 2, 2, hexc("1A1A1A"))
+        img.putpixel((ex + (1 if ex == fx + 1 else 0), fy + 2), hexc("E07A1F"))
+        img.putpixel((ex + (1 if ex == fx + 1 else 0), fy + 3), hexc("F2A33A"))
+    rect(img, fx + 2, fy + 6, 4, 1, hexc("3A2A1A"))
+    for i in range(2, 6):
+        img.putpixel((fx + i, fy + 5 + (i % 2) * 2), hexc("3A2A1A"))
+    rect(img, fx + 3, fy + 4, 2, 1, shade(skin, 0.7))
+    # Taparrabos
+    for leg in (RLEG, LLEG):
+        for name, (x, y, w, h) in faces(*leg).items():
+            if name not in ("top", "bottom"):
+                rect(img, x, y, w, 4, hexc("6B4A2B"), 0.15)
+    for name, (x, y, w, h) in faces(*BODY).items():
+        if name not in ("top", "bottom"):
+            rect(img, x, y + h - 2, w, 2, hexc("6B4A2B"), 0.15)
+    # Costillas marcadas
+    bx, by = front(BODY)
+    for j in (3, 5, 7):
+        rect(img, bx + 1, by + j, 2, 1, shade(skin, 0.8))
+        rect(img, bx + 5, by + j, 2, 1, shade(skin, 0.8))
+    if abe:
+        # La coleta de Abe
+        hx, hy, w, h = faces(*HAT)["back"]
+        rect(img, hx + 3, hy, 2, 7, hexc("3B2A1A"))
+        tx, ty, w, h = faces(*HAT)["top"]
+        rect(img, tx + 3, ty + 5, 2, 3, hexc("3B2A1A"))
+    return img
+
+
 def effect_dormido():
     img = Image.new("RGBA", (18, 18), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
@@ -603,6 +672,10 @@ def main():
                      ("estrella_de_poder", draw_estrella)]:
         save(outline(item(fn)), "item", name + ".png")
     save(fragmento(), "block", "fragmento_meteorito.png")
+    save(regolito(), "block", "regolito_papu.png")
+    save(roca(), "block", "roca_papu.png")
+    save(mudokon(False), "entity", "mudokon.png")
+    save(mudokon(True), "entity", "abe.png")
     save(effect_dormido(), "mob_effect", "dormido.png")
     save(effect_despierto(), "mob_effect", "despierto.png")
     p = planet(256)

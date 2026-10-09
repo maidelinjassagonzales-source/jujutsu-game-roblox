@@ -1,5 +1,5 @@
 {
-  "has_precipitation": true,
+  "has_precipitation": false,
   "temperature": 0.8,
   "downfall": 0.4,
   "effects": {
@@ -10,7 +10,7 @@
     "grass_color": 12082943,
     "foliage_color": 15901498,
     "particle": {
-      "probability": 0.003,
+      "probability": 0.002,
       "options": {
         "type": "minecraft:white_ash"
       }
@@ -43,12 +43,6 @@
         "weight": 12,
         "minCount": 2,
         "maxCount": 4
-      },
-      {
-        "type": "minecraft:cow",
-        "weight": 8,
-        "minCount": 2,
-        "maxCount": 4
       }
     ],
     "ambient": [],
@@ -68,10 +62,10 @@
   },
   "features": [
     [],
-    [
-      "minecraft:lake_lava_underground"
-    ],
     [],
+    [
+      "turbopapu:crater"
+    ],
     [],
     [],
     [],
@@ -91,13 +85,7 @@
     ],
     [],
     [],
-    [
-      "minecraft:trees_birch_and_oak",
-      "minecraft:flower_default",
-      "minecraft:patch_grass_plain",
-      "minecraft:patch_pumpkin",
-      "minecraft:patch_sugar_cane"
-    ],
+    [],
     []
   ]
 }

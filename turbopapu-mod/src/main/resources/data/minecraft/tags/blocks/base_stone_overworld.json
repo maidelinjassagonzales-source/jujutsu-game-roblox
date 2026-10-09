@@ -1,7 +1,6 @@
 {
   "replace": false,
   "values": [
-    "turbopapu:fragmento_meteorito",
     "turbopapu:roca_papu"
   ]
 }

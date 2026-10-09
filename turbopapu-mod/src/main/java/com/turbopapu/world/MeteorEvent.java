@@ -140,7 +140,7 @@ public final class MeteorEvent {
             chest.setStack(4, new ItemStack(ModItems.CARTA_DE_AUXILIO));
             chest.setStack(13, Books.rocketPlans(state));
             chest.setStack(10, new ItemStack(ModBlocks.FRAGMENTO_METEORITO, 10));
-            chest.setStack(16, new ItemStack(Items.COMPASS));
+            chest.setStack(16, Books.hutCompass(world, state));
             chest.setStack(22, new ItemStack(Items.COOKED_BEEF, 8));
         }
     }

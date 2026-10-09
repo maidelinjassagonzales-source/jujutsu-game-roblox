@@ -38,10 +38,22 @@ public final class Books {
                 "1. CASCO DEL COHETE\n\n  H\nH B H\nH B H\n\nH = lingote de hierro\nB = bloque de hierro",
                 "2. MOTOR TURBO\n\nM R M\nM A M\nM   M\n\nM = fragmento de meteorito\nR = bloque de redstone\nA = alto horno",
                 "3. COMBUSTIBLE PAPU\n(sin forma)\n\n2 polvo de blaze\n1 bloque de carbón\n1 fragmento de meteorito\n1 cubo de lava",
-                "4. NÚCLEO DE ICEBERG\n\nTe lo dará ALPHATEMP. Vive en una choza estilo Mudokon cerca de:\n\nX: " + state.hutX + "\nZ: " + state.hutZ + "\n\nCuidado con el sótano...",
+                "4. NÚCLEO DE ICEBERG\n\nTe lo dará ALPHATEMP. Vive en una choza estilo Mudokon cerca de:\n\nX: " + state.hutX + "\nZ: " + state.hutZ + "\n\nLa brújula del cofre apunta allí. Cuidado con el sótano...",
                 "5. MAPA ESTELAR\n\nLo tiene WILLIAM_PIRATON, un pez pirata retirado que navega por el MAR. Explora los océanos hasta encontrar su balsa.",
                 "EL COHETE\n(sin forma)\n\nCasco + Motor + Combustible + Núcleo de Iceberg + Mapa Estelar\n\nColócalo en el suelo, súbete con clic derecho y... ¡TURBO PAPU!",
                 "En el planeta te esperan los pocos que siguen despiertos.\n\nGuárdate el cohete: al llegar te lo devolvemos para volver a casa.\n\n¡Te esperamos!\n- Los Turbopapuenses");
+    }
+
+    /** Brújula que apunta a la choza Mudokon de Alphatemp (va en el cofre del meteorito). */
+    public static ItemStack hutCompass(ServerWorld world, TurboState state) {
+        ItemStack compass = new ItemStack(Items.COMPASS);
+        NbtCompound nbt = compass.getOrCreateNbt();
+        nbt.put("LodestonePos", NbtHelper.fromBlockPos(new BlockPos(state.hutX, 64, state.hutZ)));
+        World.CODEC.encodeStart(NbtOps.INSTANCE, World.OVERWORLD).result()
+                .ifPresent(dim -> nbt.put("LodestoneDimension", dim));
+        nbt.putBoolean("LodestoneTracked", false);
+        compass.setCustomName(Text.literal("Brújula a la choza de Alphatemp").formatted(Formatting.AQUA));
+        return compass;
     }
 
     /** La Brújula Despeinada de Guinxu: apunta a la guarida de Sualenidus. */

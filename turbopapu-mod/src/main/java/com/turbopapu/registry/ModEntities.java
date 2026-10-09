@@ -29,6 +29,8 @@ public final class ModEntities {
     public static final EntityType<PapuNpcEntity> JUANMA = npc("juanma", 0.6f, 1.95f);
     public static final EntityType<PapuNpcEntity> GUINXU = npc("guinxu", 0.6f, 2.2f);
     public static final EntityType<PapuNpcEntity> ELINK_64 = npc("elink_64", 0.6f, 1.95f);
+    public static final EntityType<PapuNpcEntity> MUDOKON = npc("mudokon", 0.6f, 2.0f);
+    public static final EntityType<PapuNpcEntity> ABE = npc("abe", 0.6f, 2.1f);
     public static final EntityType<PapuNpcEntity> VERITY_GORDA = npc("verity_gorda", 1.9f, 2.0f);
 
     public static final EntityType<SualenidusEntity> SUALENIDUS = register("sualenidus",
@@ -80,5 +82,7 @@ public final class ModEntities {
         NpcProfile.bind(GUINXU, NpcProfile.GUINXU);
         NpcProfile.bind(ELINK_64, NpcProfile.ELINK_64);
         NpcProfile.bind(VERITY_GORDA, NpcProfile.VERITY_GORDA);
+        NpcProfile.bind(MUDOKON, NpcProfile.MUDOKON);
+        NpcProfile.bind(ABE, NpcProfile.ABE);
     }
 }

@@ -35,6 +35,7 @@ public class PapuNpcEntity extends PathAwareEntity {
     private final Set<String> giftedPlayers = new HashSet<>();
     private int lineIndex;
     private int moonwalkTicks;
+    private int icebergCooldown = 200;
 
     public PapuNpcEntity(EntityType<? extends PathAwareEntity> type, World world) {
         super(type, world);
@@ -98,13 +99,11 @@ public class PapuNpcEntity extends PathAwareEntity {
                 }
             }
 
-            if (profile == NpcProfile.ALPHATEMP && random.nextInt(3) == 0) {
+            if (profile == NpcProfile.ALPHATEMP && icebergCooldown <= 0) {
                 // Alphatemp puede invocar icebergs enormes sobre cualquier juego... incluido este.
-                Vec3d look = player.getRotationVec(1f).multiply(14);
-                BlockPos target = BlockPos.ofFloored(getX() + look.x, getY(), getZ() + look.z);
-                target = world.getTopPosition(net.minecraft.world.Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, target);
-                say(player, "¡ICEBERG DE " + randomGame() + "! ¡Nivel máximo!");
-                IcebergBuilder.summon(world, target, random);
+                Vec3d look = player.getRotationVec(1f).multiply(16);
+                BlockPos target = BlockPos.ofFloored(player.getX() + look.x, getY(), player.getZ() + look.z);
+                summonIceberg(world, target, "¡ICEBERG DE " + randomGame() + "! ¡Nivel máximo!");
             }
             if (profile == NpcProfile.ELINK_64) {
                 moonwalkTicks = 40;
@@ -124,9 +123,39 @@ public class PapuNpcEntity extends PathAwareEntity {
                 .append(Text.literal("> " + line)), false);
     }
 
+    private void summonIceberg(ServerWorld world, BlockPos near, String shout) {
+        BlockPos target = world.getTopPosition(net.minecraft.world.Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, near);
+        world.getPlayers(p -> p.squaredDistanceTo(this) < 48 * 48).forEach(p -> say(p, shout));
+        swingHand(Hand.MAIN_HAND);
+        IcebergBuilder.summon(world, target, random);
+        icebergCooldown = 200;
+    }
+
+    /** Alphatemp: defiende la aldea Mudokon con icebergs y, de vez en cuando, invoca uno por diversión. */
+    private void alphatempTick(ServerWorld world) {
+        if (--icebergCooldown > 0 || age % 20 != 0) {
+            return;
+        }
+        net.minecraft.entity.mob.HostileEntity enemy = world.getClosestEntity(net.minecraft.entity.mob.HostileEntity.class,
+                net.minecraft.entity.ai.TargetPredicate.DEFAULT, this, getX(), getY(), getZ(), getBoundingBox().expand(20));
+        if (enemy != null) {
+            summonIceberg(world, enemy.getBlockPos(), "¡Fuera de mi choza! ¡ICEBERG!");
+            return;
+        }
+        PlayerEntity player = world.getClosestPlayer(this, 24);
+        if (player != null && random.nextInt(60) == 0) {
+            double a = random.nextDouble() * Math.PI * 2;
+            BlockPos target = BlockPos.ofFloored(getX() + Math.cos(a) * 28, getY(), getZ() + Math.sin(a) * 28);
+            summonIceberg(world, target, "Nivel " + (1 + random.nextInt(9)) + " del iceberg de " + randomGame() + ": ¡ESTE ICEBERG!");
+        }
+    }
+
     @Override
     public void tick() {
         super.tick();
+        if (getWorld() instanceof ServerWorld world && getProfile() == NpcProfile.ALPHATEMP) {
+            alphatempTick(world);
+        }
         if (!getWorld().isClient && moonwalkTicks > 0) {
             // elink_64 hace el moonwalk: camina hacia atrás deslizándose.
             moonwalkTicks--;

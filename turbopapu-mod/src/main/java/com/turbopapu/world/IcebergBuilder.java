@@ -48,5 +48,9 @@ public final class IcebergBuilder {
         for (SualenidusEntity boss : world.getEntitiesByClass(SualenidusEntity.class, area, e -> true)) {
             boss.hitByIceberg(world);
         }
+        for (net.minecraft.entity.mob.HostileEntity mob : world.getEntitiesByClass(net.minecraft.entity.mob.HostileEntity.class, area,
+                e -> !(e instanceof SualenidusEntity))) {
+            mob.damage(world.getDamageSources().freeze(), 40f);
+        }
     }
 }

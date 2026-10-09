@@ -100,6 +100,7 @@ public final class OverworldBuilds {
         if (evil != null) {
             evil.setYaw(180);
         }
+        MudokonVillage.build(world, cx, y0, cz);
         world.getPlayers(p -> p.getBlockPos().isWithinDistance(new BlockPos(cx, y0, cz), 100)).forEach(p ->
                 p.sendMessage(Text.translatable("message.turbopapu.hut_found").formatted(Formatting.AQUA), false));
     }

@@ -20,6 +20,7 @@ public class TurboPapuMod implements ModInitializer {
     @Override
     public void onInitialize() {
         ModBlocks.register();
+        ModFeatures.register();
         ModEffects.register();
         ModEntities.register();
         ModItems.register();

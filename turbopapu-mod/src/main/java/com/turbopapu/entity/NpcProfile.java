@@ -78,7 +78,27 @@ public enum NpcProfile {
                     "Sualenidus dice que soy redonda. ¡Mira quién habla, con esa barriga! :)",
                     "Sonrío siempre. Hasta dormida. Por eso la lavanda no me afecta tanto... creo. :D",
                     "Cuando todo esto acabe hacemos fiesta. Como en Las Vegas. Nadie va a recordar nada."),
-            world -> new ItemStack[0]);
+            world -> new ItemStack[0]),
+
+    MUDOKON("Mudokon", Formatting.DARK_GREEN, true, true, false,
+            List.of(
+                    "¡Hola!",
+                    "¡Vale!",
+                    "*silbido*",
+                    "¿Tú no eres un Slig, verdad? Uf, menos mal.",
+                    "Alphatemp nos dejó vivir aquí después de escapar de RuptureFarms. ¡Nada de Mudokon Pops!",
+                    "Alphatemp nos enseñó el iceberg de Oddworld. Nivel 1: Abe. Nivel 9: los huevos de Scrab... mejor no.",
+                    "*se tira un pedo* ...Perdón."),
+            world -> new ItemStack[0]),
+
+    ABE("Abe", Formatting.GREEN, true, true, false,
+            List.of(
+                    "¡Hola! Soy Abe. Antes limpiaba suelos en RuptureFarms.",
+                    "Sígueme. ...Espera, no, quédate ahí.",
+                    "¿Sabes cuántos Mudokons rescaté? 99. ¿Y tú cuántos Turbopapuenses vas a rescatar?",
+                    "Si ves un portal de pájaros, ¡sáltalo! Así escapamos nosotros.",
+                    "Alphatemp es buena gente. Pero no bajes al sótano... ahí está el otro."),
+            world -> new ItemStack[]{new ItemStack(net.minecraft.item.Items.FEATHER, 3)});
 
     private static final Map<EntityType<?>, NpcProfile> BY_TYPE = new HashMap<>();
 

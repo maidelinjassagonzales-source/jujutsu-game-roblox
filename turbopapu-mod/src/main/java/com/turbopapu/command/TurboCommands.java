@@ -45,6 +45,26 @@ public final class TurboCommands {
                             ModPackets.showEnding(ctx.getSource().getPlayerOrThrow());
                             return 1;
                         }))
+                        .then(CommandManager.literal("choza").executes(ctx -> {
+                            // Construye la choza de Alphatemp y la aldea Mudokon delante del jugador.
+                            ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+                            TurboState state = TurboState.get(ctx.getSource().getServer());
+                            int x = (int) player.getX() + 25, z = (int) player.getZ();
+                            com.turbopapu.world.OverworldBuilds.buildAlphatempHut((ServerWorld) player.getWorld(), x, z);
+                            state.hutX = x;
+                            state.hutZ = z;
+                            state.hutBuilt = true;
+                            state.markDirty();
+                            return 1;
+                        }))
+                        .then(CommandManager.literal("aldea").executes(ctx -> {
+                            // Construye una aldea de Turbopapuenses delante del jugador.
+                            ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+                            com.turbopapu.world.VillageBuilder.build((ServerWorld) player.getWorld(), (int) player.getX() + 40,
+                                    (int) player.getZ(), player.getRandom(), false,
+                                    TurboState.get(ctx.getSource().getServer()).sualenidusDefeated);
+                            return 1;
+                        }))
                         .then(CommandManager.literal("estado").executes(TurboCommands::status))));
     }
 

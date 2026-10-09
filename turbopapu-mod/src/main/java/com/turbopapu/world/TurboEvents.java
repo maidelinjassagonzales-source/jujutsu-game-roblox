@@ -2,6 +2,8 @@ package com.turbopapu.world;
 
 import com.turbopapu.registry.ModDimensions;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.registry.tag.BiomeTags;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -55,6 +57,11 @@ public final class TurboEvents {
             for (ServerPlayerEntity player : planet.getPlayers()) {
                 if (!state.lairBuilt && near(player, TurboState.LAIR_X, TurboState.LAIR_Z, 96)) {
                     PlanetBuilds.buildLair(planet, state);
+                }
+                RandomVillages.tick(planet, player, state);
+                // Gravedad lunar: se salta más alto.
+                if (!player.isSpectator()) {
+                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 50, 1, true, false, true));
                 }
             }
         }

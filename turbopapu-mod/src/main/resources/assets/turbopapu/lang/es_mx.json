@@ -50,7 +50,7 @@
   "cinematic.turbopapu.falling": "Un meteorito atraviesa el cielo...",
   "cinematic.turbopapu.impact": "¡IMPACTO!",
   "message.turbopapu.meteor_landed": "El meteorito cayó en %s, %s, %s. Hay un cofre dentro...",
-  "message.turbopapu.hut_found": "Ves una choza de barro muy rara... ¿será la casa de Alphatemp?",
+  "message.turbopapu.hut_found": "Ves una aldea Mudokon, como las de Oddworld... ¡ahí vive Alphatemp!",
   "message.turbopapu.william_found": "¡Una balsa pirata en el horizonte! Alguien naranja te saluda con la aleta.",
   "message.turbopapu.gift": "%s te ha dado: %s",
   "message.turbopapu.liftoff": "¡DESPEGUE! ¡TURBO PAPU!",
@@ -65,5 +65,12 @@
   "message.turbopapu.victory": "¡SUALENIDUS HA SIDO DERROTADO! ¡Los Turbopapuenses despiertan!",
   "hud.turbopapu.asleep": "Estás dormido. Recibes el DOBLE de daño. ¡Bebe mate de Juanma!",
   "travel.turbopapu.to_planet": "Rumbo al Planeta TurboPapu...",
-  "travel.turbopapu.to_overworld": "Volviendo a casa..."
+  "travel.turbopapu.to_overworld": "Volviendo a casa...",
+  "block.turbopapu.regolito_papu": "Regolito Papu",
+  "block.turbopapu.roca_papu": "Roca Papu",
+  "entity.turbopapu.mudokon": "Mudokon",
+  "entity.turbopapu.abe": "Abe",
+  "item.turbopapu.mudokon_spawn_egg": "Huevo de Mudokon",
+  "item.turbopapu.abe_spawn_egg": "Huevo de Abe",
+  "message.turbopapu.village_found": "Ves cúpulas a lo lejos... ¡otra aldea de Turbopapuenses!"
 }
